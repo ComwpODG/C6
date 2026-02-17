@@ -1,154 +1,59 @@
-:root {
-  --bg: #070910;
-  --ui: #cfe7ff;
-  --uiDim: rgba(207,231,255,0.65);
-  --card: rgba(8, 12, 20, 0.92);
-  --cardBorder: rgba(207,231,255,0.22);
-}
-
 html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: radial-gradient(1200px 800px at 50% 40%, #0b1030 0%, var(--bg) 60%, #000 100%);
-  overflow: hidden;
-  font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  color: var(--ui);
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #070910;
+    font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif;
+    color: rgba(207,231,255,0.8);
 }
 
 #appRoot {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
 }
 
 #tableFrame {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none; /* we re-enable on canvas + arrows */
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
 }
 
-/* Hopefully this does perspective */
-#pixiMount {
-  width: min(96vw, 1400px);
-  height: min(92vh, 900px);
-  border-radius: 18px;
-  box-shadow:
-    0 22px 60px rgba(0,0,0,0.6),
-    0 2px 0 rgba(255,255,255,0.06) inset;
-  overflow: hidden;
-
-  transform-origin: 50% 60%;
-  transform: perspective(1200px) rotateX(32deg) scale(1.02);
-  pointer-events: auto;
+#canvasMount {
+    width: min(96vw, 1400px);
+    height: min(92vh, 900px);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 22px 60px rgba(0,0,0,0.6);
+    transform-origin: 50% 60%;
+    transform: perspective(1200px) rotateX(32deg) scale(1.02);
+    position: relative;
 }
 
-/* TODO remove vignette */
-#pixiMount::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.06) inset;
-  background: radial-gradient(900px 600px at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
-}
+    /* Vignette overlay */
+    #canvasMount::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        box-shadow: 0 0 0 2px rgba(255,255,255,0.06) inset;
+        background: radial-gradient(900px 600px at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
+    }
 
-#hud {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+#mapCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 #hint {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: var(--uiDim);
-  backdrop-filter: blur(6px);
-  pointer-events: auto;
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
 }
-
-#hoverCard {
-  position: absolute;
-  min-width: 240px;
-  max-width: 340px;
-  padding: 12px 12px 10px;
-  border-radius: 14px;
-  background: var(--card);
-  border: 1px solid var(--cardBorder);
-  box-shadow: 0 14px 40px rgba(0,0,0,0.55);
-  pointer-events: none;
-}
-
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-.name {
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  flex: 1;
-}
-.ownerPill {
-  font-size: 12px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color: var(--uiDim);
-  white-space: nowrap;
-}
-
-.iconsRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 6px 0 8px;
-}
-.iconPill {
-  font-size: 12px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: var(--uiDim);
-}
-
-.details {
-  font-size: 13px;
-  line-height: 1.35;
-  color: rgba(207,231,255,0.86);
-}
-
-.navArrow {
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(0,0,0,0.35);
-  color: rgba(207,231,255,0.9);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  pointer-events: auto;
-  backdrop-filter: blur(6px);
-  user-select: none;
-}
-.navArrow:hover { background: rgba(0,0,0,0.5); }
-.navArrow:active { transform: translateY(1px); }
-
-.navArrow.left  { left:  12px; top: 50%; transform: translateY(-50%); }
-.navArrow.right { right: 12px; top: 50%; transform: translateY(-50%); }
-.navArrow.up    { top:   12px; left: 50%; transform: translateX(-50%); }
-.navArrow.down  { bottom:12px; left: 50%; transform: translateX(-50%); }
-
-.navArrow[hidden] { display: none; }

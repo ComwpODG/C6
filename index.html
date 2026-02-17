@@ -3,45 +3,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Galaxy Map</title>
+    <title>Galaxy Map (Canvas)</title>
     <link rel="stylesheet" href="style.css" />
-
-
-
-    <!-- Let's see if I can remember how this works. crt stuff -->
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pixi-filters@latest/dist/browser/pixi-filters.min.js"></script>
 </head>
 <body>
-  <div id="appRoot">
-    <!-- Tilted "table map" wrapper -->
-    <div id="tableFrame">
-      <div id="pixiMount"></div>
-
-      <!-- To fix later -->
-      <button class="navArrow left"  id="navLeft"  aria-label="Go left">◀</button>
-      <button class="navArrow right" id="navRight" aria-label="Go right">▶</button>
-      <button class="navArrow up"    id="navUp"    aria-label="Go up">▲</button>
-      <button class="navArrow down"  id="navDown"  aria-label="Go down">▼</button>
-    </div>
-
-    <!-- Non-tilted overlay UI -->
-    <div id="hud">
-      <div id="hint">
-        Drag to pan • Wheel to zoom • Press <b>C</b> to toggle CRT
-      </div>
-
-      <div id="hoverCard" hidden>
-        <div class="titleRow">
-          <div id="hcName" class="name"></div>
-          <div id="hcOwner" class="ownerPill"></div>
+    <div id="appRoot">
+        <div id="tableFrame">
+            <div id="canvasMount">
+                <canvas id="mapCanvas"></canvas>
+            </div>
         </div>
-        <div id="hcIcons" class="iconsRow"></div>
-        <div id="hcDetails" class="details"></div>
-      </div>
-    </div>
-  </div>
 
-  <script src="app.js"></script>
+        <div id="hint">
+            Drag to pan / Wheel to zoom
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
