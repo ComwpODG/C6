@@ -34,6 +34,7 @@
 
     window.addEventListener("resize", resizeCanvas);
 
+    //commit please
     function loadImage(src) {
         return new Promise((resolve, reject) => {
             const img = new Image();
