@@ -1,9 +1,9 @@
 (() => {
     const canvas = document.getElementById("mapCanvas");
-    const mount = canvas; // use the canvas itself for sizing
+    const mount = canvas;
     const ctx = canvas.getContext("2d", { alpha: true });
 
-    // Camera in "world pixels" (same coordinate space as the image)
+    // Camera in world pixels
     const cam = {
         x: 0,
         y: 0,
@@ -20,7 +20,6 @@
 
     function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
-    // Resize canvas to match its CSS size (important for crisp rendering)
     function resizeCanvas() {
         const rect = mount.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -28,37 +27,50 @@
         canvas.width = Math.floor(rect.width * dpr);
         canvas.height = Math.floor(rect.height * dpr);
 
-        // Use CSS pixels for drawing coordinates
+        // draw in CSS pixels
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
         draw();
     }
 
     window.addEventListener("resize", resizeCanvas);
 
-    // Load galaxy image
-    const img = new Image();
-    img.src = "assets/galaxy1.png";
-    img.onload = () => {
-        // Start centered on the image
-        cam.x = img.width * 0.5;
-        cam.y = img.height * 0.5;
-        draw();
-    };
-    img.onerror = () => {
-        console.error("Failed to load assets/galaxy1.png (check path + case)");
-    };
+    function loadImage(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error(`Failed to load ${src} (check path + case)`));
+        });
+    }
 
-    function screenToWorld(sx, sy) {
-        // sx/sy are in CSS pixels relative to canvas
+    // --- Galaxies in world space ---
+    // Galaxy 1 is at origin. Galaxy 2 is left (-x) and down (+y).
+    const galaxies = [
+        { id: "g1", src: "assets/galaxy1.png", x: 0, y: 0, scale: 1.0, img: null },
+        { id: "g2", src: "assets/galaxy2.png", x: -4200, y: 1800, scale: 2.0, img: null }
+    ];
+
+    Promise.all(galaxies.map(g => loadImage(g.src)))
+        .then(images => {
+            for (let i = 0; i < galaxies.length; i++) galaxies[i].img = images[i];
+
+            // Start camera centered on galaxy1
+            const g1 = galaxies[0];
+            cam.x = g1.img.width * 0.5 + g1.x;
+            cam.y = g1.img.height * 0.5 + g1.y;
+
+            draw();
+        })
+        .catch(err => console.error(err));
+
+    function screenToWorld(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
-        const x = sx - rect.left;
-        const y = sy - rect.top;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
 
         const vw = rect.width;
         const vh = rect.height;
 
-        // Inverse of: screen = (world - cam) * scale + center
         const wx = (x - vw * 0.5) / cam.scale + cam.x;
         const wy = (y - vh * 0.5) / cam.scale + cam.y;
         return { x: wx, y: wy };
@@ -69,25 +81,28 @@
         const vw = rect.width;
         const vh = rect.height;
 
-        // Clear
         ctx.clearRect(0, 0, vw, vh);
 
-        // If image not loaded yet, draw a placeholder
-        if (!img.complete || !img.naturalWidth) {
-            ctx.fillStyle = "rgba(207,231,255,0.35)";
-            ctx.fillText("Loading assets/galaxy1.png ...", 20, 30);
+        // If images not ready yet
+        if (!galaxies[0].img) {
+            ctx.fillStyle = "rgba(207,231,255,0.5)";
+            ctx.fillText("Loading galaxy images...", 20, 30);
             return;
         }
 
-        // Set transform for camera:
-        // Move origin to viewport center, apply zoom, then translate world so cam is centered.
+        // Camera transform
         ctx.save();
         ctx.translate(vw * 0.5, vh * 0.5);
         ctx.scale(cam.scale, cam.scale);
         ctx.translate(-cam.x, -cam.y);
 
-        // Draw galaxy image in world space at (0,0)
-        ctx.drawImage(img, 0, 0);
+        // Draw galaxies (in world space)
+        for (const g of galaxies) {
+            if (!g.img) continue;
+            const w = g.img.width * g.scale;
+            const h = g.img.height * g.scale;
+            ctx.drawImage(g.img, g.x, g.y, w, h);
+        }
 
         ctx.restore();
     }
@@ -115,7 +130,7 @@
         cam.dragging = false;
     });
 
-    // Zoom: mouse wheel, anchor at mouse position
+    // Zoom: mouse wheel anchored at mouse position
     canvas.addEventListener("wheel", (e) => {
         e.preventDefault();
 
@@ -126,7 +141,6 @@
 
         const after = screenToWorld(e.clientX, e.clientY);
 
-        // Adjust camera so the world point under the mouse stays fixed
         cam.x += (before.x - after.x);
         cam.y += (before.y - after.y);
 
