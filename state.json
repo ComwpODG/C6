@@ -1,81 +1,47 @@
 {
-  "version": 1,
   "updatedUtc": "2026-02-17T00:00:00Z",
   "pollSeconds": 20,
-
   "factions": {
-    "FED":   { "name": "Federation", "color": "#4aa3ff" },
-    "XRIPX": { "name": "XRIPX",      "color": "#ff4a7a" },
-    "NEUT":  { "name": "Unclaimed",  "color": "#b9c1cf" }
+    "FED": {
+      "name": "Federation",
+      "color": "#00ffff"
+    },
+    "NEUT": {
+      "name": "Unclaimed",
+      "color": "#aaaaaa"
+    }
   },
-
   "iconLegend": {
-    "shipyard": "Shipyard",
     "capital": "Capital",
-    "anomaly": "Anomaly",
-    "ruins": "Ruins",
-    "trade": "Trade Hub",
-    "danger": "Danger"
+    "shipyard": "Shipyard"
   },
-
   "galaxies": [
     {
       "id": "G1",
       "name": "Andromeda Spur",
-      "origin": [0, 0],
-      "background": { "image": "assets/galaxy1.png", "width": 4096, "height": 4096 },
-
+      "pos": [ 0, 0 ],
+      "scale": 1.0,
+      "image": "assets/galaxy1.png",
       "systems": [
-        { "id": "SOL", "name": "Sol", "pos": [2100, 2050], "owner": "FED", "icons": ["capital","shipyard","trade"], "details": "Primary hub. Heavy defenses and logistics." },
-        { "id": "KIRA", "name": "Kira’s Gate", "pos": [2650, 1800], "owner": "FED", "icons": ["anomaly"], "details": "A stabilized rift structure. Navigation is… weird." },
-        { "id": "MONO", "name": "Monolia", "pos": [1550, 2400], "owner": "NEUT", "icons": ["ruins"], "details": "Precursor remains. Salvage and rumors." },
-        { "id": "IOD", "name": "IoD Chasmline", "pos": [3100, 2650], "owner": "XRIPX", "icons": ["danger"], "details": "Hostile territory. Interdiction reported." },
-        { "id": "GLA", "name": "Glaceus Drift", "pos": [1100, 1550], "owner": "NEUT", "icons": ["trade"], "details": "Cold lanes. Quiet, but profitable." }
-      ],
-
-      "territories": [
         {
-          "id": "fed_core",
+          "id": "SOL",
+          "name": "Sol",
+          "pos": [ 2100, 2050 ],
           "owner": "FED",
-          "alpha": 0.18,
-          "polygon": [[1750,1750],[2650,1600],[3050,2050],[2700,2600],[1850,2500]]
-        },
-        {
-          "id": "xripx_hold",
-          "owner": "XRIPX",
-          "alpha": 0.14,
-          "polygon": [[2950,2400],[3650,2400],[3800,3000],[3100,3200]]
+          "icons": [ "capital", "shipyard" ],
+          "details": "Hello!"
         }
-      ]
+      ],
+      "territories": []
     },
-
     {
       "id": "G2",
       "name": "Rift Expanse",
-      "origin": [5200, 800],
-      "background": { "image": "assets/galaxy2.png", "width": 4096, "height": 4096 },
-
-      "systems": [
-        { "id": "R1", "name": "Vantor", "pos": [1200, 1900], "owner": "XRIPX", "icons": ["shipyard","danger"], "details": "Industrial output. Armed escorts common." },
-        { "id": "R2", "name": "Eidolon Reach", "pos": [2400, 1500], "owner": "NEUT", "icons": ["anomaly"], "details": "Sensor ghosts on long baseline arrays." },
-        { "id": "R3", "name": "Tunnelscape Node", "pos": [2800, 2550], "owner": "FED", "icons": ["trade"], "details": "A corridor-market built around stable routes." },
-        { "id": "R4", "name": "Iga Bloom", "pos": [1700, 2750], "owner": "NEUT", "icons": ["ruins","danger"], "details": "Kudzu-fungus remnants. Explosive seed pods still trigger." }
-      ],
-
-      "territories": [
-        {
-          "id": "fed_outpost",
-          "owner": "FED",
-          "alpha": 0.16,
-          "polygon": [[2350,2300],[3100,2350],[3200,2850],[2550,3000]]
-        },
-        {
-          "id": "xripx_arc",
-          "owner": "XRIPX",
-          "alpha": 0.13,
-          "polygon": [[800,1500],[1750,1450],[1950,2200],[1000,2300]]
-        }
-      ]
+      "pos": [ 5200, 800 ],
+      "scale": 2.0,
+      "image": "assets/galaxy2.png",
+      "systems": [],
+      "territories": []
     }
   ]
 }
