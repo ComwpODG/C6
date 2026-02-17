@@ -48,7 +48,7 @@
     // Galaxy 1 is at origin. Galaxy 2 is left (-x) and down (+y).
     const galaxies = [
         { id: "g1", src: "assets/galaxy1.png", x: 0, y: 0, scale: 1.0, img: null },
-        { id: "g2", src: "assets/galaxy2.png", x: -4200, y: 1800, scale: 2.0, img: null }
+        { id: "g2", src: "assets/galaxy2.png", x: -5200, y: 3800, scale: 3.4, img: null }
     ];
 
     Promise.all(galaxies.map(g => loadImage(g.src)))
