@@ -1,6 +1,6 @@
 (() => {
     const canvas = document.getElementById("mapCanvas");
-    const mount = document.getElementById("canvasMount");
+    const mount = canvas; // use the canvas itself for sizing
     const ctx = canvas.getContext("2d", { alpha: true });
 
     // Camera in "world pixels" (same coordinate space as the image)

@@ -13,38 +13,26 @@ html, body {
     height: 100vh;
 }
 
-#tableFrame {
+/* Fullscreen canvas. Oversize it so the tilt never reveals “outside” edges. */
+#mapCanvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* Oversize: important so tilt doesn't show background corners */
+    width: 140vw;
+    height: 140vh;
+    transform-origin: 50% 55%;
+    transform: translate(-50%, -50%) perspective(1400px) rotateX(28deg);
+    display: block;
+}
+
+/* Optional vignette that is fullscreen, not “table edge” */
+#appRoot::after {
+    content: "";
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
-}
-
-#canvasMount {
-    width: min(96vw, 1400px);
-    height: min(92vh, 900px);
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 22px 60px rgba(0,0,0,0.6);
-    transform-origin: 50% 60%;
-    transform: perspective(1200px) rotateX(32deg) scale(1.02);
-    position: relative;
-}
-
-    /* Vignette overlay */
-    #canvasMount::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        box-shadow: 0 0 0 2px rgba(255,255,255,0.06) inset;
-        background: radial-gradient(900px 600px at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
-    }
-
-#mapCanvas {
-    width: 100%;
-    height: 100%;
-    display: block;
+    pointer-events: none;
+    background: radial-gradient(1100px 800px at 50% 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.38) 100%);
 }
 
 #hint {
