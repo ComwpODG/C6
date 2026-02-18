@@ -45,3 +45,29 @@ html, body {
     border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(6px);
 }
+
+#galaxyLabel {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    pointer-events: none;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.65);
+}
+
+#galaxyName {
+    font-size: 28px;
+    letter-spacing: 2px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: rgba(207,231,255,0.92);
+}
+
+#galaxyDesc {
+    font-size: 14px;
+    max-width: min(60vw, 900px);
+    color: rgba(207,231,255,0.72);
+    line-height: 1.2;
+}

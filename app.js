@@ -3,6 +3,41 @@
     const mount = canvas;
     const ctx = canvas.getContext("2d", { alpha: true });
 
+    const galaxyNameEl = document.getElementById("galaxyName");
+    const galaxyDescEl = document.getElementById("galaxyDesc");
+    let activeGalaxyId = null;
+
+    function updateActiveGalaxyLabel() {
+        if (!galaxies || galaxies.length === 0 || !galaxies[0].img) return;
+
+        // pick the galaxy whose TOP-LEFT is closest to camera center (world coords)
+        let best = null;
+        let bestD2 = Infinity;
+
+        for (const g of galaxies) {
+            // top-left "anchor" at g.x, g.y (as requested)
+            const dx = cam.x - g.x;
+            const dy = cam.y - g.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < bestD2) {
+                bestD2 = d2;
+                best = g;
+            }
+        }
+
+        if (!best) return;
+        if (best.id === activeGalaxyId) return; // no DOM churn
+
+        activeGalaxyId = best.id;
+
+        const nm = (best.name ?? best.id ?? "").toString();
+        const ds = (best.desc ?? "").toString();
+
+        galaxyNameEl.textContent = nm;
+        galaxyDescEl.textContent = ds;
+    }
+
+
     // Camera in world pixels
     const cam = {
         x: 0,
@@ -76,7 +111,7 @@
                 const y = Number.isFinite(g.y) ? g.y : 0;
                 const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
 
-                return { id, src, x, y, scale, img: null };
+                return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
             });
 
             if (galaxies.length === 0) {
@@ -95,6 +130,8 @@
             cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
 
             draw();
+            updateActiveGalaxyLabel();
+
         } catch (err) {
             console.error(err);
             // draw a friendly message on the canvas too
@@ -147,6 +184,8 @@
         }
 
         ctx.restore();
+        updateActiveGalaxyLabel();
+
     }
 
     // Pan: pointer drag
