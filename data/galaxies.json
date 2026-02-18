@@ -1,0 +1,18 @@
+[
+  {
+    "id": "g1",
+    "src": "assets/galaxy1.png",
+    "desc": "Azapall is chaos. It is an extremely large galaxy even of its kind, corrupted by an interstellar gaseous mixture of nitrogen and other typical atmospheric chemicals, and it has been fought over for many hundreds of thousands of years. Perhaps millions.",
+    "x": 0,
+    "y": 0,
+    "scale": 1.0
+  },
+  {
+    "id": "g2",
+    "src": "assets/galaxy2.png",
+    "desc": "Veils is an outskirt galaxy which is rather quiet when it comes to wars in comparison to the chaotic azapall. While that makes it an appealing place to live, it is very poor in star density, causing it to be a poorer candidate for civilizations looking to evolve into the far future of space tech.",
+    "x": -7200,
+    "y": 3800,
+    "scale": 3.4
+  }
+]

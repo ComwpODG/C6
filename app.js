@@ -34,7 +34,6 @@
 
     window.addEventListener("resize", resizeCanvas);
 
-    //commit please
     function loadImage(src) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -44,25 +43,67 @@
         });
     }
 
-    // --- Galaxies in world space ---
-    // Galaxy 1 is at origin. Galaxy 2 is left (-x) and down (+y).
-    const galaxies = [
-        { id: "g1", src: "assets/galaxy1.png", x: 0, y: 0, scale: 1.0, img: null },
-        { id: "g2", src: "assets/galaxy2.png", x: -5200, y: 3800, scale: 3.4, img: null }
-    ];
+    async function loadGalaxiesJson() {
+        // cache-bust so updates show up quickly on GitHub Pages
+        const res = await fetch(`data/galaxies.json?cb=${Date.now()}`);
+        if (!res.ok) throw new Error(`Failed to fetch data/galaxies.json: HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("data/galaxies.json must be a JSON array");
+        return data;
+    }
 
-    Promise.all(galaxies.map(g => loadImage(g.src)))
-        .then(images => {
-            for (let i = 0; i < galaxies.length; i++) galaxies[i].img = images[i];
+    // --- Galaxies in world space (loaded from JSON) ---
+    let galaxies = []; // each: {id, src, x, y, scale, img}
 
-            // Start camera centered on galaxy1
+    async function init() {
+        try {
+            const raw = await loadGalaxiesJson();
+
+            // Normalize + validate
+            galaxies = raw.map((g, i) => {
+                const id = (typeof g.id === "string" && g.id.trim()) ? g.id.trim() : `g${i + 1}`;
+                const src = (typeof g.src === "string" && g.src.trim())
+                    ? g.src.trim()
+                    : (typeof g.image === "string" && g.image.trim())
+                        ? g.image.trim()
+                        : null;
+
+                if (!src) {
+                    throw new Error(`Galaxy entry ${i} is missing "src" (or "image")`);
+                }
+
+                const x = Number.isFinite(g.x) ? g.x : 0;
+                const y = Number.isFinite(g.y) ? g.y : 0;
+                const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
+
+                return { id, src, x, y, scale, img: null };
+            });
+
+            if (galaxies.length === 0) {
+                throw new Error("data/galaxies.json contained 0 galaxies");
+            }
+
+            // Load all images
+            const images = await Promise.all(galaxies.map(g => loadImage(g.src)));
+            for (let i = 0; i < galaxies.length; i++) {
+                galaxies[i].img = images[i];
+            }
+
+            // Start camera centered on the first galaxy in the JSON
             const g1 = galaxies[0];
-            cam.x = g1.img.width * 0.5 + g1.x;
-            cam.y = g1.img.height * 0.5 + g1.y;
+            cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
+            cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
 
             draw();
-        })
-        .catch(err => console.error(err));
+        } catch (err) {
+            console.error(err);
+            // draw a friendly message on the canvas too
+            const rect = canvas.getBoundingClientRect();
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            ctx.fillStyle = "rgba(207,231,255,0.85)";
+            ctx.fillText("Failed to load galaxies.json or images. Check console.", 20, 30);
+        }
+    }
 
     function screenToWorld(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
@@ -85,9 +126,9 @@
         ctx.clearRect(0, 0, vw, vh);
 
         // If images not ready yet
-        if (!galaxies[0].img) {
+        if (galaxies.length === 0 || !galaxies[0].img) {
             ctx.fillStyle = "rgba(207,231,255,0.5)";
-            ctx.fillText("Loading galaxy images...", 20, 30);
+            ctx.fillText("Loading galaxies...", 20, 30);
             return;
         }
 
@@ -150,4 +191,5 @@
 
     // Kick off
     resizeCanvas();
+    init();
 })();
