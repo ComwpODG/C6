@@ -51,7 +51,6 @@ html, body {
     top: 14px;
     left: 14px;
     display: flex;
-    align-items: baseline;
     gap: 14px;
     pointer-events: none;
     text-shadow: 0 2px 12px rgba(0,0,0,0.65);
