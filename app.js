@@ -16,8 +16,11 @@
 
         for (const g of galaxies) {
             // top-left "anchor" at g.x, g.y (as requested)
-            const dx = cam.x - g.x;
-            const dy = cam.y - g.y;
+            const cx = g.x + (g.img.width * g.scale) * 0.5;
+            const cy = g.y + (g.img.height * g.scale) * 0.5;
+
+            const dx = cam.x - cx;
+            const dy = cam.y - cy;
             const d2 = dx * dx + dy * dy;
             if (d2 < bestD2) {
                 bestD2 = d2;
@@ -69,14 +72,19 @@
 
     window.addEventListener("resize", resizeCanvas);
 
-    function loadImage(src) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = src;
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error(`Failed to load ${src} (check path + case)`));
-        });
+    const imageCache = new Map(); // src -> Promise<HTMLImageElement>
+    function getImageCached(src) {
+        if (!imageCache.has(src)) {
+            imageCache.set(src, new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error(`Failed to load ${src} (check path + case)`));
+            }));
+        }
+        return imageCache.get(src);
     }
+
 
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
@@ -87,12 +95,25 @@
         return data;
     }
 
+    async function loadSectorsJson() {
+        // cache-bust so updates show up quickly on GitHub Pages
+        const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
+        if (!res.ok) throw new Error(`Failed to fetch data/sectors.json: HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("data/sectors.json must be a JSON array");
+        return data;
+    }
+
     // --- Galaxies in world space (loaded from JSON) ---
     let galaxies = []; // each: {id, src, x, y, scale, img}
+    // sectors also in world space
+    let sectors = []; // each: {x, y, src, name, img}
+
 
     async function init() {
         try {
             const raw = await loadGalaxiesJson();
+            const rawSectors = await loadSectorsJson(); //Load the sectors
 
             // Normalize + validate
             galaxies = raw.map((g, i) => {
@@ -119,10 +140,35 @@
             }
 
             // Load all images
-            const images = await Promise.all(galaxies.map(g => loadImage(g.src)));
+            const images = await Promise.all(galaxies.map(g => getImageCached(g.src)));
             for (let i = 0; i < galaxies.length; i++) {
                 galaxies[i].img = images[i];
             }
+
+            //Do the same for sectors
+            // Normalize sectors
+            sectors = rawSectors.map((s, i) => {
+                const x = Number.isFinite(s.x) ? s.x : 0;
+                const y = Number.isFinite(s.y) ? s.y : 0;
+                const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
+                const name = (s.name ?? `Sector ${i + 1}`).toString();
+
+                if (!src) throw new Error(`Sector entry ${i} missing "src"`);
+
+                return { x, y, src, name, img: null };
+            });
+
+            // Preload star images ONCE per unique src, then assign to every sector
+            const uniqueStarSrcs = [...new Set(sectors.map(s => s.src))];
+            const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
+            const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
+
+            for (const s of sectors) {
+                s.img = starImgBySrc.get(s.src);
+            }
+
+
+
 
             // Start camera centered on the first galaxy in the JSON
             const g1 = galaxies[0];
@@ -182,6 +228,17 @@
             const h = g.img.height * g.scale;
             ctx.drawImage(g.img, g.x, g.y, w, h);
         }
+
+        // Draw sectors/stars (world space)
+        for (const s of sectors) {
+            if (!s.img) continue;
+
+            // Draw centered on (s.x, s.y)
+            const w = s.img.width;
+            const h = s.img.height;
+            ctx.drawImage(s.img, s.x - w * 0.5, s.y - h * 0.5);
+        }
+
 
         ctx.restore();
         updateActiveGalaxyLabel();
