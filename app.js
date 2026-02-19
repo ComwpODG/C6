@@ -202,10 +202,10 @@
     }
 
     // Star visibility + sizing rules
-    const STAR_SHOW_ZOOM = 1.0;   // below this, stars don't render at all
-    const STAR_MAX_AT_ZOOM = 2.0; // reaches max size at 2x zoom
+    const STAR_SHOW_ZOOM = 0.5;   // below this, stars don't render at all
+    const STAR_MAX_AT_ZOOM = 1.3; // reaches max size at 2x zoom
     const STAR_MIN_PX_AT_1X = 4;  // "tiny" at 1x (tune: 2..6)
-    const STAR_MAX_PX = 26;       // cap size once you hit 2x (and above)
+    const STAR_MAX_PX = 32;       // cap size once you hit 2x (and above)
 
     // Culling padding (in screen px -> converted to world units)
     const STAR_CULL_PAD_PX = 120;
