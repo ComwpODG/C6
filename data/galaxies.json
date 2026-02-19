@@ -16,5 +16,14 @@
     "x": -7200,
     "y": 3800,
     "scale": 3.4
+  },
+  {
+    "id": "g3",
+    "src": "assets/galaxy3.png",
+    "name": "Nith",
+    "desc": "this is a test... or is it",
+    "x": 1200,
+    "y": -17800,
+    "scale": 4.0
   }
 ]
