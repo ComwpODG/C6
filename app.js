@@ -201,6 +201,16 @@
         return { x: wx, y: wy };
     }
 
+    // Star visibility + sizing rules
+    const STAR_SHOW_ZOOM = 1.0;   // below this, stars don't render at all
+    const STAR_MAX_AT_ZOOM = 2.0; // reaches max size at 2x zoom
+    const STAR_MIN_PX_AT_1X = 4;  // "tiny" at 1x (tune: 2..6)
+    const STAR_MAX_PX = 26;       // cap size once you hit 2x (and above)
+
+    // Culling padding (in screen px -> converted to world units)
+    const STAR_CULL_PAD_PX = 120;
+
+
     function draw() {
         const rect = canvas.getBoundingClientRect();
         const vw = rect.width;
@@ -230,13 +240,39 @@
         }
 
         // Draw sectors/stars (world space)
-        for (const s of sectors) {
-            if (!s.img) continue;
+        // Draw sectors/stars with culling and size rules
+        if (cam.scale >= STAR_SHOW_ZOOM) {
+            // Visible world rect derived from camera + viewport
+            const halfW_world = (vw * 0.5) / cam.scale;
+            const halfH_world = (vh * 0.5) / cam.scale;
 
-            // Draw centered on (s.x, s.y)
-            const w = s.img.width;
-            const h = s.img.height;
-            ctx.drawImage(s.img, s.x - w * 0.5, s.y - h * 0.5);
+            // Add padding so stars don't pop in at the exact edge
+            const pad_world = STAR_CULL_PAD_PX / cam.scale;
+
+            const minX = cam.x - halfW_world - pad_world;
+            const maxX = cam.x + halfW_world + pad_world;
+            const minY = cam.y - halfH_world - pad_world;
+            const maxY = cam.y + halfH_world + pad_world;
+
+            // Ramp star size from tiny@1x to max@2x
+            const t = Math.max(0, Math.min(1, (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM)));
+            const desiredPx = STAR_MIN_PX_AT_1X + t * (STAR_MAX_PX - STAR_MIN_PX_AT_1X);
+
+            // Convert desired screen pixels to world units so it stays visually capped
+            const worldH = desiredPx / cam.scale;
+
+            for (const s of sectors) {
+                if (!s.img) continue;
+
+                // Cull first (cheap)
+                if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
+
+                // Maintain aspect ratio
+                const aspect = s.img.width / Math.max(1, s.img.height);
+                const worldW = worldH * aspect;
+
+                ctx.drawImage(s.img, s.x - worldW * 0.5, s.y - worldH * 0.5, worldW, worldH);
+            }
         }
 
 
