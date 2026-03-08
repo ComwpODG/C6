@@ -95,6 +95,7 @@
         return data;
     }
 
+    //TODO: instead of one monolithic sectors.json, have individual files for each galaxy
     async function loadSectorsJson() {
         // cache-bust so updates show up quickly on GitHub Pages
         const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
@@ -116,7 +117,9 @@
             const rawSectors = await loadSectorsJson(); //Load the sectors
 
             // Normalize + validate
+            // g is the actual object, i is object ID in json array
             galaxies = raw.map((g, i) => {
+                // if null after trim, ID becomes g1, g2 etc
                 const id = (typeof g.id === "string" && g.id.trim()) ? g.id.trim() : `g${i + 1}`;
                 const src = (typeof g.src === "string" && g.src.trim())
                     ? g.src.trim()
@@ -132,6 +135,8 @@
                 const y = Number.isFinite(g.y) ? g.y : 0;
                 const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
 
+                // this is shorthand notation
+                // equivalent to saying id: id, src: src etc
                 return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
             });
 
@@ -140,6 +145,7 @@
             }
 
             // Load all images
+            // promise says that if ANY load fails, nothing gets saved
             const images = await Promise.all(galaxies.map(g => getImageCached(g.src)));
             for (let i = 0; i < galaxies.length; i++) {
                 galaxies[i].img = images[i];
@@ -176,7 +182,9 @@
             cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
 
             draw();
-            updateActiveGalaxyLabel();
+
+            // this always runs at the end of draw();
+            //updateActiveGalaxyLabel();
 
         } catch (err) {
             console.error(err);
@@ -254,12 +262,13 @@
             const minY = cam.y - halfH_world - pad_world;
             const maxY = cam.y + halfH_world + pad_world;
 
+            // deprecated feature, replaced with fading in and out
             // Ramp star size from tiny@1x to max@2x
-            const t = Math.max(0, Math.min(1, (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM)));
-            const desiredPx = STAR_MIN_PX_AT_1X + t * (STAR_MAX_PX - STAR_MIN_PX_AT_1X);
+            //const t = Math.max(0, Math.min(1, (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM)));
+            //const desiredPx = STAR_MIN_PX_AT_1X + t * (STAR_MAX_PX - STAR_MIN_PX_AT_1X);
 
             // Convert desired screen pixels to world units so it stays visually capped
-            const worldH = desiredPx / cam.scale;
+            //const worldH = desiredPx / cam.scale;
 
             for (const s of sectors) {
                 if (!s.img) continue;
@@ -268,10 +277,11 @@
                 if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
 
                 // Maintain aspect ratio
-                const aspect = s.img.width / Math.max(1, s.img.height);
-                const worldW = worldH * aspect;
+                //const aspect = s.img.width / Math.max(1, s.img.height);
+                //const worldW = worldH * aspect;
 
-                ctx.drawImage(s.img, s.x - worldW * 0.5, s.y - worldH * 0.5, worldW, worldH);
+                // TODO: dynamically adjust size based on canvas size (?) or at least find better values
+                ctx.drawImage(s.img, s.x - worldW * 0.5, s.y - worldH * 0.5, 50, 50);
             }
         }
 
