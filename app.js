@@ -47,7 +47,7 @@
     const cam = {
         x: 0,
         y: 0,
-        scale: 0.35,
+        scale: 0.2,
         dragging: false,
         startMouseX: 0,
         startMouseY: 0,
@@ -231,8 +231,8 @@
     }
 
     // Star visibility + sizing rules
-    const STAR_SHOW_ZOOM = 0.3;   // below this, stars don't render at all
-    const STAR_MAX_AT_ZOOM = 1.3; // reaches max opacity at 2x zoom
+    const STAR_SHOW_ZOOM = 0.2;   // below this, stars don't render at all
+    const STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
     const STAR_MIN_PX_AT_1X = 4;  // "tiny" at 1x (tune: 2..6)
     const STAR_MAX_PX = 32;       // cap size once you hit 2x (and above)
 
@@ -299,10 +299,9 @@
             // Convert desired screen pixels to world units so it stays visually capped
             //const worldH = desiredPx / cam.scale;
 
-            // TODO: right now, this relies on STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM being exactly 1
-            // decouple them so the thresholds can be arbitrary
             // 0.0 fully transparent, 1.0 fully opaque
-            overlayCtx.globalAlpha = 1 - (STAR_MAX_AT_ZOOM - cam.scale) <= 1 ? 1 - (STAR_MAX_AT_ZOOM - cam.scale) : 1;
+            var fadeAmt = (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM);
+            overlayCtx.globalAlpha = fadeAmt <= 1 ? fadeAmt : 1;
             //console.log(STAR_MAX_AT_ZOOM - cam.scale);
 
             for (const s of sectors) {
