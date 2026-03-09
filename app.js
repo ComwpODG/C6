@@ -60,17 +60,6 @@
 
     function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
-    function worldToScreen(x, y) {
-        var xP = x;
-        var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
-        var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
-
-        //mapCanvas.
-        // TODO: make both angle and distance dynamic
-        // 1400 is perspective(1400px)
-        return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
-    }
-
     //for when the window is resized
     function resizeCanvas() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -122,20 +111,33 @@
         const res = await fetch(`data/sectors.json`);
         if (!res.ok) throw new Error(`Failed to fetch data/sectors.json: HTTP ${res.status}`);
         const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("data/sectors.json must be a JSON array");
-        return data;
+        if (!Array.isArray(data["sectors"])) throw new Error("section 'sectors' of data/sectors.json must be a JSON array");
+        return data["sectors"];
+    }
+
+    async function loadGalacticSectorsJson() {
+        // cache-bust so updates show up quickly on GitHub Pages
+        //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
+        const res = await fetch(`data/sectors.json`);
+        if (!res.ok) throw new Error(`Failed to fetch data/sectors.json: HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data["galacticSectors"])) throw new Error("section 'galacticSectors' of data/sectors.json must be a JSON array");
+        return data["galacticSectors"];
     }
 
     // --- Galaxies in world space (loaded from JSON) ---
     let galaxies = []; // each: {id, src, x, y, scale, img}
     // sectors also in world space
     let sectors = []; // each: {x, y, src, name, img}
+    // galactic sectors in world space
+    let galacticSectors = []; // each {name, vertices[x1, y1 ...]}
 
 
     async function init() {
         try {
             const raw = await loadGalaxiesJson();
             const rawSectors = await loadSectorsJson(); //Load the sectors
+            const rawGalacticSectors = await loadGalacticSectorsJson();
 
             // Normalize + validate
             // g is the actual object, i is object ID in json array
@@ -195,6 +197,14 @@
             }
 
 
+            // Load galactic sectors
+            galacticSectors = rawGalacticSectors.map((s, i) => {
+                const name = (s.name ?? `Sector ${i + 1}`).toString();
+                let vertices = s.vertices;
+
+                return {name, vertices};
+            });
+
 
 
             // Start camera centered on the first galaxy in the JSON
@@ -228,6 +238,18 @@
         const wx = (x - vw * 0.5) / cam.scale + cam.x;
         const wy = (y - vh * 0.5) / cam.scale + cam.y;
         return { x: wx, y: wy };
+    }
+
+    // TODO: fix such that it accepts slant
+    function worldToScreen(x, y) {
+        var xP = x;
+        var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
+        var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
+
+        //mapCanvas.
+        // TODO: make both angle and distance dynamic
+        // 1400 is perspective(1400px)
+        return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
     }
 
     // Star visibility + sizing rules
@@ -276,6 +298,35 @@
             mapCtx.drawImage(g.img, g.x, g.y, w, h);
         }
 
+        // Draw galacic sectors
+        mapCtx.lineWidth = 100;
+        mapCtx.globalAlpha = 0.5;
+        mapCtx.strokeStyle = "#000000";
+
+        for(const s of galacticSectors)
+        {
+            if(s.vertices.length < 2) continue;
+            var lastPair = {x:null, y:null};
+            for (const v of s.vertices){
+                if(lastPair.x === null)
+                    lastPair = {x:v.x, y:v.y};
+                else
+                {
+                    mapCtx.beginPath();
+                    mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+                    mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
+                    mapCtx.stroke();
+
+                    lastPair = {x:v.x, y:v.y};
+                }
+            }
+            mapCtx.beginPath();
+            mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+            mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
+            mapCtx.stroke();
+        }
+        mapCtx.globalAlpha = 1.0;
+
         // Draw sectors/stars (world space)
         // Draw sectors/stars with culling and size rules
         if (cam.scale >= STAR_SHOW_ZOOM) {
@@ -311,14 +362,14 @@
                 if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
 
                 // Maintain aspect ratio
-                const aspect = s.img.width / Math.max(1, s.img.height);
+                //const aspect = s.img.width / Math.max(1, s.img.height);
                 
                 // get screen coordinates from map coordinates
                 //var pos = worldToScreen(s.x, s.y);
 
                 // TODO: find better scaling factors, finish the scaler as per given specs
                 //overlayCtx.drawImage(s.img, pos.x - cam.scale, pos.y - (cam.scale * aspect), 50, 50);
-                overlayCtx.drawImage(s.img, s.x - cam.scale, s.y - (cam.scale * aspect), 50 / cam.scale, 50 / cam.scale);
+                overlayCtx.drawImage(s.img, s.x + cam.scale - (s.img.width / 2 / cam.scale), s.y + cam.scale - (s.img.height / 2 / cam.scale), 50 / cam.scale, 50 / cam.scale);
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
