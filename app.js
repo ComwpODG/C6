@@ -1,7 +1,9 @@
 (() => {
-    const canvas = document.getElementById("mapCanvas");
-    const mount = canvas;
-    const ctx = canvas.getContext("2d", { alpha: true });
+    const mapCanvas = document.getElementById("mapCanvas");
+    const mapCtx = mapCanvas.getContext("2d", { alpha: true });
+
+    const overlayCanvas = document.getElementById("overlayCanvas");
+    const overlayCtx = overlayCanvas.getContext("2d", { alpha: true });
 
     const galaxyNameEl = document.getElementById("galaxyName");
     const galaxyDescEl = document.getElementById("galaxyDesc");
@@ -58,15 +60,32 @@
 
     function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
+    function worldToScreen(x, y) {
+        var xP = x;
+        var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
+        var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
+
+        //mapCanvas.
+        // TODO: make both angle and distance dynamic
+        // 1400 is perspective(1400px)
+        return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
+    }
+
+    //for when the window is resized
     function resizeCanvas() {
-        const rect = mount.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-        canvas.width = Math.floor(rect.width * dpr);
-        canvas.height = Math.floor(rect.height * dpr);
+        const mapRect = mapCanvas.getBoundingClientRect();
+        mapCanvas.width = Math.floor(mapRect.width * dpr);
+        mapCanvas.height = Math.floor(mapRect.height * dpr);
+
+        const overlayRect = overlayCanvas.getBoundingClientRect();
+        overlayCanvas.width = Math.floor(overlayRect.width * dpr);
+        overlayCanvas.height = Math.floor(overlayRect.height * dpr);
 
         // draw in CSS pixels
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        overlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         draw();
     }
 
@@ -88,7 +107,8 @@
 
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
-        const res = await fetch(`data/galaxies.json?cb=${Date.now()}`);
+        //const res = await fetch(`data/galaxies.json?cb=${Date.now()}`);
+        const res = await fetch(`data/galaxies.json`);
         if (!res.ok) throw new Error(`Failed to fetch data/galaxies.json: HTTP ${res.status}`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("data/galaxies.json must be a JSON array");
@@ -98,7 +118,8 @@
     //TODO: instead of one monolithic sectors.json, have individual files for each galaxy
     async function loadSectorsJson() {
         // cache-bust so updates show up quickly on GitHub Pages
-        const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
+        //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
+        const res = await fetch(`data/sectors.json`);
         if (!res.ok) throw new Error(`Failed to fetch data/sectors.json: HTTP ${res.status}`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("data/sectors.json must be a JSON array");
@@ -154,8 +175,8 @@
             //Do the same for sectors
             // Normalize sectors
             sectors = rawSectors.map((s, i) => {
-                const x = Number.isFinite(s.x) ? s.x : 0;
-                const y = Number.isFinite(s.y) ? s.y : 0;
+                const x = Number.isFinite(s.x) ? s.x / 2.5 : 0;
+                const y = Number.isFinite(s.y) ? s.y / 2.5 : 0;
                 const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
                 const name = (s.name ?? `Sector ${i + 1}`).toString();
 
@@ -188,16 +209,16 @@
 
         } catch (err) {
             console.error(err);
-            // draw a friendly message on the canvas too
-            const rect = canvas.getBoundingClientRect();
-            ctx.clearRect(0, 0, rect.width, rect.height);
-            ctx.fillStyle = "rgba(207,231,255,0.85)";
-            ctx.fillText("Failed to load galaxies.json or images. Check console.", 20, 30);
+            // draw a friendly message on the mapCanvas too
+            const rect = mapCanvas.getBoundingClientRect();
+            mapCtx.clearRect(0, 0, rect.width, rect.height);
+            mapCtx.fillStyle = "rgba(207,231,255,0.85)";
+            mapCtx.fillText("Failed to load galaxies.json or images. Check console.", 20, 30);
         }
     }
 
     function screenToWorld(clientX, clientY) {
-        const rect = canvas.getBoundingClientRect();
+        const rect = mapCanvas.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
 
@@ -210,8 +231,8 @@
     }
 
     // Star visibility + sizing rules
-    const STAR_SHOW_ZOOM = 0.25;   // below this, stars don't render at all
-    const STAR_MAX_AT_ZOOM = 1.3; // reaches max size at 2x zoom
+    const STAR_SHOW_ZOOM = 0.3;   // below this, stars don't render at all
+    const STAR_MAX_AT_ZOOM = 1.3; // reaches max opacity at 2x zoom
     const STAR_MIN_PX_AT_1X = 4;  // "tiny" at 1x (tune: 2..6)
     const STAR_MAX_PX = 32;       // cap size once you hit 2x (and above)
 
@@ -220,31 +241,39 @@
 
 
     function draw() {
-        const rect = canvas.getBoundingClientRect();
+        const rect = mapCanvas.getBoundingClientRect();
         const vw = rect.width;
         const vh = rect.height;
 
-        ctx.clearRect(0, 0, vw, vh);
+        mapCtx.clearRect(0, 0, vw, vh);
+
+        // TODO: separate map from overlay
+        overlayCtx.clearRect(0, 0, vw, vh);
 
         // If images not ready yet
         if (galaxies.length === 0 || !galaxies[0].img) {
-            ctx.fillStyle = "rgba(207,231,255,0.5)";
-            ctx.fillText("Loading galaxies...", 20, 30);
+            mapCtx.fillStyle = "rgba(207,231,255,0.5)";
+            mapCtx.fillText("Loading galaxies...", 20, 30);
             return;
         }
 
         // Camera transform
-        ctx.save();
-        ctx.translate(vw * 0.5, vh * 0.5);
-        ctx.scale(cam.scale, cam.scale);
-        ctx.translate(-cam.x, -cam.y);
+        mapCtx.save();
+        mapCtx.translate(vw * 0.5, vh * 0.5);
+        mapCtx.scale(cam.scale, cam.scale);
+        mapCtx.translate(-cam.x, -cam.y);
+
+        overlayCtx.save();
+        overlayCtx.translate(vw * 0.5, vh * 0.5);
+        overlayCtx.scale(cam.scale, cam.scale);
+        overlayCtx.translate(-cam.x, -cam.y);
 
         // Draw galaxies (in world space)
         for (const g of galaxies) {
             if (!g.img) continue;
             const w = g.img.width * g.scale;
             const h = g.img.height * g.scale;
-            ctx.drawImage(g.img, g.x, g.y, w, h);
+            mapCtx.drawImage(g.img, g.x, g.y, w, h);
         }
 
         // Draw sectors/stars (world space)
@@ -270,6 +299,12 @@
             // Convert desired screen pixels to world units so it stays visually capped
             //const worldH = desiredPx / cam.scale;
 
+            // TODO: right now, this relies on STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM being exactly 1
+            // decouple them so the thresholds can be arbitrary
+            // 0.0 fully transparent, 1.0 fully opaque
+            overlayCtx.globalAlpha = 1 - (STAR_MAX_AT_ZOOM - cam.scale) <= 1 ? 1 - (STAR_MAX_AT_ZOOM - cam.scale) : 1;
+            //console.log(STAR_MAX_AT_ZOOM - cam.scale);
+
             for (const s of sectors) {
                 if (!s.img) continue;
 
@@ -277,31 +312,38 @@
                 if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
 
                 // Maintain aspect ratio
-                //const aspect = s.img.width / Math.max(1, s.img.height);
-                //const worldW = worldH * aspect;
+                const aspect = s.img.width / Math.max(1, s.img.height);
+                
+                // get screen coordinates from map coordinates
+                //var pos = worldToScreen(s.x, s.y);
 
-                // TODO: dynamically adjust size based on canvas size (?) or at least find better values
-                ctx.drawImage(s.img, s.x - worldW * 0.5, s.y - worldH * 0.5, 50, 50);
+                // TODO: find better scaling factors, finish the scaler as per given specs
+                //overlayCtx.drawImage(s.img, pos.x - cam.scale, pos.y - (cam.scale * aspect), 50, 50);
+                overlayCtx.drawImage(s.img, s.x - cam.scale, s.y - (cam.scale * aspect), 50 / cam.scale, 50 / cam.scale);
             }
+
+            overlayCtx.globalAlpha = 1.0; // reset it after, important
         }
 
 
-        ctx.restore();
+        mapCtx.restore();
+        overlayCtx.restore();
         updateActiveGalaxyLabel();
 
     }
 
+    // TODO: see if I need these on the other canvas as well
     // Pan: pointer drag
-    canvas.addEventListener("pointerdown", (e) => {
+    mapCanvas.addEventListener("pointerdown", (e) => {
         cam.dragging = true;
         cam.startMouseX = e.clientX;
         cam.startMouseY = e.clientY;
         cam.startCamX = cam.x;
         cam.startCamY = cam.y;
-        canvas.setPointerCapture(e.pointerId);
+        mapCanvas.setPointerCapture(e.pointerId);
     });
 
-    canvas.addEventListener("pointermove", (e) => {
+    mapCanvas.addEventListener("pointermove", (e) => {
         if (!cam.dragging) return;
         const dx = (e.clientX - cam.startMouseX) / cam.scale;
         const dy = (e.clientY - cam.startMouseY) / cam.scale;
@@ -310,12 +352,12 @@
         draw();
     });
 
-    canvas.addEventListener("pointerup", () => {
+    mapCanvas.addEventListener("pointerup", () => {
         cam.dragging = false;
     });
 
     // Zoom: mouse wheel anchored at mouse position
-    canvas.addEventListener("wheel", (e) => {
+    mapCanvas.addEventListener("wheel", (e) => {
         e.preventDefault();
 
         const before = screenToWorld(e.clientX, e.clientY);

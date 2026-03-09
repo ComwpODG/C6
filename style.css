@@ -13,7 +13,7 @@ html, body {
     height: 100vh;
 }
 
-/* Fullscreen canvas. Oversize it so the tilt never reveals “outside” edges. */
+/* Fullscreen canvas. Oversize it so the tilt never reveals ï¿½outsideï¿½ edges. */
 #mapCanvas {
     position: absolute;
     left: 50%;
@@ -21,12 +21,24 @@ html, body {
     /* Oversize: important so tilt doesn't show background corners */
     width: 140vw;
     height: 140vh;
-    transform-origin: 50% 55%;
-    transform: translate(-50%, -50%) perspective(1400px) rotateX(28deg);
+    /*transform-origin: 50% 55%;*/
+    transform: translate(-50%, -50%) /*perspective(1400px) rotateX(28deg)*/;
     display: block;
 }
 
-/* Optional vignette that is fullscreen, not “table edge” */
+/* map is only used to draw the galaxies and the lanes, everything else goes here*/
+#overlayCanvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 140vw;
+    height: 140vh;
+    transform: translate(-50%, -50%);
+    display: block;
+    pointer-events: none;
+}
+
+/* Optional vignette that is fullscreen, not ï¿½table edgeï¿½ */
 #appRoot::after {
     content: "";
     position: absolute;

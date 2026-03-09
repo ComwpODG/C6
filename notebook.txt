@@ -2,6 +2,8 @@ Kaelin's notes:
 
 - Stars should be upright
     - find world coordinate on the screen and don't apply the slant modifier
+    - create function that computes screen position from slanted plane and add it to stars
+
 - When zooming out, stars should fade out instead of shrinking
     - also applies to jumplanes
 
@@ -74,3 +76,5 @@ Wishful thinking / later exploration
 
 
 tickmark - ✔
+
+use python -m http.server 8000 to open a server on http:\\localhost:8000 and that's where everything will be working fine
