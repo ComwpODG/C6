@@ -4,8 +4,9 @@ Kaelin's notes:
     - find world coordinate on the screen and don't apply the slant modifier
     - create function that computes screen position from slanted plane and add it to stars
 
-- When zooming out, stars should fade out instead of shrinking
+- When zooming out, stars should fade out instead of shrinking ✔
     - also applies to jumplanes
+        - move jumplanes to a separate plane
 
 - Clicking a star should open an info panel that shows
     - system name
@@ -33,9 +34,9 @@ Kaelin's notes:
 
 
 Suggested phase 1
-- When zooming out, stars should fade out instead of shrinking
-- Stars should not lie flat on the slanted table
-- Stars should appear upright
+- When zooming out, stars should fade out instead of shrinking ✔
+- Stars should not lie flat on the slanted table ✔
+- Stars should appear upright ✔
 - Make stars clickable
 - Add info panel with basic system data that appears on click
 - Add per-system default/custom status text

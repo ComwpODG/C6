@@ -9,40 +9,6 @@
     const galaxyDescEl = document.getElementById("galaxyDesc");
     let activeGalaxyId = null;
 
-    function updateActiveGalaxyLabel() {
-        if (!galaxies || galaxies.length === 0 || !galaxies[0].img) return;
-
-        // pick the galaxy whose TOP-LEFT is closest to camera center (world coords)
-        let best = null;
-        let bestD2 = Infinity;
-
-        for (const g of galaxies) {
-            // top-left "anchor" at g.x, g.y (as requested)
-            const cx = g.x + (g.img.width * g.scale) * 0.5;
-            const cy = g.y + (g.img.height * g.scale) * 0.5;
-
-            const dx = cam.x - cx;
-            const dy = cam.y - cy;
-            const d2 = dx * dx + dy * dy;
-            if (d2 < bestD2) {
-                bestD2 = d2;
-                best = g;
-            }
-        }
-
-        if (!best) return;
-        if (best.id === activeGalaxyId) return; // no DOM churn
-
-        activeGalaxyId = best.id;
-
-        const nm = (best.name ?? best.id ?? "").toString();
-        const ds = (best.desc ?? "").toString();
-
-        galaxyNameEl.textContent = nm;
-        galaxyDescEl.textContent = ds;
-    }
-
-
     // Camera in world pixels
     const cam = {
         x: 0,
@@ -58,39 +24,109 @@
     const ZOOM_MIN = 0.08;
     const ZOOM_MAX = 4.0;
 
-    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
-    //for when the window is resized
-    function resizeCanvas() {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // --- Galaxies in world space (loaded from JSON) ---
+    let galaxies = []; // each: {id, src, x, y, scale, img}
+    // sectors also in world space
+    let sectors = []; // each: {x, y, src, name, img}
+    // galactic sectors in world space
+    let galacticSectors = []; // each {name, vertices[x1, y1 ...]}
 
-        const mapRect = mapCanvas.getBoundingClientRect();
-        mapCanvas.width = Math.floor(mapRect.width * dpr);
-        mapCanvas.height = Math.floor(mapRect.height * dpr);
+    async function init() {
+        try {
+            const raw = await loadGalaxiesJson();
+            const rawSectors = await loadSectorsJson(); //Load the sectors
+            const rawGalacticSectors = await loadGalacticSectorsJson();
 
-        const overlayRect = overlayCanvas.getBoundingClientRect();
-        overlayCanvas.width = Math.floor(overlayRect.width * dpr);
-        overlayCanvas.height = Math.floor(overlayRect.height * dpr);
+            // Normalize + validate
+            // g is the actual object, i is object ID in json array
+            galaxies = raw.map((g, i) => {
+                // if null after trim, ID becomes g1, g2 etc
+                const id = (typeof g.id === "string" && g.id.trim()) ? g.id.trim() : `g${i + 1}`;
+                const src = (typeof g.src === "string" && g.src.trim())
+                    ? g.src.trim()
+                    : (typeof g.image === "string" && g.image.trim())
+                        ? g.image.trim()
+                        : null;
 
-        // draw in CSS pixels
-        mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        overlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        draw();
-    }
+                if (!src) {
+                    throw new Error(`Galaxy entry ${i} is missing "src" (or "image")`);
+                }
 
-    window.addEventListener("resize", resizeCanvas);
+                const x = Number.isFinite(g.x) ? g.x : 0;
+                const y = Number.isFinite(g.y) ? g.y : 0;
+                const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
 
-    const imageCache = new Map(); // src -> Promise<HTMLImageElement>
-    function getImageCached(src) {
-        if (!imageCache.has(src)) {
-            imageCache.set(src, new Promise((resolve, reject) => {
-                const img = new Image();
-                img.src = src;
-                img.onload = () => resolve(img);
-                img.onerror = () => reject(new Error(`Failed to load ${src} (check path + case)`));
-            }));
+                // equivalent to saying id: id, src: src etc
+                return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
+            });
+
+            if (galaxies.length === 0) {
+                throw new Error("data/galaxies.json contained 0 galaxies");
+            }
+
+            // Load all images
+            // promise.all says that if ANY load fails, nothing gets saved
+            const images = await Promise.all(galaxies.map(g => getImageCached(g.src)));
+            for (let i = 0; i < galaxies.length; i++) {
+                galaxies[i].img = images[i];
+            }
+
+            // Start camera centered on the first galaxy in the JSON
+            const g1 = galaxies[0];
+            cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
+            cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
+
+
+
+
+            //Do the same for sectors
+            sectors = rawSectors.map((s, i) => {
+                const x = Number.isFinite(s.x) ? s.x / 2.5 : 0;
+                const y = Number.isFinite(s.y) ? s.y / 2.5 : 0;
+                const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
+                const name = (s.name ?? `Sector ${i + 1}`).toString();
+
+                if (!src) throw new Error(`Sector entry ${i} missing "src"`);
+
+                return { x, y, src, name, img: null };
+            });
+
+            // Preload star images ONCE per unique src, then assign to every sector
+            const uniqueStarSrcs = [...new Set(sectors.map(s => s.src))];
+            const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
+            const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
+
+            for (const s of sectors) {
+                s.img = starImgBySrc.get(s.src);
+            }
+
+
+
+            // Load galactic sectors
+            galacticSectors = rawGalacticSectors.map((s, i) => {
+                const name = (s.name ?? `Sector ${i + 1}`).toString();
+                let vertices = s.vertices;
+
+                return {name, vertices};
+            });
+
+
+
+            draw();
+
+            requestAnimationFrame(animationLoop);
+            requestAnimationFrame(mouseLoop);
+
+        } catch (err) {
+            console.error(err);
+
+            // draw a friendly message on the mapCanvas too
+            const rect = mapCanvas.getBoundingClientRect();
+            mapCtx.clearRect(0, 0, rect.width, rect.height);
+            mapCtx.fillStyle = "rgba(207,231,255,0.85)";
+            mapCtx.fillText("Failed to load galaxies.json or images. Check console.", 20, 30);
         }
-        return imageCache.get(src);
     }
 
 
@@ -125,145 +161,31 @@
         return data["galacticSectors"];
     }
 
-    // --- Galaxies in world space (loaded from JSON) ---
-    let galaxies = []; // each: {id, src, x, y, scale, img}
-    // sectors also in world space
-    let sectors = []; // each: {x, y, src, name, img}
-    // galactic sectors in world space
-    let galacticSectors = []; // each {name, vertices[x1, y1 ...]}
 
-
-    async function init() {
-        try {
-            const raw = await loadGalaxiesJson();
-            const rawSectors = await loadSectorsJson(); //Load the sectors
-            const rawGalacticSectors = await loadGalacticSectorsJson();
-
-            // Normalize + validate
-            // g is the actual object, i is object ID in json array
-            galaxies = raw.map((g, i) => {
-                // if null after trim, ID becomes g1, g2 etc
-                const id = (typeof g.id === "string" && g.id.trim()) ? g.id.trim() : `g${i + 1}`;
-                const src = (typeof g.src === "string" && g.src.trim())
-                    ? g.src.trim()
-                    : (typeof g.image === "string" && g.image.trim())
-                        ? g.image.trim()
-                        : null;
-
-                if (!src) {
-                    throw new Error(`Galaxy entry ${i} is missing "src" (or "image")`);
-                }
-
-                const x = Number.isFinite(g.x) ? g.x : 0;
-                const y = Number.isFinite(g.y) ? g.y : 0;
-                const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
-
-                // this is shorthand notation
-                // equivalent to saying id: id, src: src etc
-                return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
-            });
-
-            if (galaxies.length === 0) {
-                throw new Error("data/galaxies.json contained 0 galaxies");
-            }
-
-            // Load all images
-            // promise says that if ANY load fails, nothing gets saved
-            const images = await Promise.all(galaxies.map(g => getImageCached(g.src)));
-            for (let i = 0; i < galaxies.length; i++) {
-                galaxies[i].img = images[i];
-            }
-
-            //Do the same for sectors
-            // Normalize sectors
-            sectors = rawSectors.map((s, i) => {
-                const x = Number.isFinite(s.x) ? s.x / 2.5 : 0;
-                const y = Number.isFinite(s.y) ? s.y / 2.5 : 0;
-                const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
-                const name = (s.name ?? `Sector ${i + 1}`).toString();
-
-                if (!src) throw new Error(`Sector entry ${i} missing "src"`);
-
-                return { x, y, src, name, img: null };
-            });
-
-            // Preload star images ONCE per unique src, then assign to every sector
-            const uniqueStarSrcs = [...new Set(sectors.map(s => s.src))];
-            const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
-            const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
-
-            for (const s of sectors) {
-                s.img = starImgBySrc.get(s.src);
-            }
-
-
-            // Load galactic sectors
-            galacticSectors = rawGalacticSectors.map((s, i) => {
-                const name = (s.name ?? `Sector ${i + 1}`).toString();
-                let vertices = s.vertices;
-
-                return {name, vertices};
-            });
-
-
-
-            // Start camera centered on the first galaxy in the JSON
-            const g1 = galaxies[0];
-            cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
-            cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
-
-            draw();
-
-            requestAnimationFrame(animationLoop);
-            requestAnimationFrame(mouseLoop);
-
-            // this always runs at the end of draw();
-            //updateActiveGalaxyLabel();
-
-        } catch (err) {
-            console.error(err);
-            // draw a friendly message on the mapCanvas too
-            const rect = mapCanvas.getBoundingClientRect();
-            mapCtx.clearRect(0, 0, rect.width, rect.height);
-            mapCtx.fillStyle = "rgba(207,231,255,0.85)";
-            mapCtx.fillText("Failed to load galaxies.json or images. Check console.", 20, 30);
+    const imageCache = new Map(); // src -> Promise<HTMLImageElement>
+    function getImageCached(src) {
+        if (!imageCache.has(src)) {
+            imageCache.set(src, new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error(`Failed to load ${src} (check path + case)`));
+            }));
         }
+        return imageCache.get(src);
     }
 
-    function screenToWorld(clientX, clientY) {
-        const rect = mapCanvas.getBoundingClientRect();
-        const x = clientX - rect.left;
-        const y = clientY - rect.top;
 
-        const vw = rect.width;
-        const vh = rect.height;
-
-        const wx = (x - vw * 0.5) / cam.scale + cam.x;
-        const wy = (y - vh * 0.5) / cam.scale + cam.y;
-        return { x: wx, y: wy };
-    }
-
-    // TODO: fix such that it accepts slant
-    function worldToScreen(x, y) {
-        var xP = x;
-        var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
-        var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
-
-        //mapCanvas.
-        // TODO: make both angle and distance dynamic
-        // 1400 is perspective(1400px)
-        return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
-    }
 
     // Star visibility + sizing rules
     const STAR_SHOW_ZOOM = 0.2;   // below this, stars don't render at all
     const STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
-    const STAR_MIN_PX_AT_1X = 4;  // "tiny" at 1x (tune: 2..6)
-    const STAR_MAX_PX = 32;       // cap size once you hit 2x (and above)
 
     // Culling padding (in screen px -> converted to world units)
     const STAR_CULL_PAD_PX = 120;
 
+    const STAR_SIZE = 50;
+    let starScale = STAR_SIZE;
 
     function draw() {
         const rect = mapCanvas.getBoundingClientRect();
@@ -330,7 +252,9 @@
         }
         mapCtx.globalAlpha = 1.0;
 
-        // Draw sectors/stars (world space)
+
+        starScale = STAR_SIZE / cam.scale;
+
         // Draw sectors/stars with culling and size rules
         if (cam.scale >= STAR_SHOW_ZOOM) {
             // Visible world rect derived from camera + viewport
@@ -345,14 +269,6 @@
             const minY = cam.y - halfH_world - pad_world;
             const maxY = cam.y + halfH_world + pad_world;
 
-            // deprecated feature, replaced with fading in and out
-            // Ramp star size from tiny@1x to max@2x
-            //const t = Math.max(0, Math.min(1, (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM)));
-            //const desiredPx = STAR_MIN_PX_AT_1X + t * (STAR_MAX_PX - STAR_MIN_PX_AT_1X);
-
-            // Convert desired screen pixels to world units so it stays visually capped
-            //const worldH = desiredPx / cam.scale;
-
             // 0.0 fully transparent, 1.0 fully opaque
             var fadeAmt = (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM);
             overlayCtx.globalAlpha = fadeAmt <= 1 ? fadeAmt : 1;
@@ -364,16 +280,7 @@
                 // Cull first (cheap)
                 if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
 
-                // Maintain aspect ratio
-                //const aspect = s.img.width / Math.max(1, s.img.height);
-                
-                // get screen coordinates from map coordinates
-                //var pos = worldToScreen(s.x, s.y);
-
-                // TODO: find better scaling factors, finish the scaler as per given specs
-                //overlayCtx.drawImage(s.img, pos.x - cam.scale, pos.y - (cam.scale * aspect), 50, 50);
-                //overlayCtx.drawImage(s.img, s.x + cam.scale - (s.img.width / 2 / cam.scale), s.y + cam.scale - (s.img.height / 2 / cam.scale), 50 / cam.scale, 50 / cam.scale);
-                overlayCtx.drawImage(s.img, s.x - ((50 / cam.scale) / 2), s.y - ((50 / cam.scale) / 2), 50 / cam.scale, 50 / cam.scale);
+                overlayCtx.drawImage(s.img, s.x - ((50 / cam.scale) / 2), s.y - ((50 / cam.scale) / 2), starScale, starScale);
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
@@ -385,6 +292,64 @@
         updateActiveGalaxyLabel();
 
     }
+
+
+
+    function updateActiveGalaxyLabel() {
+        if (!galaxies || galaxies.length === 0 || !galaxies[0].img) return;
+
+        // pick the galaxy whose TOP-LEFT is closest to camera center (world coords)
+        let best = null;
+        let bestD2 = Infinity;
+
+        for (const g of galaxies) {
+            // top-left "anchor" at g.x, g.y (as requested)
+            const cx = g.x + (g.img.width * g.scale) * 0.5;
+            const cy = g.y + (g.img.height * g.scale) * 0.5;
+
+            const dx = cam.x - cx;
+            const dy = cam.y - cy;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < bestD2) {
+                bestD2 = d2;
+                best = g;
+            }
+        }
+
+        if (!best) return;
+        if (best.id === activeGalaxyId) return; // no DOM churn
+
+        activeGalaxyId = best.id;
+
+        const nm = (best.name ?? best.id ?? "").toString();
+        const ds = (best.desc ?? "").toString();
+
+        galaxyNameEl.textContent = nm;
+        galaxyDescEl.textContent = ds;
+    }
+
+
+
+    //for when the window is resized
+    window.addEventListener("resize", resizeCanvas);
+
+    function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        const mapRect = mapCanvas.getBoundingClientRect();
+        mapCanvas.width = Math.floor(mapRect.width * dpr);
+        mapCanvas.height = Math.floor(mapRect.height * dpr);
+
+        const overlayRect = overlayCanvas.getBoundingClientRect();
+        overlayCanvas.width = Math.floor(overlayRect.width * dpr);
+        overlayCanvas.height = Math.floor(overlayRect.height * dpr);
+
+        // draw in CSS pixels
+        mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        overlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        draw();
+    }
+
 
     // Pan: pointer drag
     let LClickTime = null;
@@ -417,7 +382,7 @@
     });
 
     function mouseLoop(){
-        if(LClickTime)
+        if(LClickTime && cam.dragging === false)
         {
             if(Date.now() - LClickTime > 1000) //1s threshold for hold
             {
@@ -467,7 +432,40 @@
         mouseRaw = {x: e.clientX, y:e.clientY};
     }, { passive: false });
 
+
+
+
+
+    function screenToWorld(clientX, clientY) {
+        const rect = mapCanvas.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        const vw = rect.width;
+        const vh = rect.height;
+
+        const wx = (x - vw * 0.5) / cam.scale + cam.x;
+        const wy = (y - vh * 0.5) / cam.scale + cam.y;
+        return { x: wx, y: wy };
+    }
+
+
+    // TODO: fix such that it accepts slant
+    function worldToScreen(x, y) {
+        var xP = x;
+        var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
+        var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
+
+        //mapCanvas.
+        // TODO: make both angle and distance dynamic
+        // 1400 is perspective(1400px)
+        return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
+    }
+
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
     // Kick off
     resizeCanvas();
     init();
 })();
+
