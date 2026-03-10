@@ -30,7 +30,7 @@
     // sectors also in world space
     let sectors = []; // each: {x, y, src, name, img}
     // galactic sectors in world space
-    let galacticSectors = []; // each {name, vertices[x1, y1 ...]}
+    let galacticSectors = []; // each {name, vertices:{x1, y1}, ...]}
 
     async function init() {
         try {
@@ -113,7 +113,7 @@
 
 
             await loadFonts();
-
+            overlayCtx.imageSmoothingEnabled = false;
 
 
             draw();
@@ -245,18 +245,18 @@
                     lastPair = {x:v.x, y:v.y};
                 else
                 {
-                    mapCtx.beginPath();
-                    mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
-                    mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
-                    mapCtx.stroke();
+                    //mapCtx.beginPath();
+                    //mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+                    //mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
+                    //mapCtx.stroke();
 
                     lastPair = {x:v.x, y:v.y};
                 }
             }
-            mapCtx.beginPath();
-            mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
-            mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
-            mapCtx.stroke();
+            //mapCtx.beginPath();
+            //mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+            //mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
+            //mapCtx.stroke();
         }
         mapCtx.globalAlpha = 1.0;
 
@@ -359,7 +359,7 @@
     }
 
     async function loadFonts() {
-        const font = new FontFace("C6-font", "url(assets/38_Arial_10pt_st.ttf)", {
+        const font = new FontFace("C6-font", "url(assets/20_Arial_12pt_st.ttf)", {
             style: "normal",
             weight: "400",
             stretch: "condensed",
@@ -420,12 +420,50 @@
     mapCanvas.addEventListener("pointerup", (e) => {
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
-            //var s = checkClickedStar(screenToWorld(e.clientX, e.clientY));
-            //if(s) console.warn(s.name);
+            var s = checkClickedStar(screenToWorld(e.clientX, e.clientY));
+            if(s){
+                console.warn(s.name);
+            }
+            else{
+                var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));
+                if(a === null){
+                    galacticSectors.push({name: "newSector", vertices: tempSector});
+                    for (const v of tempSector) console.log(v);
+                    tempSector = [];
+                    draw();
+                }
+                else tempSector.push(a);
+            }
         }
         cam.dragging = false;
         LClickTime = null;  
     });
+
+
+    let tempSector = [];
+    function checkSectorVertex(mousePos){
+        var coords = {x: mousePos.x * 2.5, y: mousePos.y * 2.5};
+
+        if(tempSector.length != 0){
+            var dist = ((tempSector[0].x - coords.x) * (tempSector[0].x - coords.x)) + ((tempSector[0].y - coords.y) * (tempSector[0].y - coords.y));
+            if(dist <= 1000000) return null;
+        }
+
+        for(const s of galacticSectors)
+        {
+            for (const v of s.vertices){
+                var dist = ((v.x - coords.x) * (v.x - coords.x)) + ((v.y - coords.y) * (v.y - coords.y));
+                if(dist <= 1000000)
+                    return v;
+            }
+        }
+
+        if(tempSector.length == 0) return coords;
+
+        return coords;
+    }
+
+
 
     function mouseLoop(){
         if(LClickTime && cam.dragging === false)
