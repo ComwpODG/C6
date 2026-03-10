@@ -112,6 +112,9 @@
             });
 
 
+            await loadFonts();
+
+
 
             draw();
 
@@ -180,6 +183,11 @@
     // Star visibility + sizing rules
     const STAR_SHOW_ZOOM = 0.2;   // below this, stars don't render at all
     const STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
+
+    const TEXT_SHOW_ZOOM = 0.5;   // below this, stars don't render at all
+    const TEXT_MAX_AT_ZOOM = 0.8; // reaches max opacity at 2x zoom
+
+
 
     // Culling padding (in screen px -> converted to world units)
     const STAR_CULL_PAD_PX = 120;
@@ -270,9 +278,11 @@
             const maxY = cam.y + halfH_world + pad_world;
 
             // 0.0 fully transparent, 1.0 fully opaque
-            var fadeAmt = (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM);
-            overlayCtx.globalAlpha = fadeAmt <= 1 ? fadeAmt : 1;
-            //console.log(STAR_MAX_AT_ZOOM - cam.scale);
+            var starFadeAmt = (cam.scale - STAR_SHOW_ZOOM) / (STAR_MAX_AT_ZOOM - STAR_SHOW_ZOOM);
+            var textFadeAmt = clamp((cam.scale - TEXT_SHOW_ZOOM) / (TEXT_MAX_AT_ZOOM - TEXT_SHOW_ZOOM), 0, 1);
+
+            overlayCtx.font = `${starScale / 3}px C6-font`;
+            overlayCtx.fillStyle = "#FFFFFF";
 
             for (const s of sectors) {
                 if (!s.img) continue;
@@ -280,7 +290,11 @@
                 // Cull first (cheap)
                 if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
 
-                overlayCtx.drawImage(s.img, s.x - ((50 / cam.scale) / 2), s.y - ((50 / cam.scale) / 2), starScale, starScale);
+                overlayCtx.globalAlpha = starFadeAmt <= 1 ? starFadeAmt : 1;
+                overlayCtx.drawImage(s.img, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2), starScale, starScale);
+
+                overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
+                overlayCtx.fillText(s.name, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2) + (starScale/5 + starScale));
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
@@ -330,6 +344,36 @@
 
 
 
+    function checkClickedStar(a){
+        for(const s of sectors){
+            var starX = s.x ;
+            var starY = s.y ;
+            var dist = ((starX - a.x) * (starX - a.x)) + ((starY - a.y) * (starY - a.y))
+
+            //console.log(dist, " <- ", starScale * starScale);
+            
+            if(dist <= starScale * starScale)
+                return s;
+        }
+        return null;
+    }
+
+    async function loadFonts() {
+        const font = new FontFace("C6-font", "url(assets/38_Arial_10pt_st.ttf)", {
+            style: "normal",
+            weight: "400",
+            stretch: "condensed",
+        });
+        // wait for font to be loaded
+        await font.load();
+        // add font to document
+        document.fonts.add(font);
+        // enable font with CSS class
+        document.body.classList.add("fonts-loaded");
+    }
+
+
+
     //for when the window is resized
     window.addEventListener("resize", resizeCanvas);
 
@@ -375,7 +419,9 @@
 
     mapCanvas.addEventListener("pointerup", (e) => {
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
-            console.log("click at:", e.clientX, " ", e.clientY);
+            //console.log("click at:", e.clientX, " ", e.clientY);
+            //var s = checkClickedStar(screenToWorld(e.clientX, e.clientY));
+            //if(s) console.warn(s.name);
         }
         cam.dragging = false;
         LClickTime = null;  
@@ -386,7 +432,7 @@
         {
             if(Date.now() - LClickTime > 1000) //1s threshold for hold
             {
-                console.log("Holding!");
+                //console.log("Holding!");
             }
         }
 
@@ -399,7 +445,7 @@
     let mouseRaw = null;
     function animationLoop() {
         if(before){
-            if(Math.abs(targetZoom - cam.scale) > 0.1){
+            if(Math.abs(targetZoom - cam.scale) > 0.001){
                 cam.scale += (targetZoom - cam.scale) * 0.1;
                 const after = screenToWorld(mouseRaw.x, mouseRaw.y);
 
@@ -425,8 +471,10 @@
 
     mapCanvas.addEventListener("wheel", (e) => {
         e.preventDefault();
-        targetZoom *= e.deltaY < 0 ? 1.1 : 0.9;
+        targetZoom *= Math.pow(1.0017, -e.deltaY);;
         targetZoom = clamp(targetZoom, ZOOM_MIN, ZOOM_MAX);
+
+        //console.log(targetZoom, " -> ", targetZoom - cam.scale);
 
         before = screenToWorld(e.clientX, e.clientY);
         mouseRaw = {x: e.clientX, y:e.clientY};
@@ -462,6 +510,7 @@
         return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
     }
 
+    // b is up, a is down
     function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
     // Kick off
