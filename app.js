@@ -214,6 +214,8 @@
 
             draw();
 
+            requestAnimationFrame(animationLoop);
+
             // this always runs at the end of draw();
             //updateActiveGalaxyLabel();
 
@@ -369,7 +371,8 @@
 
                 // TODO: find better scaling factors, finish the scaler as per given specs
                 //overlayCtx.drawImage(s.img, pos.x - cam.scale, pos.y - (cam.scale * aspect), 50, 50);
-                overlayCtx.drawImage(s.img, s.x + cam.scale - (s.img.width / 2 / cam.scale), s.y + cam.scale - (s.img.height / 2 / cam.scale), 50 / cam.scale, 50 / cam.scale);
+                //overlayCtx.drawImage(s.img, s.x + cam.scale - (s.img.width / 2 / cam.scale), s.y + cam.scale - (s.img.height / 2 / cam.scale), 50 / cam.scale, 50 / cam.scale);
+                overlayCtx.drawImage(s.img, s.x - ((50 / cam.scale) / 2), s.y - ((50 / cam.scale) / 2), 50 / cam.scale, 50 / cam.scale);
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
@@ -406,21 +409,38 @@
         cam.dragging = false;
     });
 
+
     // Zoom: mouse wheel anchored at mouse position
+    let targetZoom = 0.1;
+    let before = null;
+    let mouseRaw = null;
+    function animationLoop() {
+        if(Math.abs(targetZoom - cam.scale) > 0.1){
+            cam.scale += (targetZoom - cam.scale) * 0.1;
+            if(before){
+                const after = screenToWorld(mouseRaw.x, mouseRaw.y);
+
+                cam.x += (before.x - after.x);
+                cam.y += (before.y - after.y);
+            }
+            draw();
+        }
+        else{
+            cam.scale = targetZoom;
+            before = null;
+            draw();
+        }
+
+        requestAnimationFrame(animationLoop);
+    }
+
     mapCanvas.addEventListener("wheel", (e) => {
         e.preventDefault();
+        targetZoom *= e.deltaY < 0 ? 1.1 : 0.9;
+        targetZoom = clamp(targetZoom, ZOOM_MIN, ZOOM_MAX);
 
-        const before = screenToWorld(e.clientX, e.clientY);
-
-        const zoomFactor = Math.pow(1.0017, -e.deltaY);
-        cam.scale = clamp(cam.scale * zoomFactor, ZOOM_MIN, ZOOM_MAX);
-
-        const after = screenToWorld(e.clientX, e.clientY);
-
-        cam.x += (before.x - after.x);
-        cam.y += (before.y - after.y);
-
-        draw();
+        before = screenToWorld(e.clientX, e.clientY);
+        mouseRaw = {x: e.clientX, y:e.clientY};
     }, { passive: false });
 
     // Kick off
