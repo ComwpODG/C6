@@ -13,7 +13,7 @@
     const cam = {
         x: 0,
         y: 0,
-        scale: 0.2,
+        scale: 0.22,
         dragging: false,
         startMouseX: 0,
         startMouseY: 0,
@@ -116,6 +116,10 @@
             overlayCtx.imageSmoothingEnabled = false;
 
 
+            before = {x: cam.x, y: cam.y};
+            const rect = mapCanvas.getBoundingClientRect();
+            mouseRaw = {x: rect.width / 3, y: rect.height / 3};
+
             draw();
 
             requestAnimationFrame(animationLoop);
@@ -181,7 +185,7 @@
 
 
     // Star visibility + sizing rules
-    const STAR_SHOW_ZOOM = 0.2;   // below this, stars don't render at all
+    const STAR_SHOW_ZOOM = 0.22;   // below this, stars don't render at all
     const STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
 
     const TEXT_SHOW_ZOOM = 0.5;   // below this, stars don't render at all
@@ -478,7 +482,7 @@
     }
 
     // Zoom: mouse wheel anchored at mouse position
-    let targetZoom = 0.1;
+    let targetZoom = 0.15;
     let before = null;
     let mouseRaw = null;
     function animationLoop() {
