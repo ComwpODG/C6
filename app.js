@@ -215,6 +215,7 @@
             draw();
 
             requestAnimationFrame(animationLoop);
+            //requestAnimationFrame(mouseLoop);
 
             // this always runs at the end of draw();
             //updateActiveGalaxyLabel();
@@ -385,10 +386,11 @@
 
     }
 
-    // TODO: see if I need these on the other canvas as well
     // Pan: pointer drag
+    let LClickTime = null;
     mapCanvas.addEventListener("pointerdown", (e) => {
-        cam.dragging = true;
+        LClickTime = Date.now();
+        
         cam.startMouseX = e.clientX;
         cam.startMouseY = e.clientY;
         cam.startCamX = cam.x;
@@ -397,6 +399,7 @@
     });
 
     mapCanvas.addEventListener("pointermove", (e) => {
+        if(LClickTime && !cam.dragging) cam.dragging = true;
         if (!cam.dragging) return;
         const dx = (e.clientX - cam.startMouseX) / cam.scale;
         const dy = (e.clientY - cam.startMouseY) / cam.scale;
@@ -405,30 +408,51 @@
         draw();
     });
 
-    mapCanvas.addEventListener("pointerup", () => {
+    mapCanvas.addEventListener("pointerup", (e) => {
+        if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
+            console.log("click at:", e.clientX, " ", e.clientY);
+        }
         cam.dragging = false;
+        LClickTime = null;  
     });
 
+    function mouseLoop(){
+        if(LClickTime)
+        {
+            if(Date.now - LClickTime > 1000) //1s threshold for hold
+            {
+                console.log("Holding!");
+            }
+        }
+
+        requestAnimationFrame(mouseLoop);
+    }
 
     // Zoom: mouse wheel anchored at mouse position
     let targetZoom = 0.1;
     let before = null;
     let mouseRaw = null;
     function animationLoop() {
-        if(Math.abs(targetZoom - cam.scale) > 0.1){
-            cam.scale += (targetZoom - cam.scale) * 0.1;
-            if(before){
+        if(before){
+            if(Math.abs(targetZoom - cam.scale) > 0.1){
+                cam.scale += (targetZoom - cam.scale) * 0.1;
                 const after = screenToWorld(mouseRaw.x, mouseRaw.y);
 
                 cam.x += (before.x - after.x);
                 cam.y += (before.y - after.y);
+
+                draw();
             }
-            draw();
-        }
-        else{
-            cam.scale = targetZoom;
-            before = null;
-            draw();
+            else{
+                cam.scale = targetZoom;
+                const after = screenToWorld(mouseRaw.x, mouseRaw.y);
+
+                cam.x += (before.x - after.x);
+                cam.y += (before.y - after.y);
+
+                before = null;
+                draw();
+            }
         }
 
         requestAnimationFrame(animationLoop);
