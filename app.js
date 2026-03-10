@@ -215,7 +215,7 @@
             draw();
 
             requestAnimationFrame(animationLoop);
-            //requestAnimationFrame(mouseLoop);
+            requestAnimationFrame(mouseLoop);
 
             // this always runs at the end of draw();
             //updateActiveGalaxyLabel();
@@ -419,7 +419,7 @@
     function mouseLoop(){
         if(LClickTime)
         {
-            if(Date.now - LClickTime > 1000) //1s threshold for hold
+            if(Date.now() - LClickTime > 1000) //1s threshold for hold
             {
                 console.log("Holding!");
             }
