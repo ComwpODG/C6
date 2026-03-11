@@ -38,18 +38,6 @@ html, body {
     pointer-events: none;
 }
 
-/* used for anything that needs to be color keyed or modded in other ways*/
-#modCanvas {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 140vw;
-    height: 140vh;
-    transform: translate(-50%, -50%);
-    display: block;
-    pointer-events: none;
-}
-
 /* Optional vignette that is fullscreen, not �table edge� */
 #appRoot::after {
     content: "";

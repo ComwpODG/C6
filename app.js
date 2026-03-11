@@ -5,9 +5,6 @@
     const overlayCanvas = document.getElementById("overlayCanvas");
     const overlayCtx = overlayCanvas.getContext("2d", { alpha: true });
 
-    const modCanvas = document.getElementById("modCanvas");
-    const modCtx = modCanvas.getContext("2d", { alpha: true });
-
     const galaxyNameEl = document.getElementById("galaxyName");
     const galaxyDescEl = document.getElementById("galaxyDesc");
     let activeGalaxyId = null;
@@ -38,7 +35,7 @@
     let lanes = [];  //each: {{x1, y1, x2, y2}, ...}
 
 
-    let factionMap = new Map();
+    const factionMap = new Map();
 
     factionMap.set("PC",         "#FFD800");
     factionMap.set("AZ",         "#636363");
@@ -55,6 +52,8 @@
     factionMap.set("SIGG",       "#9BFF70");
     factionMap.set("OSM",        "#7FC9FF");
     factionMap.set("LVN",        "#FFC600");
+
+    const factionFrames = new Map();
 
 
     async function init() {
@@ -155,6 +154,23 @@
 
                 return {name, vertices};
             });
+
+
+            // pre-render coloured diamonds for performance reasons
+            for (const [faction, colour] of factionMap) {
+                const off = document.createElement('canvas');
+                off.width = diamondFrame.width;
+                off.height = diamondFrame.height;
+                const offCtx = off.getContext('2d');
+
+                offCtx.drawImage(diamondFrame, 0, 0);
+                offCtx.globalCompositeOperation = "source-atop";
+                offCtx.fillStyle = colour;
+                offCtx.fillRect(0, 0, off.width, off.height);
+                offCtx.globalCompositeOperation = "source-over";
+
+                factionFrames.set(faction, off);
+            }
 
 
 
@@ -267,7 +283,6 @@
 
         mapCtx.clearRect(0, 0, vw, vh);
         overlayCtx.clearRect(0, 0, vw, vh);
-        modCtx.clearRect(0, 0, vw, vh);
 
         // If images not ready yet
         if (galaxies.length === 0 || !galaxies[0].img) {
@@ -286,11 +301,6 @@
         overlayCtx.translate(vw * 0.5, vh * 0.5);
         overlayCtx.scale(cam.scale, cam.scale);
         overlayCtx.translate(-cam.x, -cam.y);
-
-        modCtx.save();
-        modCtx.translate(vw * 0.5, vh * 0.5);
-        modCtx.scale(cam.scale, cam.scale);
-        modCtx.translate(-cam.x, -cam.y);
 
 
         // Draw galaxies (in world space)
@@ -384,15 +394,10 @@
                     starScale
                     );
 
-                if(s.faction)
+                if(s.faction && factionFrames.has(s.faction))
                 {
                     //console.warn(s.faction);
-                    var colour = factionMap.get(s.faction) ?? "#FFFFFF";
-                    modCtx.fillStyle = colour;
-                    modCtx.drawImage(diamondFrame, s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
-                    modCtx.globalCompositeOperation = "source-atop";
-                    modCtx.fillRect(s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
-                    modCtx.globalCompositeOperation = "source-over";
+                    overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
                 }
 
 
@@ -412,7 +417,6 @@
 
         mapCtx.restore();
         overlayCtx.restore();
-        modCtx.restore();
         updateActiveGalaxyLabel();
 
     }
@@ -561,14 +565,9 @@
         overlayCanvas.width = Math.floor(overlayRect.width * dpr);
         overlayCanvas.height = Math.floor(overlayRect.height * dpr);
 
-        const modRect = modCanvas.getBoundingClientRect();
-        modCanvas.width = Math.floor(modRect.width * dpr);
-        modCanvas.height = Math.floor(modRect.height * dpr);
-
         // draw in CSS pixels
         mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         overlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        modCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         draw();
     }
 
