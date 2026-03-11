@@ -32,6 +32,8 @@
     // galactic sectors in world space
     let galacticSectors = []; // each {name, vertices:{x1, y1}, ...]}
 
+    let lanes = [];  //each: {{x1, y1, x2, y2}, ...}
+
 
     let factionMap = new Map();
 
@@ -141,7 +143,6 @@
             }
 
 
-
             // Load galactic sectors
             galacticSectors = rawGalacticSectors.map((s, i) => {
                 const name = (s.name ?? `Sector ${i + 1}`).toString();
@@ -149,6 +150,10 @@
 
                 return {name, vertices};
             });
+
+
+
+            lanes = await loadLanesJson("data/lanes.json");
 
 
             await loadFonts();
@@ -204,6 +209,16 @@
         if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("data/galacticSectors.json must be a JSON array");
+        return data;
+    }
+
+    async function loadLanesJson(src) {
+        // cache-bust so updates show up quickly on GitHub Pages
+        //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
+        const res = await fetch(src);
+        if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("data/lanes.json must be a JSON array");
         return data;
     }
 
@@ -301,13 +316,26 @@
             mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
             mapCtx.stroke();
         }
-        mapCtx.globalAlpha = 1.0;
 
+        mapCtx.globalAlpha = 1.0;
 
         starScale = STAR_SIZE / cam.scale;
 
         // Draw sectors/stars with culling and size rules
         if (cam.scale >= STAR_SHOW_ZOOM) {
+            mapCtx.lineWidth = 2;
+            mapCtx.globalAlpha = 0.5;
+            mapCtx.strokeStyle = "#FFFFFF";
+            for(const l of lanes){
+                mapCtx.beginPath();
+                mapCtx.moveTo(l.x1 / 2.5, l.y1 / 2.5);
+                mapCtx.lineTo(l.x2 / 2.5, l.y2 / 2.5);
+                mapCtx.stroke();
+            }
+
+            mapCtx.globalAlpha = 1.0;
+
+
             // Visible world rect derived from camera + viewport
             const halfW_world = (vw * 0.5) / cam.scale;
             const halfH_world = (vh * 0.5) / cam.scale;
