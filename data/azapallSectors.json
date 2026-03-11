@@ -1639,6 +1639,7 @@
     },
     {
         "name": "Sector 4389",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 7682,
         "y": 4356
@@ -1729,6 +1730,7 @@
     },
     {
         "name": "Sector 4182",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 8419,
         "y": 4576
@@ -1759,6 +1761,7 @@
     },
     {
         "name": "Sector 3757",
+        "properName": "Modia",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 5745,
         "y": 4608
@@ -1857,6 +1860,7 @@
     },
     {
         "name": "Sector 9512",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 7395,
         "y": 4749
@@ -1905,6 +1909,7 @@
     },
     {
         "name": "Sector 5996",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 7665,
         "y": 4826
@@ -1941,6 +1946,7 @@
     },
     {
         "name": "Sector 2949",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 8343,
         "y": 4873
@@ -1953,6 +1959,7 @@
     },
     {
         "name": "Sector 3195",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 6884,
         "y": 4897
@@ -1983,6 +1990,7 @@
     },
     {
         "name": "Sector 4488",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 8868,
         "y": 4966
@@ -2001,6 +2009,7 @@
     },
     {
         "name": "Sector 5734",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 7402,
         "y": 4984
@@ -2025,6 +2034,7 @@
     },
     {
         "name": "Sector 0671",
+        "properName": "Gozna",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 4198,
         "y": 5021
@@ -2049,6 +2059,7 @@
     },
     {
         "name": "Sector 4355",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 7207,
         "y": 5055
@@ -2079,6 +2090,8 @@
     },
     {
         "name": "Sector 1832",
+        "properName": "Miyao",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 7937,
         "y": 5090
@@ -2175,6 +2188,7 @@
     },
     {
         "name": "Sector 1173",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 7464,
         "y": 5257
@@ -2253,6 +2267,7 @@
     },
     {
         "name": "Sector 8313",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 6948,
         "y": 5360
@@ -2345,6 +2360,7 @@
     },
     {
         "name": "Sector 9334",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_15_delay-0.1s.bmp",
         "x": 7496,
         "y": 5515
@@ -2424,12 +2440,14 @@
     },
     {
         "name": "Sector 2668",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 6925,
         "y": 5615
     },
     {
         "name": "Sector 7192",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 8042,
         "y": 5622
@@ -2454,6 +2472,7 @@
     },
     {
         "name": "Sector 9213",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_16_delay-0.1s.bmp",
         "x": 8394,
         "y": 5658
@@ -2484,6 +2503,7 @@
     },
     {
         "name": "Sector 2625",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 7733,
         "y": 5705
@@ -2553,6 +2573,7 @@
     },
     {
         "name": "Sector 2725",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_07_delay-0.1s.bmp",
         "x": 6697,
         "y": 5801
@@ -2577,6 +2598,7 @@
     },
     {
         "name": "Sector 7222",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 7289,
         "y": 5830
@@ -2679,6 +2701,7 @@
     },
     {
         "name": "Sector 2550",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_00_delay-0.1s.bmp",
         "x": 8220,
         "y": 6047
@@ -2733,6 +2756,7 @@
     },
     {
         "name": "Sector 2658",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 7498,
         "y": 6120
@@ -2770,6 +2794,7 @@
     },
     {
         "name": "Sector 3851",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 7767,
         "y": 6178
@@ -3142,6 +3167,7 @@
     },
     {
         "name": "Sector 8958",
+        "properName": "Valux",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 7442,
         "y": 6821
@@ -3184,6 +3210,7 @@
     },
     {
         "name": "Sector 6439",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_08_delay-0.1s.bmp",
         "x": 14418,
         "y": 6875
