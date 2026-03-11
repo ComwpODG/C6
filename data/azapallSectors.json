@@ -2411,6 +2411,7 @@
     },
     {
         "name": "Sector 2270",
+        "faction":"meow",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 11227,
         "y": 5605
@@ -2490,7 +2491,7 @@
     {
         "name": "Sector 1543",
         "properName": "Osculpa",
-        "faction": "MEW",
+        "faction": "M.E.W.A.O.",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 10196,
         "y": 5710
@@ -2750,6 +2751,7 @@
     },
     {
         "name": "Sector 2466",
+        "faction":"VT",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 9982,
         "y": 6142

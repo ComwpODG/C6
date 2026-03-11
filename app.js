@@ -37,7 +37,7 @@
 
     factionMap.set("PC",         "#FFD800");
     factionMap.set("AZ",         "#636363");
-    factionMap.set("VT",         "#39dbcb");
+    factionMap.set("VT",         "#05D7AE");
     factionMap.set("ENI",        "#8F93FF");
     factionMap.set("BIO",        "#00FF00");
     factionMap.set("FED",        "#00FFFF");
@@ -368,13 +368,13 @@
     let activeStar = null;
     function drawInfoPanel(){
         if(activeStar){
-            const colour = activeStar.faction ? factionMap.get(activeStar.faction) : "#FFFFFF";
+            var colour = factionMap.get(activeStar.faction) ?? "#FFFFFF";
             overlayCtx.fillStyle = "#000000";
             overlayCtx.strokeStyle = colour;
             overlayCtx.lineWidth = 5 / cam.scale;
 
             const textHeight = starScale / 3;
-            overlayCtx.textAlign = "start";
+            overlayCtx.textAlign = "start"; 
             overlayCtx.textBaseline = "top";
 
             const bottomLeftX = activeStar.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
@@ -423,7 +423,7 @@
             overlayCtx.fillStyle = colour;
             overlayCtx.textAlign = "center";
             overlayCtx.textBaseline = "middle";
-            var factionText = activeStar.faction ? activeStar.faction + "-Controlled Territory" : "Uncontested Territory"
+            var factionText = factionMap.get(activeStar.faction) ? activeStar.faction + "-Controlled Territory" : "Uncontrolled Territory"
             overlayCtx.fillText(factionText, activeStar.x, topLeft + topOffset, 500 / cam.scale);
             topOffset += textHeight;
         }
