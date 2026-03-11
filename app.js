@@ -43,7 +43,7 @@
             galaxies = raw.map((g, i) => {
                 // if null after trim, ID becomes g1, g2 etc
                 const id = (typeof g.id === "string" && g.id.trim()) ? g.id.trim() : `g${i + 1}`;
-                const src = (typeof g.src === "string" && g.src.trim())
+                var src = (typeof g.src === "string" && g.src.trim())
                     ? g.src.trim()
                     : (typeof g.image === "string" && g.image.trim())
                         ? g.image.trim()
@@ -100,11 +100,15 @@
                 const x = Number.isFinite(s.x) ? s.x / 2.5 : 0;
                 const y = Number.isFinite(s.y) ? s.y / 2.5 : 0;
                 const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
-                const name = (s.name ?? `Sector ${i + 1}`).toString();
+                const fedName = (s.name ?? `Sector ${i + 1}`).toString();
+
+                //prioritize properName
+                const name = (typeof s.properName === "string" && s.properName.trim()) ? s.properName.trim() : null;
+                const faction = (typeof s.faction === "string" && s.faction.trim()) ? s.faction.trim() : null;
 
                 if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                return { x, y, src, name, img: null };
+                return { x, y, src, name, fedName, faction, img: null };
             });
 
             // Preload star images ONCE per unique src, then assign to every sector
@@ -322,20 +326,86 @@
 
                 overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
                 overlayCtx.fillText(
-                    s.name,
+                    s.name ?? s.fedName,
                     s.x,
                     s.y - (starScale / 2) + (starScale / 5 + starScale)
                 );
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
-        }
 
+            // only draw info panel when the stars are also visible
+            drawInfoPanel();
+        }
 
         mapCtx.restore();
         overlayCtx.restore();
         updateActiveGalaxyLabel();
 
+    }
+
+
+    let activeStar = null;
+    function drawInfoPanel(){
+        if(activeStar){
+            overlayCtx.fillStyle = "#000000";
+            overlayCtx.strokeStyle = "#FFFFFF"
+            overlayCtx.lineWidth = 5 / cam.scale;
+
+            const textHeight = starScale / 3;
+            overlayCtx.textAlign = "start";
+            overlayCtx.textBaseline = "top";
+
+            const bottomLeftX = activeStar.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
+            var bottomLeftY = activeStar.y - starScale - (30 / cam.scale);
+
+
+            var rectHeight = 2 * overlayCtx.lineWidth; // baseline
+            var topOffset = overlayCtx.lineWidth * 1.8;
+
+            rectHeight += 2 * textHeight + (40 / cam.scale) + overlayCtx.lineWidth; // fed name and faction
+
+            if(activeStar.name){
+                rectHeight += (starScale / 2);
+                topOffset += (starScale / 2);
+            }
+
+            // this is where we wound add notes;
+            //
+            //
+
+            const topLeft = bottomLeftY - rectHeight;
+
+            // draw background
+            overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), topLeft, 500 / cam.scale, rectHeight);
+            overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), topLeft, 500 / cam.scale, rectHeight);
+
+            // draw title
+            if(activeStar.name){
+                overlayCtx.fillStyle = "#FFFFFF";
+                overlayCtx.font = `${starScale / 2}px C6-font`;
+                overlayCtx.fillText(activeStar.name, bottomLeftX, topLeft + (10 / cam.scale), 500 / cam.scale);
+            }
+
+            overlayCtx.font = `${textHeight}px C6-font`;
+
+            overlayCtx.fillStyle = "#666666";
+            overlayCtx.fillText(activeStar.fedName, bottomLeftX, topLeft + topOffset, 500 / cam.scale);
+            topOffset += textHeight + (20 / cam.scale);
+
+            overlayCtx.beginPath();
+            overlayCtx.moveTo(bottomLeftX + (50 / cam.scale), topLeft + topOffset);
+            overlayCtx.lineTo(bottomLeftX + (450 / cam.scale), topLeft + topOffset);
+            overlayCtx.stroke();
+            topOffset += (20 / cam.scale) + overlayCtx.lineWidth;
+
+            overlayCtx.fillStyle = "#FFFFFF";
+            overlayCtx.textAlign = "center";
+            overlayCtx.textBaseline = "middle";
+            var factionText = activeStar.faction ? activeStar.faction + "-Controlled Territory" : "Uncontested Territory"
+            overlayCtx.fillText(factionText, activeStar.x, topLeft + topOffset, 500 / cam.scale);
+            topOffset += textHeight;
+        }
     }
 
 
@@ -451,9 +521,10 @@
     mapCanvas.addEventListener("pointerup", (e) => {
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
-            var s = checkClickedStar(screenToWorld(e.clientX, e.clientY));
-            if(s){
-                console.warn(s.name);
+            activeStar = checkClickedStar(screenToWorld(e.clientX, e.clientY));
+            draw();
+            if(activeStar){
+                console.warn(activeStar);
             }
             else{
                 //var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));

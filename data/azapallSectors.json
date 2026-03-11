@@ -1844,6 +1844,7 @@
     {
         "name": "Sector 6549",
         "properName": "Nemesis Stockyard",
+        "faction": "WVP",
         "src": "assets\\stars\\frame_02_delay-0.1s.bmp",
         "x": 7943,
         "y": 4725
@@ -2277,6 +2278,7 @@
     {
         "name": "Sector 4018",
         "properName": "Fort Death",
+        "faction" : "WVP",
         "src": "assets\\stars\\frame_02_delay-0.1s.bmp",
         "x": 7776,
         "y": 5381
@@ -2487,6 +2489,8 @@
     },
     {
         "name": "Sector 1543",
+        "properName": "Osculpa",
+        "faction": "MEW",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 10196,
         "y": 5710
@@ -2541,6 +2545,7 @@
     },
     {
         "name": "Sector 7593",
+        "faction": "",
         "src": "assets\\stars\\frame_05_delay-0.1s.bmp",
         "x": 10814,
         "y": 5786
@@ -5094,6 +5099,8 @@
     },
     {
         "name": "Sector 0440",
+        "properName": "Gravitas",
+        "faction": "M.E.W.A.O.",
         "src": "assets\\stars\\frame_19_delay-0.1s.bmp",
         "x": 10458,
         "y": 5990
