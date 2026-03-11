@@ -35,8 +35,8 @@
     async function init() {
         try {
             const raw = await loadGalaxiesJson();
-            const rawSectors = await loadSectorsJson(); //Load the sectors
-            const rawGalacticSectors = await loadGalacticSectorsJson();
+            let rawSectors = []; //Load the sectors
+            let rawGalacticSectors = [];
 
             // Normalize + validate
             // g is the actual object, i is object ID in json array
@@ -53,12 +53,22 @@
                     throw new Error(`Galaxy entry ${i} is missing "src" (or "image")`);
                 }
 
+                const sectorFile = (typeof g.sectors === "string" && g.sectors.trim()) ? g.sectors.trim() : null;
+                if (!sectorFile) {
+                    throw new Error(`Galaxy entry ${i} is missing "sectors"`);
+                }
+
+                const gsectorFile = (typeof g.galacticSectors === "string" && g.galacticSectors.trim()) ? g.galacticSectors.trim() : null;
+                if (!gsectorFile) {
+                    throw new Error(`Galaxy entry ${i} is missing "galacticSectors"`);
+                }
+
                 const x = Number.isFinite(g.x) ? g.x : 0;
                 const y = Number.isFinite(g.y) ? g.y : 0;
                 const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
 
                 // equivalent to saying id: id, src: src etc
-                return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
+                return { id, src, sectorFile, gsectorFile, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
             });
 
             if (galaxies.length === 0) {
@@ -77,6 +87,11 @@
             cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
             cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
 
+
+            for (const g of galaxies){
+                rawSectors = [...rawSectors, ...await loadSectorsJson(g.sectorFile)];
+                rawGalacticSectors = [...rawGalacticSectors, ...await loadGalacticSectorsJson(g.gsectorFile)];
+            }
 
 
 
@@ -148,24 +163,24 @@
     }
 
     //TODO: instead of one monolithic sectors.json, have individual files for each galaxy
-    async function loadSectorsJson() {
+    async function loadSectorsJson(src) {
         // cache-bust so updates show up quickly on GitHub Pages
         //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(`data/sectors.json`);
-        if (!res.ok) throw new Error(`Failed to fetch data/sectors.json: HTTP ${res.status}`);
+        const res = await fetch(src);
+        if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
         const data = await res.json();
-        if (!Array.isArray(data["sectors"])) throw new Error("section 'sectors' of data/sectors.json must be a JSON array");
-        return data["sectors"];
+        if (!Array.isArray(data)) throw new Error("data/sectors.json must be a JSON array");
+        return data;
     }
 
-    async function loadGalacticSectorsJson() {
+    async function loadGalacticSectorsJson(src) {
         // cache-bust so updates show up quickly on GitHub Pages
         //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(`data/sectors.json`);
-        if (!res.ok) throw new Error(`Failed to fetch data/sectors.json: HTTP ${res.status}`);
+        const res = await fetch(src);
+        if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
         const data = await res.json();
-        if (!Array.isArray(data["galacticSectors"])) throw new Error("section 'galacticSectors' of data/sectors.json must be a JSON array");
-        return data["galacticSectors"];
+        if (!Array.isArray(data)) throw new Error("data/galacticSectors.json must be a JSON array");
+        return data;
     }
 
 
@@ -249,18 +264,18 @@
                     lastPair = {x:v.x, y:v.y};
                 else
                 {
-                    //mapCtx.beginPath();
-                    //mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
-                    //mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
-                    //mapCtx.stroke();
+                    mapCtx.beginPath();
+                    mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+                    mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
+                    mapCtx.stroke();
 
                     lastPair = {x:v.x, y:v.y};
                 }
             }
-            //mapCtx.beginPath();
-            //mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
-            //mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
-            //mapCtx.stroke();
+            mapCtx.beginPath();
+            mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+            mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
+            mapCtx.stroke();
         }
         mapCtx.globalAlpha = 1.0;
 
@@ -309,12 +324,6 @@
                     s.x - (starScale / 2),
                     s.y - (starScale / 2) + (starScale / 5 + starScale)
                 );
-
-                //overlayCtx.globalAlpha = starFadeAmt <= 1 ? starFadeAmt : 1;
-                //overlayCtx.drawImage(s.img, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2), starScale, starScale);
-
-                //overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
-                //overlayCtx.fillText(s.name, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2) + (starScale/5 + starScale));
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
@@ -448,7 +457,9 @@
                 var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));
                 if(a === null){
                     galacticSectors.push({name: "newSector", vertices: tempSector});
-                    for (const v of tempSector) console.log(v);
+                    for (const v of tempSector) {
+                        console.log("{\"x\":",v.x, ", \"y\":", v.y,"},");
+                    }
                     tempSector = [];
                     draw();
                 }

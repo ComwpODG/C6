@@ -2,6 +2,8 @@
   {
     "id": "g1",
     "src": "assets/galaxy1.png",
+    "sectors": "data/azapallSectors.json",
+    "galacticSectors": "data/azapallGalacticSectors.json",
     "name": "Azapall",
     "desc": "Azapall is chaos. It is an extremely large galaxy even of its kind, corrupted by an interstellar gaseous mixture of nitrogen and other typical atmospheric chemicals, and it has been fought over for many hundreds of thousands of years. Perhaps millions.",
     "x": 0,
@@ -11,6 +13,8 @@
   {
     "id": "g2",
     "src": "assets/galaxy2.png",
+    "sectors": "data/demo1.json",
+    "galacticSectors": "data/demo2.json",
     "name": "Veils",
     "desc": "Veils is an outskirt galaxy which is rather quiet when it comes to wars in comparison to the chaotic azapall. While that makes it an appealing place to live, it is very poor in star density, causing it to be a poorer candidate for civilizations looking to evolve into the far future of space tech.",
     "x": -7200,
@@ -20,6 +24,8 @@
   {
     "id": "g3",
     "src": "assets/galaxy3.png",
+    "sectors": "data/demo1.json",
+    "galacticSectors": "data/demo2.json",
     "name": "Nith",
     "desc": "this is a test... or is it",
     "x": 1200,
