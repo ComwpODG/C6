@@ -1844,6 +1844,7 @@
     },
     {
         "name": "Sector 6549",
+        "properName": "Nemesis Stockyard",
         "src": "assets\\stars\\frame_02_delay-0.1s.bmp",
         "x": 7943,
         "y": 4725
@@ -2276,6 +2277,7 @@
     },
     {
         "name": "Sector 4018",
+        "properName": "Fort Death",
         "src": "assets\\stars\\frame_02_delay-0.1s.bmp",
         "x": 7776,
         "y": 5381
@@ -3266,6 +3268,7 @@
     },
     {
         "name": "Sector 9405",
+        "properName": "Olongaa",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 6868,
         "y": 7044
@@ -3326,6 +3329,7 @@
     },
     {
         "name": "Sector 0556",
+        "properName": "C",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 6618,
         "y": 7145
@@ -3476,12 +3480,14 @@
     },
     {
         "name": "Sector 9855",
+        "properName": "Sharolin",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 6639,
         "y": 7375
     },
     {
         "name": "Sector 2053",
+        "properName": "Aspal",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 6309,
         "y": 7381
@@ -3536,6 +3542,7 @@
     },
     {
         "name": "Sector 2963",
+        "properName": "Zogle",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 6994,
         "y": 7475
@@ -3668,6 +3675,7 @@
     },
     {
         "name": "Sector 1783",
+        "properName": "Itulonoi",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 4431,
         "y": 7752
@@ -3680,24 +3688,28 @@
     },
     {
         "name": "Sector 7398",
+        "properName": "Dinpro",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 6457,
         "y": 7778
     },
     {
         "name": "Sector 2279",
+        "properName": "Zinpo",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 4909,
         "y": 7795
     },
     {
         "name": "Sector 2701",
+        "properName": "Noherre Straits",
         "src": "assets\\stars\\frame_00_delay-0.1s.bmp",
         "x": 5348,
         "y": 7810
     },
     {
         "name": "Sector 2193",
+        "properName": "Axele",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 6707,
         "y": 7816
@@ -3782,6 +3794,7 @@
     },
     {
         "name": "Sector 9855",
+        "properName": "Kinto",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 5960,
         "y": 8013
@@ -3836,6 +3849,7 @@
     },
     {
         "name": "Sector 8443",
+        "properName": "Noherre",
         "src": "assets\\stars\\frame_00_delay-0.1s.bmp",
         "x": 5086,
         "y": 8124
@@ -3902,6 +3916,7 @@
     },
     {
         "name": "Sector 8112",
+        "properName": "Aplik",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 5576,
         "y": 8208
@@ -3962,6 +3977,7 @@
     },
     {
         "name": "Sector 5990",
+        "properName": "Firsataep",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 4738,
         "y": 8359
@@ -4178,6 +4194,7 @@
     },
     {
         "name": "Sector 5824",
+        "properName": "Unoogol",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 4984,
         "y": 8819
@@ -5096,7 +5113,7 @@
             ]
         },
         {
-            "name":"Pirate Sector",
+            "name":"The Western Void",
             "vertices":[
                 {"x":6389, "y":5890},
                 {"x":6895, "y":4553},
@@ -5105,7 +5122,7 @@
             ]
         },
         {
-            "name":"Out sector 1",
+            "name":"Tif",
             "vertices":[
                 {"x":6389, "y":5890},
                 {"x":2790, "y":4300},
@@ -5114,7 +5131,7 @@
             ]
         },
         {
-            "name":"Out sector 2",
+            "name":"Zonata",
             "vertices":[
                 {"x":4120, "y":2682},
                 {"x":9260, "y":1936},

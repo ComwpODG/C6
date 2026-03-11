@@ -295,10 +295,26 @@
                 if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
 
                 overlayCtx.globalAlpha = starFadeAmt <= 1 ? starFadeAmt : 1;
-                overlayCtx.drawImage(s.img, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2), starScale, starScale);
+                overlayCtx.drawImage(
+                    s.img,
+                    s.x - (starScale / 2), // Center on x
+                    s.y - (starScale / 2), // Center on y
+                    starScale,
+                    starScale
+                    );
 
                 overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
-                overlayCtx.fillText(s.name, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2) + (starScale/5 + starScale));
+                overlayCtx.fillText(
+                    s.name,
+                    s.x - (starScale / 2),
+                    s.y - (starScale / 2) + (starScale / 5 + starScale)
+                );
+
+                //overlayCtx.globalAlpha = starFadeAmt <= 1 ? starFadeAmt : 1;
+                //overlayCtx.drawImage(s.img, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2), starScale, starScale);
+
+                //overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
+                //overlayCtx.fillText(s.name, s.x - (STAR_SIZE / 2), s.y - (STAR_SIZE / 2) + (starScale/5 + starScale));
             }
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
