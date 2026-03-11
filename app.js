@@ -302,6 +302,8 @@
 
             overlayCtx.font = `${starScale / 3}px C6-font`;
             overlayCtx.fillStyle = "#FFFFFF";
+            overlayCtx.textAlign = "center";
+            overlayCtx.textBaseline = "middle";
 
             for (const s of sectors) {
                 if (!s.img) continue;
@@ -321,7 +323,7 @@
                 overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
                 overlayCtx.fillText(
                     s.name,
-                    s.x - (starScale / 2),
+                    s.x,
                     s.y - (starScale / 2) + (starScale / 5 + starScale)
                 );
             }
@@ -454,16 +456,16 @@
                 console.warn(s.name);
             }
             else{
-                var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));
-                if(a === null){
-                    galacticSectors.push({name: "newSector", vertices: tempSector});
-                    for (const v of tempSector) {
-                        console.log("{\"x\":",v.x, ", \"y\":", v.y,"},");
-                    }
-                    tempSector = [];
-                    draw();
-                }
-                else tempSector.push(a);
+                //var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));
+                //if(a === null){
+                //    galacticSectors.push({name: "newSector", vertices: tempSector});
+                //    for (const v of tempSector) {
+                //        console.log("{\"x\":",v.x, ", \"y\":", v.y,"},");
+                //    }
+                //    tempSector = [];
+                //    draw();
+                //}
+                //else tempSector.push(a);
             }
         }
         cam.dragging = false;
