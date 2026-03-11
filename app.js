@@ -32,6 +32,26 @@
     // galactic sectors in world space
     let galacticSectors = []; // each {name, vertices:{x1, y1}, ...]}
 
+
+    let factionMap = new Map();
+
+    factionMap.set("PC",         "#FFD800");
+    factionMap.set("AZ",         "#636363");
+    factionMap.set("VT",         "#39dbcb");
+    factionMap.set("ENI",        "#8F93FF");
+    factionMap.set("BIO",        "#00FF00");
+    factionMap.set("FED",        "#00FFFF");
+    factionMap.set("KGC",        "#FF0000");
+    factionMap.set("WVP",        "#FF00DC");
+    factionMap.set("M.E.W.A.O.", "#A80000");
+    factionMap.set("PTMC",       "#FFC987");
+    factionMap.set("BOTS",       "#E27900");
+    factionMap.set("PHM",        "#BAD300");
+    factionMap.set("SIGG",       "#9BFF70");
+    factionMap.set("OSM",        "#7FC9FF");
+    factionMap.set("LVN",        "#FFC600");
+
+
     async function init() {
         try {
             const raw = await loadGalaxiesJson();
@@ -348,8 +368,9 @@
     let activeStar = null;
     function drawInfoPanel(){
         if(activeStar){
+            const colour = activeStar.faction ? factionMap.get(activeStar.faction) : "#FFFFFF";
             overlayCtx.fillStyle = "#000000";
-            overlayCtx.strokeStyle = "#FFFFFF"
+            overlayCtx.strokeStyle = colour;
             overlayCtx.lineWidth = 5 / cam.scale;
 
             const textHeight = starScale / 3;
@@ -382,7 +403,7 @@
 
             // draw title
             if(activeStar.name){
-                overlayCtx.fillStyle = "#FFFFFF";
+                overlayCtx.fillStyle = colour;
                 overlayCtx.font = `${starScale / 2}px C6-font`;
                 overlayCtx.fillText(activeStar.name, bottomLeftX, topLeft + (10 / cam.scale), 500 / cam.scale);
             }
@@ -390,7 +411,7 @@
             overlayCtx.font = `${textHeight}px C6-font`;
 
             overlayCtx.fillStyle = "#666666";
-            overlayCtx.fillText(activeStar.fedName, bottomLeftX, topLeft + topOffset, 500 / cam.scale);
+            overlayCtx.fillText(activeStar.fedName, bottomLeftX, topLeft + topOffset + (7/cam.scale), 500 / cam.scale);
             topOffset += textHeight + (20 / cam.scale);
 
             overlayCtx.beginPath();
@@ -399,7 +420,7 @@
             overlayCtx.stroke();
             topOffset += (20 / cam.scale) + overlayCtx.lineWidth;
 
-            overlayCtx.fillStyle = "#FFFFFF";
+            overlayCtx.fillStyle = colour;
             overlayCtx.textAlign = "center";
             overlayCtx.textBaseline = "middle";
             var factionText = activeStar.faction ? activeStar.faction + "-Controlled Territory" : "Uncontested Territory"
