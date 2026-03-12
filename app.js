@@ -28,7 +28,7 @@
     // --- Galaxies in world space (loaded from JSON) ---
     let galaxies = []; // each: {id, src, x, y, scale, img}
     // sectors also in world space
-    let sectors = []; // each: {x, y, src, name, img}
+    const sectors = new Map(); // each: {x, y, src, name, img}
     // galactic sectors in world space
     let galacticSectors = []; // each {name, vertices:{x1, y1}, ...]}
 
@@ -120,7 +120,7 @@
 
 
             //Do the same for sectors
-            sectors = rawSectors.map((s, i) => {
+            rawSectors.forEach((s, i) => {
                 const x = Number.isFinite(s.x) ? s.x / 2.5 : 0;
                 const y = Number.isFinite(s.y) ? s.y / 2.5 : 0;
                 const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
@@ -132,17 +132,17 @@
 
                 if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                return { x, y, src, name, fedName, faction, img: null };
+                sectors.set(getStarFedHash(fedName), { x, y, src, name, fedName, faction, img: null });
             });
 
             // Preload star images ONCE per unique src, then assign to every sector
-            const uniqueStarSrcs = [...new Set(sectors.map(s => s.src))];
+            const uniqueStarSrcs = [...new Set([...sectors.values()].map((s, key) => s.src))];
             const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
             const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
 
-            for (const s of sectors) {
+            sectors.forEach((s, key) => {
                 s.img = starImgBySrc.get(s.src);
-            }
+            });
             diamondFrame = await getImageCached("assets/stars/star frame.bmp");
 
 
@@ -349,9 +349,13 @@
             mapCtx.globalAlpha = 0.5;
             mapCtx.strokeStyle = "#FFFFFF";
             for(const l of lanes){
+                var star1 = getStarFedHash(l.star1);
+                var coords1 = {x:sectors.get(star1).x, y:sectors.get(star1).y};
+                var star2 = getStarFedHash(l.star2);
+                var coords2 = {x:sectors.get(star2).x, y:sectors.get(star2).y};
                 mapCtx.beginPath();
-                mapCtx.moveTo(l.x1 / 2.5, l.y1 / 2.5);
-                mapCtx.lineTo(l.x2 / 2.5, l.y2 / 2.5);
+                mapCtx.moveTo(coords1.x, coords1.y);
+                mapCtx.lineTo(coords2.x, coords2.y);
                 mapCtx.stroke();
             }
 
@@ -379,11 +383,11 @@
             overlayCtx.textAlign = "center";
             overlayCtx.textBaseline = "middle";
 
-            for (const s of sectors) {
-                if (!s.img) continue;
+            sectors.forEach( (s, key) => {
+                if (!s.img) return;
 
                 // Cull first (cheap)
-                if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) continue;
+                if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) return;
 
                 overlayCtx.globalAlpha = starFadeAmt <= 1 ? starFadeAmt : 1;
                 overlayCtx.drawImage(
@@ -396,7 +400,6 @@
 
                 if(s.faction && factionFrames.has(s.faction))
                 {
-                    //console.warn(s.faction);
                     overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
                 }
 
@@ -407,7 +410,7 @@
                     s.x,
                     s.y - (starScale / 2) + (starScale / 5 + starScale)
                 );
-            }
+            });
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
 
@@ -435,7 +438,7 @@
             overlayCtx.textBaseline = "top";
 
             const bottomLeftX = activeStar.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
-            var bottomLeftY = activeStar.y - starScale - (30 / cam.scale);
+            var bottomLeftY = activeStar.y - starScale;
 
 
             var rectHeight = 2 * overlayCtx.lineWidth; // baseline
@@ -524,7 +527,7 @@
 
 
     function checkClickedStar(a){
-        for(const s of sectors){
+        for(const [key, s] of sectors){
             var starX = s.x ;
             var starY = s.y ;
             var dist = ((starX - a.x) * (starX - a.x)) + ((starY - a.y) * (starY - a.y))
@@ -533,6 +536,15 @@
                 return s;
         }
         return null;
+    }
+
+    // extracts the ID of a star from its fedName
+    function getStarFedHash(name){
+        var id = parseInt(name.slice(-4));
+        return id;
+    }
+    function getStarENIHash(name){
+
     }
 
     async function loadFonts() {
@@ -622,7 +634,7 @@
 
     let tempSector = [];
     function checkSectorVertex(mousePos){
-        var coords = {x: mousePos.x * 2.5, y: mousePos.y * 2.5};
+        var coords = {x: Math.trunc(mousePos.x * 2.5), y: Math.trunc(mousePos.y * 2.5)};
 
         if(tempSector.length != 0){
             var dist = ((tempSector[0].x - coords.x) * (tempSector[0].x - coords.x)) + ((tempSector[0].y - coords.y) * (tempSector[0].y - coords.y));

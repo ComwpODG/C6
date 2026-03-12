@@ -570,7 +570,7 @@
         "y": 2384
     },
     {
-        "name": "Sector 1538",
+        "name": "Sector 1539",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 17604,
         "y": 2385
@@ -834,7 +834,7 @@
         "y": 2878
     },
     {
-        "name": "Sector 1338",
+        "name": "Sector 4736",
         "src": "assets\\stars\\frame_08_delay-0.1s.bmp",
         "x": 7651,
         "y": 2889
@@ -1638,8 +1638,8 @@
         "y": 4345
     },
     {
-        "name": "Sector 4389",
         "faction": "WVP",
+        "name": "Sector 4389",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 7682,
         "y": 4356
@@ -1729,8 +1729,8 @@
         "y": 4573
     },
     {
-        "name": "Sector 4182",
         "faction": "WVP",
+        "name": "Sector 4182",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 8419,
         "y": 4576
@@ -1845,9 +1845,9 @@
         "y": 4716
     },
     {
+        "faction": "WVP",
         "name": "Sector 6549",
         "properName": "Nemesis Stockyard",
-        "faction": "WVP",
         "src": "assets\\stars\\frame_02_delay-0.1s.bmp",
         "x": 7943,
         "y": 4725
@@ -1859,8 +1859,8 @@
         "y": 4736
     },
     {
-        "name": "Sector 9512",
         "faction": "WVP",
+        "name": "Sector 9512",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 7395,
         "y": 4749
@@ -1908,8 +1908,8 @@
         "y": 4820
     },
     {
-        "name": "Sector 5996",
         "faction": "WVP",
+        "name": "Sector 5996",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 7665,
         "y": 4826
@@ -1945,8 +1945,8 @@
         "y": 4870
     },
     {
-        "name": "Sector 2949",
         "faction": "WVP",
+        "name": "Sector 2949",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 8343,
         "y": 4873
@@ -1958,8 +1958,8 @@
         "y": 4883
     },
     {
-        "name": "Sector 3195",
         "faction": "WVP",
+        "name": "Sector 3196",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 6884,
         "y": 4897
@@ -1989,8 +1989,8 @@
         "y": 4957
     },
     {
-        "name": "Sector 4488",
         "faction": "WVP",
+        "name": "Sector 4488",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 8868,
         "y": 4966
@@ -2008,8 +2008,8 @@
         "y": 4983
     },
     {
-        "name": "Sector 5734",
         "faction": "WVP",
+        "name": "Sector 5734",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 7402,
         "y": 4984
@@ -2058,8 +2058,8 @@
         "y": 5038
     },
     {
-        "name": "Sector 4355",
         "faction": "WVP",
+        "name": "Sector 4355",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 7207,
         "y": 5055
@@ -2071,7 +2071,7 @@
         "y": 5074
     },
     {
-        "name": "Sector 0053",
+        "name": "Sector 0054",
         "src": "assets\\stars\\frame_15_delay-0.1s.bmp",
         "x": 2729,
         "y": 5076
@@ -2089,9 +2089,9 @@
         "y": 5087
     },
     {
+        "faction": "WVP",
         "name": "Sector 1832",
         "properName": "Miyao",
-        "faction": "WVP",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 7937,
         "y": 5090
@@ -2103,7 +2103,7 @@
         "y": 5114
     },
     {
-        "name": "Sector 4313",
+        "name": "Sector 4314",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 10401,
         "y": 5120
@@ -2145,13 +2145,14 @@
         "y": 5167
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 4144",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 10962,
         "y": 5211
     },
     {
-        "name": "Sector 3196",
+        "name": "Sector 3197",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 19812,
         "y": 5215
@@ -2187,8 +2188,8 @@
         "y": 5252
     },
     {
-        "name": "Sector 1173",
         "faction": "WVP",
+        "name": "Sector 1173",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 7464,
         "y": 5257
@@ -2218,6 +2219,7 @@
         "y": 5287
     },
     {
+        "faction": "WVP",
         "name": "Sector 6439",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 8367,
@@ -2248,6 +2250,7 @@
         "y": 5335
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 4745",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 10298,
@@ -2266,8 +2269,8 @@
         "y": 5346
     },
     {
-        "name": "Sector 8313",
         "faction": "WVP",
+        "name": "Sector 8313",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 6948,
         "y": 5360
@@ -2291,9 +2294,9 @@
         "y": 5380
     },
     {
+        "faction": "WVP",
         "name": "Sector 4018",
         "properName": "Fort Death",
-        "faction" : "WVP",
         "src": "assets\\stars\\frame_02_delay-0.1s.bmp",
         "x": 7776,
         "y": 5381
@@ -2311,7 +2314,7 @@
         "y": 5383
     },
     {
-        "name": "Sector 7958",
+        "name": "Sector 7959",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 14165,
         "y": 5391
@@ -2347,7 +2350,7 @@
         "y": 5445
     },
     {
-        "name": "Sector 9314",
+        "name": "Sector 9315",
         "src": "assets\\stars\\frame_07_delay-0.1s.bmp",
         "x": 13999,
         "y": 5473
@@ -2359,8 +2362,8 @@
         "y": 5473
     },
     {
-        "name": "Sector 9334",
         "faction": "WVP",
+        "name": "Sector 9334",
         "src": "assets\\stars\\frame_15_delay-0.1s.bmp",
         "x": 7496,
         "y": 5515
@@ -2426,8 +2429,8 @@
         "y": 5601
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 2270",
-        "faction":"meow",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 11227,
         "y": 5605
@@ -2439,15 +2442,15 @@
         "y": 5609
     },
     {
-        "name": "Sector 2668",
         "faction": "WVP",
+        "name": "Sector 2668",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 6925,
         "y": 5615
     },
     {
-        "name": "Sector 7192",
         "faction": "WVP",
+        "name": "Sector 7192",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 8042,
         "y": 5622
@@ -2471,8 +2474,8 @@
         "y": 5650
     },
     {
-        "name": "Sector 9213",
         "faction": "WVP",
+        "name": "Sector 9213",
         "src": "assets\\stars\\frame_16_delay-0.1s.bmp",
         "x": 8394,
         "y": 5658
@@ -2502,16 +2505,16 @@
         "y": 5681
     },
     {
-        "name": "Sector 2625",
         "faction": "WVP",
+        "name": "Sector 2625",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 7733,
         "y": 5705
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 1543",
         "properName": "Osculpa",
-        "faction": "M.E.W.A.O.",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 10196,
         "y": 5710
@@ -2547,7 +2550,7 @@
         "y": 5771
     },
     {
-        "name": "Sector 1003",
+        "name": "Sector 1004",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 19579,
         "y": 5776
@@ -2565,15 +2568,15 @@
         "y": 5779
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 7593",
-        "faction": "",
         "src": "assets\\stars\\frame_05_delay-0.1s.bmp",
         "x": 10814,
         "y": 5786
     },
     {
-        "name": "Sector 2725",
         "faction": "WVP",
+        "name": "Sector 2725",
         "src": "assets\\stars\\frame_07_delay-0.1s.bmp",
         "x": 6697,
         "y": 5801
@@ -2591,14 +2594,14 @@
         "y": 5810
     },
     {
-        "name": "Sector 0142",
+        "name": "Sector 0143",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 6008,
         "y": 5813
     },
     {
-        "name": "Sector 7222",
         "faction": "WVP",
+        "name": "Sector 7222",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 7289,
         "y": 5830
@@ -2658,6 +2661,7 @@
         "y": 5979
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 0235",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 11459,
@@ -2700,8 +2704,8 @@
         "y": 6037
     },
     {
-        "name": "Sector 2550",
         "faction": "WVP",
+        "name": "Sector 2550",
         "src": "assets\\stars\\frame_00_delay-0.1s.bmp",
         "x": 8220,
         "y": 6047
@@ -2755,8 +2759,8 @@
         "y": 6119
     },
     {
-        "name": "Sector 2658",
         "faction": "WVP",
+        "name": "Sector 2658",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 7498,
         "y": 6120
@@ -2774,8 +2778,9 @@
         "y": 6135
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 2466",
-        "faction":"VT",
+        "properName": "Dethmaker",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 9982,
         "y": 6142
@@ -2793,8 +2798,8 @@
         "y": 6174
     },
     {
-        "name": "Sector 3851",
         "faction": "WVP",
+        "name": "Sector 3851",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 7767,
         "y": 6178
@@ -2860,6 +2865,7 @@
         "y": 6377
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 4757",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 10888,
@@ -2890,6 +2896,7 @@
         "y": 6415
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 2043",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 10658,
@@ -2944,13 +2951,13 @@
         "y": 6497
     },
     {
-        "name": "Sector 4474",
+        "name": "Sector 4475",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 8341,
         "y": 6498
     },
     {
-        "name": "Sector 2625",
+        "name": "Sector 2626",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 5329,
         "y": 6512
@@ -3004,7 +3011,7 @@
         "y": 6581
     },
     {
-        "name": "Sector 4596",
+        "name": "Sector 4597",
         "src": "assets\\stars\\frame_08_delay-0.1s.bmp",
         "x": 3334,
         "y": 6591
@@ -3046,7 +3053,7 @@
         "y": 6659
     },
     {
-        "name": "Sector 6202",
+        "name": "Sector 6203",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 7083,
         "y": 6661
@@ -3088,7 +3095,7 @@
         "y": 6697
     },
     {
-        "name": "Sector 5547",
+        "name": "Sector 5548",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 18110,
         "y": 6699
@@ -3124,7 +3131,7 @@
         "y": 6749
     },
     {
-        "name": "Sector 1763",
+        "name": "Sector 1764",
         "src": "assets\\stars\\frame_08_delay-0.1s.bmp",
         "x": 12506,
         "y": 6775
@@ -3154,7 +3161,7 @@
         "y": 6812
     },
     {
-        "name": "Sector 0900",
+        "name": "Sector 0901",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 16225,
         "y": 6814
@@ -3197,6 +3204,7 @@
         "y": 6852
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 1200",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 10566,
@@ -3209,8 +3217,7 @@
         "y": 6873
     },
     {
-        "name": "Sector 6439",
-        "faction": "WVP",
+        "name": "Sector 6440",
         "src": "assets\\stars\\frame_08_delay-0.1s.bmp",
         "x": 14418,
         "y": 6875
@@ -3240,7 +3247,7 @@
         "y": 6903
     },
     {
-        "name": "Sector 6477",
+        "name": "Sector 6478",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 18308,
         "y": 6916
@@ -3380,7 +3387,7 @@
         "y": 7164
     },
     {
-        "name": "Sector 9357",
+        "name": "Sector 9359",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 17658,
         "y": 7165
@@ -3464,7 +3471,7 @@
         "y": 7275
     },
     {
-        "name": "Sector 4041",
+        "name": "Sector 4042",
         "src": "assets\\stars\\frame_15_delay-0.1s.bmp",
         "x": 16071,
         "y": 7276
@@ -3526,7 +3533,7 @@
         "y": 7381
     },
     {
-        "name": "Sector 6962",
+        "name": "Sector 6963",
         "src": "assets\\stars\\frame_08_delay-0.1s.bmp",
         "x": 13567,
         "y": 7387
@@ -3587,7 +3594,7 @@
         "y": 7483
     },
     {
-        "name": "Sector 2483",
+        "name": "Sector 2484",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 3165,
         "y": 7490
@@ -3689,7 +3696,7 @@
         "y": 7697
     },
     {
-        "name": "Sector 1626",
+        "name": "Sector 1627",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 14536,
         "y": 7740
@@ -3784,13 +3791,13 @@
         "y": 7924
     },
     {
-        "name": "Sector 5705",
+        "name": "Sector 5706",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 12073,
         "y": 7941
     },
     {
-        "name": "Sector 6962",
+        "name": "Sector 6964",
         "src": "assets\\stars\\frame_15_delay-0.1s.bmp",
         "x": 9153,
         "y": 7954
@@ -3826,7 +3833,7 @@
         "y": 8004
     },
     {
-        "name": "Sector 9855",
+        "name": "Sector 9856",
         "properName": "Kinto",
         "src": "assets\\stars\\frame_13_delay-0.1s.bmp",
         "x": 5960,
@@ -3973,7 +3980,7 @@
         "y": 8262
     },
     {
-        "name": "Sector 0040",
+        "name": "Sector 0042",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 10038,
         "y": 8263
@@ -4028,13 +4035,13 @@
         "y": 8391
     },
     {
-        "name": "Sector 9314",
+        "name": "Sector 9316",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 12189,
         "y": 8404
     },
     {
-        "name": "Sector 8651",
+        "name": "Sector 8652",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 16745,
         "y": 8409
@@ -4046,7 +4053,7 @@
         "y": 8411
     },
     {
-        "name": "Sector 2044",
+        "name": "Sector 2045",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 10593,
         "y": 8436
@@ -4100,7 +4107,7 @@
         "y": 8505
     },
     {
-        "name": "Sector 3829",
+        "name": "Sector 3830",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 8835,
         "y": 8509
@@ -4148,7 +4155,7 @@
         "y": 8569
     },
     {
-        "name": "Sector 1627",
+        "name": "Sector 1628",
         "src": "assets\\stars\\frame_04_delay-0.1s.bmp",
         "x": 3977,
         "y": 8640
@@ -4226,7 +4233,7 @@
         "y": 8788
     },
     {
-        "name": "Sector 5824",
+        "name": "Sector 5825",
         "properName": "Unoogol",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 4984,
@@ -4269,7 +4276,7 @@
         "y": 8916
     },
     {
-        "name": "Sector 4084",
+        "name": "Sector 4085",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 9132,
         "y": 8922
@@ -4335,7 +4342,7 @@
         "y": 9053
     },
     {
-        "name": "Sector 5706",
+        "name": "Sector 5707",
         "src": "assets\\stars\\frame_18_delay-0.1s.bmp",
         "x": 7815,
         "y": 9054
@@ -4347,7 +4354,7 @@
         "y": 9071
     },
     {
-        "name": "Sector 9010",
+        "name": "Sector 9012",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 9895,
         "y": 9075
@@ -4425,7 +4432,7 @@
         "y": 9292
     },
     {
-        "name": "Sector 5205",
+        "name": "Sector 5206",
         "src": "assets\\stars\\frame_18_delay-0.1s.bmp",
         "x": 11421,
         "y": 9299
@@ -4437,13 +4444,13 @@
         "y": 9312
     },
     {
-        "name": "Sector 1539",
+        "name": "Sector 1540",
         "src": "assets\\stars\\frame_07_delay-0.1s.bmp",
         "x": 12347,
         "y": 9315
     },
     {
-        "name": "Sector 0303",
+        "name": "Sector 0304",
         "src": "assets\\stars\\frame_17_delay-0.1s.bmp",
         "x": 8291,
         "y": 9332
@@ -4467,7 +4474,7 @@
         "y": 9362
     },
     {
-        "name": "Sector 3584",
+        "name": "Sector 3585",
         "src": "assets\\stars\\frame_07_delay-0.1s.bmp",
         "x": 9409,
         "y": 9387
@@ -4545,7 +4552,7 @@
         "y": 9492
     },
     {
-        "name": "Sector 3985",
+        "name": "Sector 3987",
         "src": "assets\\stars\\frame_11_delay-0.1s.bmp",
         "x": 3062,
         "y": 9530
@@ -4593,7 +4600,7 @@
         "y": 9639
     },
     {
-        "name": "Sector 7870",
+        "name": "Sector 7871",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 11164,
         "y": 9665
@@ -4659,7 +4666,7 @@
         "y": 9836
     },
     {
-        "name": "Sector 4423",
+        "name": "Sector 4424",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 6098,
         "y": 9837
@@ -4701,7 +4708,7 @@
         "y": 9934
     },
     {
-        "name": "Sector 1543",
+        "name": "Sector 1544",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 13181,
         "y": 9951
@@ -4767,7 +4774,7 @@
         "y": 10116
     },
     {
-        "name": "Sector 0608",
+        "name": "Sector 0609",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 11587,
         "y": 10178
@@ -4779,7 +4786,7 @@
         "y": 10257
     },
     {
-        "name": "Sector 1221",
+        "name": "Sector 1222",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 12290,
         "y": 10298
@@ -4791,7 +4798,7 @@
         "y": 10300
     },
     {
-        "name": "Sector 9954",
+        "name": "Sector 9955",
         "src": "assets\\stars\\frame_12_delay-0.1s.bmp",
         "x": 8965,
         "y": 10316
@@ -4893,7 +4900,7 @@
         "y": 10601
     },
     {
-        "name": "Sector 5629",
+        "name": "Sector 5630",
         "src": "assets\\stars\\frame_18_delay-0.1s.bmp",
         "x": 6938,
         "y": 10612
@@ -4983,7 +4990,7 @@
         "y": 10984
     },
     {
-        "name": "Sector 2549",
+        "name": "Sector 2551",
         "src": "assets\\stars\\frame_15_delay-0.1s.bmp",
         "x": 15055,
         "y": 10989
@@ -5127,9 +5134,9 @@
         "y": 11811
     },
     {
+        "faction": "M.E.W.A.O.",
         "name": "Sector 0440",
         "properName": "Gravitas",
-        "faction": "M.E.W.A.O.",
         "src": "assets\\stars\\frame_19_delay-0.1s.bmp",
         "x": 10458,
         "y": 5990
