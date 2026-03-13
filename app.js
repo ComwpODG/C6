@@ -270,6 +270,8 @@
 
 
 
+    const NEWS_FEED_SIZE = 20;
+
     let newsContainer = null;
     let newsFeedIndex = 0;
     let newsText = "";
@@ -288,6 +290,7 @@
             //console.log(newsOffset);
             while(newsCtx.measureText(newsText).width < width + 20){
                 if(newsFeedIndex == newsContainer.length) newsFeedIndex = 0;
+                newsText += ' '.repeat(40);
                 newsText += newsContainer[newsFeedIndex].text;
                 newsFeedIndex++;
             }
@@ -306,7 +309,7 @@
             //console.log(newsRect.height);
             newsCtx.fillStyle = "#000000";
             newsCtx.fillRect(0, newsRect.height - NEWS_FEED_SIZE - (2 * 5), newsRect.width, NEWS_FEED_SIZE + (2 * 5));
-            newsCtx.fillStyle = "#ffee00";
+            newsCtx.fillStyle = "#CFE7FF";
             newsCtx.fillText(newsText, 5 - newsOffset, newsRect.height - NEWS_FEED_SIZE - 5)
         }
     }
@@ -326,12 +329,9 @@
     let starScale = STAR_SIZE;
 
 
-    const NEWS_FEED_SIZE = 50;
-
-
     const ANOMALY_SHOW_BEFORE = 0.1;
     const ANOMALY_MAX_AT = 0.05;
-    const ANOMALY_RADIUS = 5000;
+    const ANOMALY_RADIUS = 4000;
     let azapallAnomaly = null;
 
     function draw() {
@@ -477,22 +477,23 @@
             drawInfoPanel();
         }
 
-        else if (cam.scale <= ANOMALY_SHOW_BEFORE) {
-            if(azapallAnomaly){
-                overlayCtx.fillStyle = "#ff000055";
+        //else if (cam.scale <= ANOMALY_SHOW_BEFORE) {
+            //if(azapallAnomaly){
+                //overlayCtx.fillStyle = "#ff000055";
                 overlayCtx.strokeStyle = "#ff0000";
                 overlayCtx.lineWidth = 5 / cam.scale;
-                overlayCtx.globalAlpha = clamp((ANOMALY_SHOW_BEFORE - cam.scale) / (ANOMALY_SHOW_BEFORE - ANOMALY_MAX_AT), 0, 0.5);
-                overlayCtx.beginPath();
-                overlayCtx.arc(azapallAnomaly.x, azapallAnomaly.y, ANOMALY_RADIUS, 0, 2 * Math.PI);
-                overlayCtx.fill();
+                overlayCtx.globalAlpha = 1;
+                //overlayCtx.globalAlpha = clamp((ANOMALY_SHOW_BEFORE - cam.scale) / (ANOMALY_SHOW_BEFORE - ANOMALY_MAX_AT), 0, 0.5);
+                //overlayCtx.beginPath();
+                //overlayCtx.arc(azapallAnomaly.x, azapallAnomaly.y, ANOMALY_RADIUS, 0, 2 * Math.PI);
+                //overlayCtx.fill();
                 overlayCtx.beginPath();
                 overlayCtx.arc(azapallAnomaly.x, azapallAnomaly.y, ANOMALY_RADIUS, 0, 2 * Math.PI);
                 overlayCtx.stroke();
 
                 overlayCtx.globalAlpha = 1.0;
-            }
-        }
+            //}
+        //}
 
         mapCtx.restore();
         overlayCtx.restore();

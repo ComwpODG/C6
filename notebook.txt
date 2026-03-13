@@ -4,32 +4,24 @@ Kaelin's notes:
     - find world coordinate on the screen and don't apply the slant modifier
     - create function that computes screen position from slanted plane and add it to stars
 
-- When zooming out, stars should fade out instead of shrinking ✔
-    - also applies to jumplanes ✔
-        - move jumplanes to a separate plane ✔
+here's what needs to happen
+- Reduce news_size
+- Inject spaces in news feed
+- fix the wave to not fade on zoom / no inner fill
 
-- Clicking a star should open an info panel that shows
-    - system name ✔
-    - galactic sector - this should be precomputed
-    - owner (default message if no owner) ✔
-    - thumbnail image
-    - list of information blocks below it
-    - coloured according to faction ✔
-    - if data is missing, don't even show the heading for the section ✔
-    - IF sector has description, it appears under faction ownership even if no owner
-    - refer to pinned message for formatting ✔
+- Research on google drive Apps Script API
+- If successful research, then use google sheets to store player data. if not, use players.json
+- make sure it loads properly and overrides the main sectors list (which is now a hashmap keyed by sector ID). There is a getStarFEDHash function to get the key, the eni one isn't needed because we only need one key and it's the fed one..
+- This includes making a drop down for players
 
-- Each star should support a list of markers/icons
-    - center aligned above the star, works the same as center alignment in text editors
+- music loop
+- Territorial Polygons (and a way to make them within reason) - LOWEST PRIORITY
+- Spawnable, Movable, and Deletable ship tokens, that show up at the nearest sector's info panel
+*If you do the last one right, you might be able to get away with ion storms just secretly being the same internal object as ships. haha*
 
-- Need territorial lines / areas
-    - defined as closed sets of vertices
-    - manually defined
-    - color the space with the faction colour
-- dropdown player select
-    - uses the player name to load the file "playername.json"
-    - this file holds all data that isn't star name, sprite, position and jumplane
-        - sprite can be overridden
+My plans for after the end
+- Look into CRT style filtering - doable, hard
+- Darken background and add stars to fill the intergalactic void
 
 
 Note:
