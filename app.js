@@ -5,6 +5,9 @@
     const overlayCanvas = document.getElementById("overlayCanvas");
     const overlayCtx = overlayCanvas.getContext("2d", { alpha: true });
 
+    const newsCanvas = document.getElementById("newsCanvas");
+    const newsCtx = newsCanvas.getContext("2d", { alpha: true });
+
     const galaxyNameEl = document.getElementById("galaxyName");
     const galaxyDescEl = document.getElementById("galaxyDesc");
     let activeGalaxyId = null;
@@ -178,6 +181,11 @@
 
 
             await loadFonts();
+
+            await getNewsFeed();
+            newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
+            newsCtx.textBaseline = "top";
+            console.log(newsContainer);
             //overlayCtx.imageSmoothingEnabled = false;
 
 
@@ -190,7 +198,6 @@
             draw();
 
             requestAnimationFrame(animationLoop);
-            requestAnimationFrame(mouseLoop);
 
         } catch (err) {
             console.error(err);
@@ -263,6 +270,48 @@
 
 
 
+    let newsContainer = null;
+    let newsFeedIndex = 0;
+    let newsText = "";
+    let newsOffset = 0;
+    async function getNewsFeed(){
+        const res = await fetch(`data/newsFeed.json`);
+        if (!res.ok) throw new Error(`Failed to fetch data/newsFeed.json: HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("data/newsFeed.json must be a JSON array");
+        newsContainer = data;
+    }
+
+    function handleNewsFeed(dt){
+        if(newsContainer){
+            const width = mapCanvas.getBoundingClientRect().width;
+            //console.log(newsOffset);
+            while(newsCtx.measureText(newsText).width < width + 20){
+                if(newsFeedIndex == newsContainer.length) newsFeedIndex = 0;
+                newsText += newsContainer[newsFeedIndex].text;
+                newsFeedIndex++;
+            }
+
+            
+            const firstCharWidth = newsCtx.measureText(newsText[0]).width;
+            if(newsOffset > firstCharWidth){
+                newsText = newsText.slice(1);
+                newsOffset -= firstCharWidth;
+                console.log(newsOffset, firstCharWidth);
+            }
+
+            newsOffset += (dt / 1000.0) > 10 ? 0 : 50 * (dt / 1000.0);
+
+            const newsRect = newsCanvas.getBoundingClientRect();
+            //console.log(newsRect.height);
+            newsCtx.fillStyle = "#000000";
+            newsCtx.fillRect(0, newsRect.height - NEWS_FEED_SIZE - (2 * 5), newsRect.width, NEWS_FEED_SIZE + (2 * 5));
+            newsCtx.fillStyle = "#ffee00";
+            newsCtx.fillText(newsText, 5 - newsOffset, newsRect.height - NEWS_FEED_SIZE - 5)
+        }
+    }
+
+
     // Star visibility + sizing rules
     const STAR_SHOW_ZOOM = 0.22;   // below this, stars don't render at all
     const STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
@@ -277,6 +326,9 @@
     let starScale = STAR_SIZE;
 
 
+    const NEWS_FEED_SIZE = 50;
+
+
     const ANOMALY_SHOW_BEFORE = 0.1;
     const ANOMALY_MAX_AT = 0.05;
     const ANOMALY_RADIUS = 5000;
@@ -289,6 +341,7 @@
 
         mapCtx.clearRect(0, 0, vw, vh);
         overlayCtx.clearRect(0, 0, vw, vh);
+        newsCtx.clearRect(0, 0, newsCanvas.getBoundingClientRect().width, newsCanvas.getBoundingClientRect().height);
 
         // If images not ready yet
         if (galaxies.length === 0 || !galaxies[0].img) {
@@ -443,6 +496,8 @@
 
         mapCtx.restore();
         overlayCtx.restore();
+        
+
         updateActiveGalaxyLabel();
 
     }
@@ -600,9 +655,14 @@
         overlayCanvas.width = Math.floor(overlayRect.width * dpr);
         overlayCanvas.height = Math.floor(overlayRect.height * dpr);
 
+        const newsRect = newsCanvas.getBoundingClientRect();
+        newsCanvas.width = Math.floor(newsRect.width * dpr);
+        newsCanvas.height = Math.floor(newsRect.height * dpr);
+
         // draw in CSS pixels
         mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         overlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        newsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         draw();
     }
 
@@ -679,23 +739,12 @@
     }
 
 
-
-    function mouseLoop(){
-        if(LClickTime && cam.dragging === false)
-        {
-            if(Date.now() - LClickTime > 1000) //1s threshold for hold
-            {
-                //console.log("Holding!");
-            }
-        }
-
-        requestAnimationFrame(mouseLoop);
-    }
-
     // Zoom: mouse wheel anchored at mouse position
     let targetZoom = 0.15;
     let before = null;
     let mouseRaw = null;
+    let lastTime = 0;
+    let dt = 0;
     function animationLoop() {
         if(before){
             if(Math.abs(targetZoom - cam.scale) > 0.001){
@@ -719,6 +768,21 @@
             }
         }
 
+
+        if(LClickTime && cam.dragging === false)
+        {
+            if(Date.now() - LClickTime > 1000) //1s threshold for hold
+            {
+                //console.log("Holding!");
+            }
+        }
+
+
+        // news feed ticker
+        handleNewsFeed(dt);
+
+        dt = Date.now() - lastTime;
+        lastTime = Date.now();
         requestAnimationFrame(animationLoop);
     }
 

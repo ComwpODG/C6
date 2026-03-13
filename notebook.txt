@@ -5,8 +5,8 @@ Kaelin's notes:
     - create function that computes screen position from slanted plane and add it to stars
 
 - When zooming out, stars should fade out instead of shrinking ✔
-    - also applies to jumplanes
-        - move jumplanes to a separate plane
+    - also applies to jumplanes ✔
+        - move jumplanes to a separate plane ✔
 
 - Clicking a star should open an info panel that shows
     - system name ✔
@@ -14,9 +14,8 @@ Kaelin's notes:
     - owner (default message if no owner) ✔
     - thumbnail image
     - list of information blocks below it
-    - examples of occupying forces or notable units
-    - coloured according to faction
-    - if data is missing, don't even show the heading for the section
+    - coloured according to faction ✔
+    - if data is missing, don't even show the heading for the section ✔
     - IF sector has description, it appears under faction ownership even if no owner
     - refer to pinned message for formatting ✔
 
@@ -33,16 +32,9 @@ Kaelin's notes:
         - sprite can be overridden
 
 
-Suggested phase 1
-- When zooming out, stars should fade out instead of shrinking ✔
-- Stars should not lie flat on the slanted table ✔
-- Stars should appear upright ✔
-- Make stars clickable ✔
-- Add info panel with basic system data that appears on click ✔
-- Add per-system default/custom status text
-- Add zoom threshold for labels ✔
-- Add per-star stacked markers/icons
-- Add manual colored territory polygons
+Note:
+- newsFeed should be integrated into playerFile
+
 
 trim, force lowercase, hash algorithm -> hashmap key
 at hashmap data, hold Name, all other relevant data
