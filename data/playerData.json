@@ -1,0 +1,46 @@
+{
+    "userData":{
+        "name": "Kaelin",
+        "flags": {
+            "hideWVP":false,
+            "hideMEWAO":true,
+            "hideWave":true,
+            "hideVeils":true
+        },
+
+        "sectorOverrides":[
+            {
+                "name": "Sector 0440",
+                "properName": "it work!",
+                "notes":[
+                    {
+                        "title":"Progress",
+                        "desc":"we making it out of beta with this one, maybe even into prod",
+                        "src":""
+                    },
+                    {
+                        "title":"Suffering",
+                        "desc":"this one has taken a toll on us",
+                        "src":""
+                    }
+                ]
+            },
+            {
+                "name": "Sector 4018",
+                "properName":"",
+                "faction": "AZ"
+            }
+        ],
+
+        "newsFeed":[
+            {"text": "The Wave continues to expand outwards."},
+            {"text": "Destruction continues near Galactic Center."},
+            {"text": "KGC Base recently discovered and eradicated by spare Federation forces."},
+            {"text": "Anomalous readings to be investigated by spare WVP Squadron, crews worried about reusing equipment broken in previous raids."}
+        ],
+
+        "icons":[
+
+        ]
+    }
+}

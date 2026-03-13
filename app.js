@@ -59,6 +59,13 @@
     const factionFrames = new Map();
 
 
+    //progression flags:
+    let hideWVP = true;
+    let hideMEWAO = true;
+    let hideVeils = true;
+    let hideWave = true;
+
+
     async function init() {
         try {
             const raw = await loadGalaxiesJson();
@@ -135,7 +142,7 @@
 
                 if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                sectors.set(getStarFedHash(fedName), { x, y, src, name, fedName, faction, img: null });
+                sectors.set(getStarFedHash(fedName), { x, y, src, name, fedName, faction, img: null});
             });
 
             // Preload star images ONCE per unique src, then assign to every sector
@@ -182,11 +189,13 @@
 
             await loadFonts();
 
-            await getNewsFeed();
+            //await getNewsFeed();
             newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
             newsCtx.textBaseline = "top";
-            console.log(newsContainer);
-            //overlayCtx.imageSmoothingEnabled = false;
+
+
+            // THE FINAL STEP: throw everything away
+            await loadPlayerOverrides("data/playerData.json");
 
 
             // little intro animation
@@ -266,6 +275,35 @@
         return imageCache.get(src);
     }
 
+
+    // TODO: rewrite this function to do the same thing but fetch from sheet
+    async function loadPlayerOverrides(player){
+        //for now, player is source file. This function doesn't return, though
+        const res = await fetch(player);
+        if (!res.ok) throw new Error(`Failed to fetch ${player}: HTTP ${res.status}`);
+        const temp = await res.json();
+        const data = temp["userData"];
+
+        newsContainer = data["newsFeed"];
+
+        for(const s of data["sectorOverrides"]){
+            var sector = sectors.get(getStarFedHash(s.name));
+
+            sector.name = s.properName ? (s.properName === "" ? null : s.properName) : sector.name;
+            sector.src = s.src ? (s.src === "" ? null : s.src) : sector.src;
+            sector.faction = s.faction ? (s.faction === "" ? null : s.faction) : sector.faction;
+
+            if(s.notes) sector.notes = s.notes;
+
+            sectors.set(getStarFedHash(s.name), sector);
+        }
+
+        hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
+        hideVeils   = data["flags"].hideVeils ?? hideVeils;
+        hideWVP     = data["flags"].hideWVP ?? hideWVP;
+        hideWave    = data["flags"].hideWave ?? hideWave;
+    }
+
     let diamondFrame = null;
 
 
@@ -276,18 +314,10 @@
     let newsFeedIndex = 0;
     let newsText = "";
     let newsOffset = 0;
-    async function getNewsFeed(){
-        const res = await fetch(`data/newsFeed.json`);
-        if (!res.ok) throw new Error(`Failed to fetch data/newsFeed.json: HTTP ${res.status}`);
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("data/newsFeed.json must be a JSON array");
-        newsContainer = data;
-    }
 
     function handleNewsFeed(dt){
         if(newsContainer){
             const width = mapCanvas.getBoundingClientRect().width;
-            //console.log(newsOffset);
             while(newsCtx.measureText(newsText).width < width + 20){
                 if(newsFeedIndex == newsContainer.length) newsFeedIndex = 0;
                 newsText += ' '.repeat(40);
@@ -300,13 +330,11 @@
             if(newsOffset > firstCharWidth){
                 newsText = newsText.slice(1);
                 newsOffset -= firstCharWidth;
-                console.log(newsOffset, firstCharWidth);
             }
 
             newsOffset += (dt / 1000.0) > 10 ? 0 : 50 * (dt / 1000.0);
 
             const newsRect = newsCanvas.getBoundingClientRect();
-            //console.log(newsRect.height);
             newsCtx.fillStyle = "#000000";
             newsCtx.fillRect(0, newsRect.height - NEWS_FEED_SIZE - (2 * 5), newsRect.width, NEWS_FEED_SIZE + (2 * 5));
             newsCtx.fillStyle = "#CFE7FF";
@@ -365,6 +393,7 @@
         // Draw galaxies (in world space)
         for (const g of galaxies) {
             if (!g.img) continue;
+            if (g.name === "Veils" && hideVeils) continue;
             const w = g.img.width * g.scale;
             const h = g.img.height * g.scale;
             mapCtx.drawImage(g.img, g.x, g.y, w, h);
@@ -459,7 +488,9 @@
 
                 if(s.faction && factionFrames.has(s.faction))
                 {
-                    overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
+                    if(s.faction === "WVP" && hideWVP);
+                    else if(s.faction === "M.E.W.A.O." && hideMEWAO);
+                    else overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
                 }
 
 
@@ -477,6 +508,7 @@
             drawInfoPanel();
         }
 
+        if(!hideWave){
         //else if (cam.scale <= ANOMALY_SHOW_BEFORE) {
             //if(azapallAnomaly){
                 //overlayCtx.fillStyle = "#ff000055";
@@ -494,6 +526,7 @@
                 overlayCtx.globalAlpha = 1.0;
             //}
         //}
+        }
 
         mapCtx.restore();
         overlayCtx.restore();
@@ -530,9 +563,15 @@
                 topOffset += (starScale / 2);
             }
 
-            // this is where we wound add notes;
-            //
-            //
+            if(activeStar.notes){
+                rectHeight += 1.5 * textHeight
+                for(const note of activeStar.notes){
+                    rectHeight += (20 / cam.scale);
+                    rectHeight += 2 * textHeight; //title section
+                    rectHeight += textHeight; // description
+                }
+            }
+
 
             const topLeft = bottomLeftY - rectHeight;
 
@@ -564,7 +603,37 @@
             overlayCtx.textBaseline = "middle";
             var factionText = factionMap.get(activeStar.faction) ? activeStar.faction + "-Controlled Territory" : "Uncontrolled Territory"
             overlayCtx.fillText(factionText, activeStar.x, topLeft + topOffset, 500 / cam.scale);
-            topOffset += textHeight;
+            topOffset += 1 * textHeight;
+
+            // this is where we draw notes
+            if(activeStar.notes){
+                topOffset += 0.5 * textHeight;
+
+                overlayCtx.beginPath();
+                overlayCtx.moveTo(bottomLeftX + (50 / cam.scale), topLeft + topOffset);
+                overlayCtx.lineTo(bottomLeftX + (450 / cam.scale), topLeft + topOffset);
+                overlayCtx.stroke();
+
+
+                overlayCtx.textAlign = "left";
+                overlayCtx.textBaseline = "alphabetical";
+                overlayCtx.fillStyle = "#666666";
+                overlayCtx.lineWidth = overlayCtx.lineWidth / 3;
+                for(const note of activeStar.notes){
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(bottomLeftX + (10 / cam.scale), topLeft + topOffset);
+                    overlayCtx.lineTo(bottomLeftX + (470 / cam.scale), topLeft + topOffset);
+                    overlayCtx.stroke();
+
+                    overlayCtx.fillStyle = colour;
+                    overlayCtx.fillText(note.title, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+                    topOffset += textHeight * 2;
+
+                    overlayCtx.fillStyle = "#666666";
+                    overlayCtx.fillText(note.desc, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                    topOffset += textHeight + (20 / cam.scale);
+                }
+            }
         }
     }
 
@@ -659,6 +728,8 @@
         const newsRect = newsCanvas.getBoundingClientRect();
         newsCanvas.width = Math.floor(newsRect.width * dpr);
         newsCanvas.height = Math.floor(newsRect.height * dpr);
+
+        newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
 
         // draw in CSS pixels
         mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
