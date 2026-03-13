@@ -21,7 +21,7 @@
         startCamY: 0
     };
 
-    const ZOOM_MIN = 0.08;
+    const ZOOM_MIN = 0.04;
     const ZOOM_MAX = 4.0;
 
 
@@ -178,13 +178,15 @@
 
 
             await loadFonts();
-            overlayCtx.imageSmoothingEnabled = false;
+            //overlayCtx.imageSmoothingEnabled = false;
 
 
+            // little intro animation
             before = {x: cam.x, y: cam.y};
             const rect = mapCanvas.getBoundingClientRect();
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
+            azapallAnomaly = sectors.get(2466);
             draw();
 
             requestAnimationFrame(animationLoop);
@@ -268,13 +270,17 @@
     const TEXT_SHOW_ZOOM = 0.5;   // below this, stars don't render at all
     const TEXT_MAX_AT_ZOOM = 0.8; // reaches max opacity at 2x zoom
 
-
-
     // Culling padding (in screen px -> converted to world units)
     const STAR_CULL_PAD_PX = 120;
 
     const STAR_SIZE = 50;
     let starScale = STAR_SIZE;
+
+
+    const ANOMALY_SHOW_BEFORE = 0.1;
+    const ANOMALY_MAX_AT = 0.05;
+    const ANOMALY_RADIUS = 5000;
+    let azapallAnomaly = null;
 
     function draw() {
         const rect = mapCanvas.getBoundingClientRect();
@@ -416,6 +422,23 @@
 
             // only draw info panel when the stars are also visible
             drawInfoPanel();
+        }
+
+        else if (cam.scale <= ANOMALY_SHOW_BEFORE) {
+            if(azapallAnomaly){
+                overlayCtx.fillStyle = "#ff000055";
+                overlayCtx.strokeStyle = "#ff0000";
+                overlayCtx.lineWidth = 5 / cam.scale;
+                overlayCtx.globalAlpha = clamp((ANOMALY_SHOW_BEFORE - cam.scale) / (ANOMALY_SHOW_BEFORE - ANOMALY_MAX_AT), 0, 0.5);
+                overlayCtx.beginPath();
+                overlayCtx.arc(azapallAnomaly.x, azapallAnomaly.y, ANOMALY_RADIUS, 0, 2 * Math.PI);
+                overlayCtx.fill();
+                overlayCtx.beginPath();
+                overlayCtx.arc(azapallAnomaly.x, azapallAnomaly.y, ANOMALY_RADIUS, 0, 2 * Math.PI);
+                overlayCtx.stroke();
+
+                overlayCtx.globalAlpha = 1.0;
+            }
         }
 
         mapCtx.restore();
