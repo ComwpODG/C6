@@ -219,6 +219,10 @@
                 authorize();
             };
 
+            document.getElementById("loadButton").onclick = () => {
+                authorize();
+            };
+
             azapallAnomaly = sectors.get(2466);
             draw();
 
