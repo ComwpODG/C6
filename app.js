@@ -151,7 +151,7 @@
 
                 if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                sectors.set(getStarFedHash(fedName), { x, y, src, name, fedName, faction, img: null});
+                sectors.set(getStarFedHash(fedName), { x, y, src, name, fedName, faction, nearbyToken: null, img: null});
             });
 
             // Preload star images ONCE per unique src, then assign to every sector
@@ -318,7 +318,7 @@
         // TODO: add an info panel for tokens that shows name, desc and sprite
         // can be formatted like a note from the main panel
         tokenList = data.icons.map((t, i) => {
-            return{name: t["name"], desc: t["desc"], x: 10 + (500 * i), y: 0, src: t["src"], color: t["color"], img: null, id:null};
+            return{name: t["name"], desc: t["desc"], nearbySector: null, x: 10 + (500 * i), y: 0, src: t["src"], color: t["color"], img: null, id:null};
         });
         for(const t of tokenList){
             t.img = await getImageCached(t.src);
@@ -619,11 +619,30 @@
     }
 
 
+    const TOKEN_SEARCH_RADIUS = 70;
     let activeObject= null;
     let isActiveObjectStar = true;
+    let tokenCache = [];
+    let searchedForTokens = null;
     function drawInfoPanel() {
         if (activeObject) {
             if (isActiveObjectStar) {
+                if(searchedForTokens !== activeObject){
+                    tokenCache = [];
+                    for(const t of tokens){
+                        var dist = ((t.x - activeObject.x) * (t.x - activeObject.x)) + ((t.y - activeObject.y) * (t.y - activeObject.y))
+                        
+                        // TODO:
+                        // make it so only tokens that are closest to this sector than any other sector show up
+                        // do this by having every token compute its nearest sector
+                        // O(n*m)
+                        if(dist <= TOKEN_SEARCH_RADIUS * TOKEN_SEARCH_RADIUS){
+                            tokenCache.push(t);
+                        }
+                    }
+                }
+                searchedForTokens = activeObject;
+
                 var faction = "";
                 if (activeObject.faction === "WVP" && hideWVP);
                 else if (activeObject.faction === "M.E.W.A.O." && hideMEWAO);
@@ -661,6 +680,14 @@
                     }
                 }
 
+                if(tokenCache.length > 0){
+                    for (const note of tokenCache) {
+                        rectHeight += (20 / cam.scale);
+                        rectHeight += 2 * textHeight; //title section
+                        rectHeight += textHeight; // description
+                    }
+                }
+
 
                 const topLeft = bottomLeftY - rectHeight;
 
@@ -675,8 +702,8 @@
                     overlayCtx.fillText(activeObject.name, bottomLeftX, topLeft, 500 / cam.scale);
                 }
                 else{
-                    overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight);
-                    overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight);
+                    overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight + (2 / cam.scale));
+                    overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight + (2 / cam.scale));
                 }
 
                 overlayCtx.font = `${textHeight}px C6-font`;
@@ -699,9 +726,11 @@
                 topOffset += 1 * textHeight;
 
 
+                var firstNote = true;
                 if (activeObject.notes) {
                     topOffset += 0.5 * textHeight;
 
+                    overlayCtx.lineWidth = 5 / cam.scale;
                     overlayCtx.beginPath();
                     overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (50 / cam.scale), topLeft + topOffset);
                     overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (430 / cam.scale), topLeft + topOffset);
@@ -709,11 +738,10 @@
 
 
                     overlayCtx.strokeStyle = "#666666";
-                    var firstNote = true;
                     overlayCtx.textAlign = "left";
                     overlayCtx.textBaseline = "alphabetic";
                     overlayCtx.fillStyle = "#666666";
-                    overlayCtx.lineWidth = overlayCtx.lineWidth / 3;
+                    overlayCtx.lineWidth = (5 / cam.scale) / 3;
                     for (const note of activeObject.notes) {
                         if (!firstNote) {
                             overlayCtx.beginPath();
@@ -741,6 +769,48 @@
                             overlayCtx.fillText(temp, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
                             topOffset += textHeight;
                         }
+                        overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                        topOffset += textHeight + (20 / cam.scale);
+                    }
+                }
+
+
+                if (tokenCache.length > 0) {
+                    if(!activeObject.notes){
+                        overlayCtx.lineWidth = 5 / cam.scale;
+                        overlayCtx.beginPath();
+                        overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (50 / cam.scale), topLeft + topOffset);
+                        overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (430 / cam.scale), topLeft + topOffset);
+                        overlayCtx.stroke();
+                    }
+
+                    overlayCtx.strokeStyle = "#666666";
+                    overlayCtx.textAlign = "left";
+                    overlayCtx.textBaseline = "alphabetic";
+                    overlayCtx.fillStyle = "#666666";
+                    overlayCtx.lineWidth = (5 / cam.scale) / 3;
+                    for (const note of tokenCache) {
+                        if (!firstNote) {
+                            overlayCtx.beginPath();
+                            overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (10 / cam.scale), topLeft + topOffset);
+                            overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (470 / cam.scale), topLeft + topOffset);
+                            overlayCtx.stroke();
+                        } else firstNote = false;
+
+
+
+                        overlayCtx.fillStyle = colour;
+                        if (note.src) {
+                            //console.log(note.src);
+                            overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset + (5 /cam.scale), textHeight * 2, textHeight * 2);
+                            overlayCtx.fillText(note.name, bottomLeftX + (textHeight * 2) + (5 / cam.scale), topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+                        }
+                        else overlayCtx.fillText(note.name, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+
+                        topOffset += textHeight * 2;
+
+                        overlayCtx.fillStyle = "#666666";
+                        let prev = 0;
                         overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
                         topOffset += textHeight + (20 / cam.scale);
                     }
@@ -977,6 +1047,7 @@
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
             activeObject = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
+            if(activeObject && isActiveObjectStar) searchedForTokens = null;
             draw();
         }
         if(newToken && e.clientX > 100)

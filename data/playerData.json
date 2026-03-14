@@ -11,6 +11,7 @@
         "sectorOverrides":[
             {
                 "name": "Sector 0440",
+                "faction":"FED",
                 "notes":[
                     {
                         "title":"Progress",
