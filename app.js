@@ -293,8 +293,15 @@
             sector.src = s.src ? (s.src === "" ? null : s.src) : sector.src;
             sector.faction = s.faction ? (s.faction === "" ? null : s.faction) : sector.faction;
 
-            if(s.notes) sector.notes = s.notes;
-
+            if(s.notes){
+                sector.notes = s.notes;
+                for(const note of sector.notes){
+                    if(note.src){
+                        note.img = await getImageCached(note.src);
+                        console.log(note.img);
+                    }
+                }
+            }
             sectors.set(getStarFedHash(s.name), sector);
         }
 
@@ -563,12 +570,13 @@
                 topOffset += (starScale / 2);
             }
 
+
             if(activeStar.notes){
                 rectHeight += 1.5 * textHeight
                 for(const note of activeStar.notes){
                     rectHeight += (20 / cam.scale);
                     rectHeight += 2 * textHeight; //title section
-                    rectHeight += textHeight; // description
+                    rectHeight += textHeight * (note.charNL.length + 1); // description
                 }
             }
 
@@ -594,7 +602,7 @@
 
             overlayCtx.beginPath();
             overlayCtx.moveTo(bottomLeftX + (50 / cam.scale), topLeft + topOffset);
-            overlayCtx.lineTo(bottomLeftX + (450 / cam.scale), topLeft + topOffset);
+            overlayCtx.lineTo(bottomLeftX + (430 / cam.scale), topLeft + topOffset);
             overlayCtx.stroke();
             topOffset += (20 / cam.scale) + overlayCtx.lineWidth;
 
@@ -605,32 +613,50 @@
             overlayCtx.fillText(factionText, activeStar.x, topLeft + topOffset, 500 / cam.scale);
             topOffset += 1 * textHeight;
 
-            // this is where we draw notes
+
             if(activeStar.notes){
                 topOffset += 0.5 * textHeight;
 
                 overlayCtx.beginPath();
                 overlayCtx.moveTo(bottomLeftX + (50 / cam.scale), topLeft + topOffset);
-                overlayCtx.lineTo(bottomLeftX + (450 / cam.scale), topLeft + topOffset);
+                overlayCtx.lineTo(bottomLeftX + (430 / cam.scale), topLeft + topOffset);
                 overlayCtx.stroke();
 
 
+                overlayCtx.strokeStyle = "#666666";
+                var firstNote = true;
                 overlayCtx.textAlign = "left";
-                overlayCtx.textBaseline = "alphabetical";
+                overlayCtx.textBaseline = "alphabetic";
                 overlayCtx.fillStyle = "#666666";
                 overlayCtx.lineWidth = overlayCtx.lineWidth / 3;
                 for(const note of activeStar.notes){
-                    overlayCtx.beginPath();
-                    overlayCtx.moveTo(bottomLeftX + (10 / cam.scale), topLeft + topOffset);
-                    overlayCtx.lineTo(bottomLeftX + (470 / cam.scale), topLeft + topOffset);
-                    overlayCtx.stroke();
+                    if(!firstNote){
+                        overlayCtx.beginPath();
+                        overlayCtx.moveTo(bottomLeftX + (10 / cam.scale), topLeft + topOffset);
+                        overlayCtx.lineTo(bottomLeftX + (470 / cam.scale), topLeft + topOffset);
+                        overlayCtx.stroke();
+                    } else firstNote = false;
+
 
                     overlayCtx.fillStyle = colour;
-                    overlayCtx.fillText(note.title, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+                    if(note.src){
+                        console.log(note.src);
+                        overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset, textHeight * 2, textHeight * 2);
+                        overlayCtx.fillText(note.title, bottomLeftX + (textHeight * 2) + (5 / cam.scale), topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);   
+                    }
+                    else overlayCtx.fillText(note.title, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+                    
                     topOffset += textHeight * 2;
 
                     overlayCtx.fillStyle = "#666666";
-                    overlayCtx.fillText(note.desc, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                    let prev = 0;
+                    for(const breakPoint of note.charNL){
+                        var temp = note.desc.slice(prev, breakPoint);
+                        prev = breakPoint;
+                        overlayCtx.fillText(temp, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                        topOffset += textHeight;
+                    }
+                    overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
                     topOffset += textHeight + (20 / cam.scale);
                 }
             }
