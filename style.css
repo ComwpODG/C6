@@ -95,6 +95,21 @@ html, body {
 }
 
 
+#authButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+#authButton:hover {
+    filter: brightness(1.3);
+}
+
+
 
 #crtOverlay {
     position: absolute;

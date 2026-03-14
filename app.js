@@ -214,6 +214,11 @@
             const rect = mapCanvas.getBoundingClientRect();
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
+
+            document.getElementById("authButton").onclick = () => {
+                authorize();
+            };
+
             azapallAnomaly = sectors.get(2466);
             draw();
 
@@ -1065,8 +1070,8 @@
         if(!trinket){
             var leftX = newsCanvas.getBoundingClientRect().width - 80;
             if(e.clientX >= leftX && e.clientY >= 30 && e.clientX <= leftX + 50 && e.clientY <= 80)
-                //showTokenTray = !showTokenTray;
-                authorize();
+                showTokenTray = !showTokenTray;
+                //authorize();
             //console.log(showTokenTray);
         }
         if(showTokenTray){
