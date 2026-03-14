@@ -653,7 +653,7 @@
 
 
                 if (activeObject.notes) {
-                    rectHeight += 1.5 * textHeight
+                    if (activeObject.name)rectHeight += 1.5 * textHeight
                     for (const note of activeObject.notes) {
                         rectHeight += (20 / cam.scale);
                         rectHeight += 2 * textHeight; //title section
@@ -675,8 +675,8 @@
                     overlayCtx.fillText(activeObject.name, bottomLeftX, topLeft, 500 / cam.scale);
                 }
                 else{
-                    overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight + (15 / cam.scale));
-                    overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight + (15 / cam.scale));
+                    overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight);
+                    overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight);
                 }
 
                 overlayCtx.font = `${textHeight}px C6-font`;
@@ -809,6 +809,8 @@
 
         if (!best) return;
         if (best.id === activeGalaxyId) return; // no DOM churn
+
+        if(best.name === "Veils" && hideVeils) return;
 
         activeGalaxyId = best.id;
 

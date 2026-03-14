@@ -23,6 +23,47 @@
                         "desc":"this one has taken a toll on us",
                         "charNL":[],
                         "src":"assets/icons/fed.png"
+                    },
+                    {
+                        "title":"Denial",
+                        "desc":"No, I will not learn JS",
+                        "charNL":[],
+                        "src":""
+                    },
+                    {
+                        "title":"Anger",
+                        "desc":"Javscript sucks",
+                        "charNL":[],
+                        "src":""
+                    },
+                    {
+                        "title":"Depression",
+                        "desc":"I will never be good enough at JS",
+                        "charNL":[],
+                        "src":""
+                    },
+                    {
+                        "title":"Bargaining",
+                        "desc":"But 120$ is 120$",
+                        "charNL":[],
+                        "src":""
+                    },
+                    {
+                        "title":"Acceptance",
+                        "desc":"At least its better than python",
+                        "charNL":[25],
+                        "src":""
+                    }
+                ]
+            },
+            {
+                "name": "Sector 3031",
+                "notes":[
+                    {
+                        "title":"tears",
+                        "desc":"tears were shed into the making of this",
+                        "charNL":[],
+                        "src":""
                     }
                 ]
             }
