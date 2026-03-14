@@ -25,20 +25,10 @@ My plans for after the end
 
 
 Note:
-- newsFeed should be integrated into playerFile
+- newsFeed should be integrated into playerFile ✔
 
 
-trim, force lowercase, hash algorithm -> hashmap key
-at hashmap data, hold Name, all other relevant data
-on player data load, for each hashmap entry, use Name to check if player file has entry, if yes load overrides and rest of data, else continue
-on display, show hashmap key for FED name and actual name for ENI name
-check icons field, for each entry load icon, draw them based on count
-check optional fields. If exists AND not null, display data, otherwise dont display
-
-hash algorithm should be: if A is 1 and B is 2, AB becomes (int)12, dont care about two digit numbers
--> might lead to collisions!
-    - edge case of two letters represented by 2 digits (L -> 12) can also be represented by two lower letters (AB -> 12)
-    - was given creative liberty in finding a solution
+trim, force lowercase, hash algorithm -> hashmap key ✔
 
 
 Com suggests:

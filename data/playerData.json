@@ -36,7 +36,8 @@
         ],
 
         "icons":[
-
+            "assets/icons/fed.png",
+            "assets/icons/wvp.png"
         ]
     }
 }

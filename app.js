@@ -37,6 +37,8 @@
 
     let lanes = [];  //each: {{x1, y1, x2, y2}, ...}
 
+    let trinkets = [];
+
 
     const factionMap = new Map();
 
@@ -298,11 +300,17 @@
                 for(const note of sector.notes){
                     if(note.src){
                         note.img = await getImageCached(note.src);
-                        console.log(note.img);
                     }
                 }
             }
             sectors.set(getStarFedHash(s.name), sector);
+        }
+
+        trinkets = data.icons.map((t, i) => {
+            return{x: 10 + (500 * i), y: 0, src: t, img: null};
+        });
+        for(const t of trinkets){
+            t.img = await getImageCached(t.src);
         }
 
         hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
@@ -514,6 +522,18 @@
             // only draw info panel when the stars are also visible
             drawInfoPanel();
         }
+
+        
+        for(const t of trinkets){
+            overlayCtx.drawImage(
+                t.img,
+                t.x - ((40 / cam.scale) / 2), // Center on x
+                t.y - ((40 / cam.scale) / 2), // Center on y
+                (40 / cam.scale),
+                (40 / cam.scale)
+                );
+        }
+
 
         if(!hideWave){
         //else if (cam.scale <= ANOMALY_SHOW_BEFORE) {
@@ -767,6 +787,7 @@
 
     // Pan: pointer drag
     let LClickTime = null;
+    let trinket = null;
     mapCanvas.addEventListener("pointerdown", (e) => {
         LClickTime = Date.now();
         
@@ -775,16 +796,32 @@
         cam.startCamX = cam.x;
         cam.startCamY = cam.y;
         mapCanvas.setPointerCapture(e.pointerId);
+
+        for(const t of trinkets){
+            var a = screenToWorld(e.clientX, e.clientY);
+            var dist = ((t.x - a.x) * (t.x - a.x)) + ((t.y - a.y) * (t.y - a.y))
+            
+            if(dist <= starScale * starScale)
+                trinket = t;
+        }
+        console.log(trinket);
     });
 
     mapCanvas.addEventListener("pointermove", (e) => {
-        if(LClickTime && !cam.dragging) cam.dragging = true;
-        if (!cam.dragging) return;
-        const dx = (e.clientX - cam.startMouseX) / cam.scale;
-        const dy = (e.clientY - cam.startMouseY) / cam.scale;
-        cam.x = cam.startCamX - dx;
-        cam.y = cam.startCamY - dy;
-        draw();
+        if(LClickTime && !cam.dragging && !trinket) cam.dragging = true;
+        if (cam.dragging){
+            const dx = (e.clientX - cam.startMouseX) / cam.scale;
+            const dy = (e.clientY - cam.startMouseY) / cam.scale;
+            cam.x = cam.startCamX - dx;
+            cam.y = cam.startCamY - dy;
+            draw();
+        }
+        else if(trinket){
+            var a = screenToWorld(e.clientX, e.clientY);
+            trinket.x = a.x;
+            trinket.y = a.y;
+            draw();
+        }
     });
 
     mapCanvas.addEventListener("pointerup", (e) => {
@@ -793,7 +830,7 @@
             activeStar = checkClickedStar(screenToWorld(e.clientX, e.clientY));
             draw();
             if(activeStar){
-                console.warn(activeStar);
+                //console.warn(activeStar);
             }
             else{
                 //var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));
@@ -809,7 +846,9 @@
             }
         }
         cam.dragging = false;
-        LClickTime = null;  
+        LClickTime = null;
+        console.log(trinket);
+        trinket = null;
     });
 
 
