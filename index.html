@@ -37,6 +37,7 @@
 <body>
   <button id="authorize_button">Authorize</button>
   <button id="read_button" disabled>Read Sheet Range</button>
+  <button id="messing_around">test_no_authorize</button>
 
   <pre id="output"></pre>
 
@@ -44,6 +45,7 @@
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
     const RANGE = "Sheet1!A1:B2";
+    const API_KEY = "AIzaSyDmL9dl6qPa3dvd_qFkB3opNUMBsSB_prQ";
 
     const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
 
@@ -53,6 +55,7 @@
     const output = document.getElementById("output");
     const authButton = document.getElementById("authorize_button");
     const readButton = document.getElementById("read_button");
+    const testButton = document.getElementById("messing_around");
 
     function log(obj) {
       output.textContent =
@@ -108,6 +111,25 @@
 
         log(data);
       } catch (err) {
+        console.error(err);
+        log(String(err));
+      }
+    };
+
+    testButton.onclick = async () => {
+        try{
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (!res.ok) {
+            console.error(data);
+            log(data);
+            return;
+            }
+
+            log(data);
+        } catch (err) {
         console.error(err);
         log(String(err));
       }
