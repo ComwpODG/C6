@@ -38,9 +38,6 @@
     let lanes = [];  //each: {{x1, y1, x2, y2}, ...}
 
 
-
-    let showTokenTray = false;
-    let hamburgerButton;
     let tokenList = [];
     let tokens = [];
 
@@ -196,7 +193,6 @@
             lanes = await loadLanesJson("data/lanes.json");
 
 
-            hamburgerButton = await getImageCached("assets/icons/login.png");
             trayImage = await getImageCached("assets/icons/tray.png");
             await loadFonts();
 
@@ -215,6 +211,7 @@
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
 
+            /*
             document.getElementById("authButton").onclick = () => {
                 authorize();
             };
@@ -222,6 +219,7 @@
             document.getElementById("loadButton").onclick = () => {
                 authorize();
             };
+            */
 
             azapallAnomaly = sectors.get(2466);
             draw();
@@ -648,38 +646,28 @@
 
         newsCtx.fillStyle = "#00FFFF";
         newsCtx.font = `10px C6-font`;
-        if(showTokenTray){
-            newsCtx.textAlign = "center";
-
-            newsCtx.drawImage(
-                trayImage,
-                0,
-                0,
-                100,
-                2000
-            );
-
-            var i = 0;
-            for(const t of tokenList){
-                newsCtx.drawImage(
-                    t.img,
-                    30,
-                    70 * i + 60,
-                    40,
-                    40
-                );
-                newsCtx.fillText(t.name, 50, 70 * i + 100);
-                i++;
-            }
-        }
-
+        newsCtx.textAlign = "center";
+        
         newsCtx.drawImage(
-            hamburgerButton,
-            newsCanvas.getBoundingClientRect().width - 80,
-            30,
-            50,
-            50
+            trayImage,
+            0,
+            0,
+            100,
+            2000
         );
+
+        var i = 0;
+        for(const t of tokenList){
+            newsCtx.drawImage(
+                t.img,
+                30,
+                70 * i + 60,
+                40,
+                40
+            );
+            newsCtx.fillText(t.name, 50, 70 * i + 100);
+            i++;
+        }
         
 
         updateActiveGalaxyLabel();
@@ -1071,24 +1059,16 @@
                 trinket = t;
         }
         
-        if(!trinket){
-            var leftX = newsCanvas.getBoundingClientRect().width - 80;
-            if(e.clientX >= leftX && e.clientY >= 30 && e.clientX <= leftX + 50 && e.clientY <= 80)
-                showTokenTray = !showTokenTray;
-                //authorize();
-            //console.log(showTokenTray);
-        }
-        if(showTokenTray){
-            var i = 0;
-            for(const t of tokenList)
-            {
-                if(e.clientX >= 25 && e.clientY >= 70 * i + 50 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 100){
-                    newToken = true;
-                    trinket = t;
-                    break;
-                }
-                i++;
+        
+        var i = 0;
+        for(const t of tokenList)
+        {
+            if(e.clientX >= 25 && e.clientY >= 70 * i + 50 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 100){
+                newToken = true;
+                trinket = t;
+                break;
             }
+            i++;
         }
     });
 
@@ -1129,7 +1109,7 @@
             draw();
         }
 
-        if(trinket && showTokenTray)
+        if(trinket)
         {
             if(e.clientX < 100)
             {
