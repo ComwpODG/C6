@@ -72,7 +72,7 @@ html, body {
 #galaxyLabel {
     position: absolute;
     top: 14px;
-    left: 14px;
+    left: 114px;
     display: flex;
     gap: 14px;
     pointer-events: none;
@@ -92,4 +92,36 @@ html, body {
     max-width: min(60vw, 1700px);
     color: rgba(207,231,255,0.72);
     line-height: 1.2;
+}
+
+
+
+#crtOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    
+    /* Scanlines */
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 1, 65, 0.445) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+    );
+}
+
+#appRoot::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 11;
 }

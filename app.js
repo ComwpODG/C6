@@ -37,7 +37,12 @@
 
     let lanes = [];  //each: {{x1, y1, x2, y2}, ...}
 
-    let trinkets = [];
+
+
+    let showTokenTray = false;
+    let hamburgerButton;
+    let tokenList = [];
+    let tokens = [];
 
 
     const factionMap = new Map();
@@ -189,6 +194,7 @@
             lanes = await loadLanesJson("data/lanes.json");
 
 
+            hamburgerButton = await getImageCached("assets/icons/hamburger.png");
             await loadFonts();
 
             //await getNewsFeed();
@@ -306,10 +312,10 @@
             sectors.set(getStarFedHash(s.name), sector);
         }
 
-        trinkets = data.icons.map((t, i) => {
+        tokenList = data.icons.map((t, i) => {
             return{x: 10 + (500 * i), y: 0, src: t, img: null};
         });
-        for(const t of trinkets){
+        for(const t of tokenList){
             t.img = await getImageCached(t.src);
         }
 
@@ -372,8 +378,6 @@
     let starScale = STAR_SIZE;
 
 
-    const ANOMALY_SHOW_BEFORE = 0.1;
-    const ANOMALY_MAX_AT = 0.05;
     const ANOMALY_RADIUS = 4000;
     let azapallAnomaly = null;
 
@@ -524,7 +528,7 @@
         }
 
         
-        for(const t of trinkets){
+        for(const t of tokens){
             overlayCtx.drawImage(
                 t.img,
                 t.x - ((40 / cam.scale) / 2), // Center on x
@@ -557,17 +561,49 @@
 
         mapCtx.restore();
         overlayCtx.restore();
+
+        newsCtx.fillStyle = "#3d3d3d";
+        if(true){
+            newsCtx.fillRect(
+                0, 
+                0,
+                100,
+                newsCanvas.getBoundingClientRect().height - NEWS_FEED_SIZE + (2 * 5)
+            );
+
+            var i = 0;
+            for(const t of tokenList){
+                newsCtx.drawImage(
+                    t.img,
+                    25,
+                    70 * i++ + 50,
+                    50,
+                    50
+                );
+            }
+        }
+
+        newsCtx.drawImage(
+            hamburgerButton,
+            newsCanvas.getBoundingClientRect().width - 80,
+            30,
+            50,
+            50
+        );
         
 
         updateActiveGalaxyLabel();
-
     }
 
 
     let activeStar = null;
     function drawInfoPanel(){
         if(activeStar){
-            var colour = factionMap.get(activeStar.faction) ?? "#FFFFFF";
+            var faction = "";
+            if(activeStar.faction === "WVP" && hideWVP);
+            else if(activeStar.faction === "M.E.W.A.O." && hideMEWAO);
+            else faction = activeStar.faction;
+            var colour = factionMap.get(faction) ?? "#FFFFFF";
             overlayCtx.fillStyle = "#000000";
             overlayCtx.strokeStyle = colour;
             overlayCtx.lineWidth = 5 / cam.scale;
@@ -629,7 +665,7 @@
             overlayCtx.fillStyle = colour;
             overlayCtx.textAlign = "center";
             overlayCtx.textBaseline = "middle";
-            var factionText = factionMap.get(activeStar.faction) ? activeStar.faction + "-Controlled Territory" : "Uncontrolled Territory"
+            var factionText = factionMap.get(faction) ? faction + "-Controlled Territory" : "Uncontrolled Territory"
             overlayCtx.fillText(factionText, activeStar.x, topLeft + topOffset, 500 / cam.scale);
             topOffset += 1 * textHeight;
 
@@ -797,14 +833,29 @@
         cam.startCamY = cam.y;
         mapCanvas.setPointerCapture(e.pointerId);
 
-        for(const t of trinkets){
+        for(const t of tokens){
             var a = screenToWorld(e.clientX, e.clientY);
             var dist = ((t.x - a.x) * (t.x - a.x)) + ((t.y - a.y) * (t.y - a.y))
             
             if(dist <= starScale * starScale)
                 trinket = t;
         }
-        console.log(trinket);
+        
+        if(!trinket){
+            var leftX = newsCanvas.getBoundingClientRect().width - 80;
+            if(e.clientX >= leftX && e.clientY >= 30 && e.clientX <= leftX + 50 && e.clientY <= 80)
+                showTokenTray = !showTokenTray;
+            console.log(showTokenTray);
+        }
+        else
+        {
+            if(showTokenTray){
+                for(const t of tokenList)
+                {
+                    
+                }
+            }
+        }
     });
 
     mapCanvas.addEventListener("pointermove", (e) => {
