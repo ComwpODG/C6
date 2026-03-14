@@ -44,6 +44,8 @@
     let tokenList = [];
     let tokens = [];
 
+    let trayImage;
+
 
     const factionMap = new Map();
 
@@ -195,6 +197,7 @@
 
 
             hamburgerButton = await getImageCached("assets/icons/hamburger.png");
+            trayImage = await getImageCached("assets/icons/tray.png");
             await loadFonts();
 
             //await getNewsFeed();
@@ -203,7 +206,7 @@
 
 
             // THE FINAL STEP: throw everything away
-            await loadPlayerOverrides("data/playerData.json");
+            await loadPlayerOverrides("Kaelin");
 
 
             // little intro animation
@@ -287,10 +290,10 @@
     // TODO: rewrite this function to do the same thing but fetch from sheet
     async function loadPlayerOverrides(player){
         //for now, player is source file. This function doesn't return, though
-        const res = await fetch(player);
-        if (!res.ok) throw new Error(`Failed to fetch ${player}: HTTP ${res.status}`);
+        const res = await fetch("data/playerData.json");
+        if (!res.ok) throw new Error(`Failed to fetch data/playerData.json: HTTP ${res.status}`);
         const temp = await res.json();
-        const data = temp["userData"];
+        const data = temp[player];
 
         newsContainer = data["newsFeed"];
 
@@ -312,8 +315,10 @@
             sectors.set(getStarFedHash(s.name), sector);
         }
 
+        // TODO: add an info panel for tokens that shows name, desc and sprite
+        // can be formatted like a note from the main panel
         tokenList = data.icons.map((t, i) => {
-            return{x: 10 + (500 * i), y: 0, src: t, img: null};
+            return{name: t["name"], desc: t["desc"], x: 10 + (500 * i), y: 0, src: t["src"], color: t["color"], img: null, id:null};
         });
         for(const t of tokenList){
             t.img = await getImageCached(t.src);
@@ -338,6 +343,8 @@
 
     function handleNewsFeed(dt){
         if(newsContainer){
+            newsCtx.textAlign = "left";
+            newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
             const width = mapCanvas.getBoundingClientRect().width;
             while(newsCtx.measureText(newsText).width < width + 20){
                 if(newsFeedIndex == newsContainer.length) newsFeedIndex = 0;
@@ -524,8 +531,8 @@
             overlayCtx.globalAlpha = 1.0; // reset it after, important
 
             // only draw info panel when the stars are also visible
-            drawInfoPanel();
         }
+        drawInfoPanel();
 
         
         for(const t of tokens){
@@ -536,6 +543,16 @@
                 (40 / cam.scale),
                 (40 / cam.scale)
                 );
+        }
+
+        if(trinket){
+            overlayCtx.drawImage(
+                trinket.img,
+                trinket.x - ((40 / cam.scale) / 2), // Center on x
+                trinket.y - ((40 / cam.scale) / 2), // Center on y
+                (40 / cam.scale),
+                (40 / cam.scale)
+            );
         }
 
 
@@ -562,24 +579,30 @@
         mapCtx.restore();
         overlayCtx.restore();
 
-        newsCtx.fillStyle = "#3d3d3d";
-        if(true){
-            newsCtx.fillRect(
-                0, 
+        newsCtx.fillStyle = "#00FFFF";
+        newsCtx.font = `10px C6-font`;
+        if(showTokenTray){
+            newsCtx.textAlign = "center";
+
+            newsCtx.drawImage(
+                trayImage,
+                0,
                 0,
                 100,
-                newsCanvas.getBoundingClientRect().height - NEWS_FEED_SIZE + (2 * 5)
+                2000
             );
 
             var i = 0;
             for(const t of tokenList){
                 newsCtx.drawImage(
                     t.img,
-                    25,
-                    70 * i++ + 50,
-                    50,
-                    50
+                    30,
+                    70 * i + 60,
+                    40,
+                    40
                 );
+                newsCtx.fillText(t.name, 50, 70 * i + 100);
+                i++;
             }
         }
 
@@ -596,125 +619,167 @@
     }
 
 
-    let activeStar = null;
-    function drawInfoPanel(){
-        if(activeStar){
-            var faction = "";
-            if(activeStar.faction === "WVP" && hideWVP);
-            else if(activeStar.faction === "M.E.W.A.O." && hideMEWAO);
-            else faction = activeStar.faction;
-            var colour = factionMap.get(faction) ?? "#FFFFFF";
-            overlayCtx.fillStyle = "#000000";
-            overlayCtx.strokeStyle = colour;
-            overlayCtx.lineWidth = 5 / cam.scale;
+    let activeObject= null;
+    let isActiveObjectStar = true;
+    function drawInfoPanel() {
+        if (activeObject) {
+            if (isActiveObjectStar) {
+                var faction = "";
+                if (activeObject.faction === "WVP" && hideWVP);
+                else if (activeObject.faction === "M.E.W.A.O." && hideMEWAO);
+                else faction = activeObject.faction;
+                var colour = factionMap.get(faction) ?? "#FFFFFF";
+                overlayCtx.fillStyle = "#000000";
+                overlayCtx.strokeStyle = colour;
+                overlayCtx.lineWidth = 5 / cam.scale;
 
-            const textHeight = starScale / 3;
-            overlayCtx.textAlign = "start"; 
-            overlayCtx.textBaseline = "top";
+                const textHeight = starScale / 3;
+                overlayCtx.textAlign = "start";
+                overlayCtx.textBaseline = "top";
 
-            const bottomLeftX = activeStar.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
-            var bottomLeftY = activeStar.y - starScale;
-
-
-            var rectHeight = 2 * overlayCtx.lineWidth; // baseline
-            var topOffset = overlayCtx.lineWidth * 1.8;
-
-            rectHeight += 2 * textHeight + (40 / cam.scale) + overlayCtx.lineWidth; // fed name and faction
-
-            if(activeStar.name){
-                rectHeight += (starScale / 2);
-                topOffset += (starScale / 2);
-            }
+                const bottomLeftX = activeObject.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8) + (20 / cam.scale);
+                var bottomLeftY = activeObject.y - starScale;
 
 
-            if(activeStar.notes){
-                rectHeight += 1.5 * textHeight
-                for(const note of activeStar.notes){
-                    rectHeight += (20 / cam.scale);
-                    rectHeight += 2 * textHeight; //title section
-                    rectHeight += textHeight * (note.charNL.length + 1); // description
+                var rectHeight = 2 * overlayCtx.lineWidth; // baseline
+                var topOffset = overlayCtx.lineWidth * 1.8;
+
+                rectHeight += 2 * textHeight + (40 / cam.scale) + overlayCtx.lineWidth; // fed name and faction
+
+                if (activeObject.name) {
+                    rectHeight += (starScale / 2);
+                    topOffset += (starScale / 2);
                 }
-            }
 
 
-            const topLeft = bottomLeftY - rectHeight;
-
-            // draw background
-            overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), topLeft, 500 / cam.scale, rectHeight);
-            overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), topLeft, 500 / cam.scale, rectHeight);
-
-            // draw title
-            if(activeStar.name){
-                overlayCtx.fillStyle = colour;
-                overlayCtx.font = `${starScale / 2}px C6-font`;
-                overlayCtx.fillText(activeStar.name, bottomLeftX, topLeft + (10 / cam.scale), 500 / cam.scale);
-            }
-
-            overlayCtx.font = `${textHeight}px C6-font`;
-
-            overlayCtx.fillStyle = "#666666";
-            overlayCtx.fillText(activeStar.fedName, bottomLeftX, topLeft + topOffset + (7/cam.scale), 500 / cam.scale);
-            topOffset += textHeight + (20 / cam.scale);
-
-            overlayCtx.beginPath();
-            overlayCtx.moveTo(bottomLeftX + (50 / cam.scale), topLeft + topOffset);
-            overlayCtx.lineTo(bottomLeftX + (430 / cam.scale), topLeft + topOffset);
-            overlayCtx.stroke();
-            topOffset += (20 / cam.scale) + overlayCtx.lineWidth;
-
-            overlayCtx.fillStyle = colour;
-            overlayCtx.textAlign = "center";
-            overlayCtx.textBaseline = "middle";
-            var factionText = factionMap.get(faction) ? faction + "-Controlled Territory" : "Uncontrolled Territory"
-            overlayCtx.fillText(factionText, activeStar.x, topLeft + topOffset, 500 / cam.scale);
-            topOffset += 1 * textHeight;
+                if (activeObject.notes) {
+                    rectHeight += 1.5 * textHeight
+                    for (const note of activeObject.notes) {
+                        rectHeight += (20 / cam.scale);
+                        rectHeight += 2 * textHeight; //title section
+                        rectHeight += textHeight * (note.charNL.length + 1); // description
+                    }
+                }
 
 
-            if(activeStar.notes){
-                topOffset += 0.5 * textHeight;
+                const topLeft = bottomLeftY - rectHeight;
 
-                overlayCtx.beginPath();
-                overlayCtx.moveTo(bottomLeftX + (50 / cam.scale), topLeft + topOffset);
-                overlayCtx.lineTo(bottomLeftX + (430 / cam.scale), topLeft + topOffset);
-                overlayCtx.stroke();
-
-
-                overlayCtx.strokeStyle = "#666666";
-                var firstNote = true;
-                overlayCtx.textAlign = "left";
-                overlayCtx.textBaseline = "alphabetic";
-                overlayCtx.fillStyle = "#666666";
-                overlayCtx.lineWidth = overlayCtx.lineWidth / 3;
-                for(const note of activeStar.notes){
-                    if(!firstNote){
-                        overlayCtx.beginPath();
-                        overlayCtx.moveTo(bottomLeftX + (10 / cam.scale), topLeft + topOffset);
-                        overlayCtx.lineTo(bottomLeftX + (470 / cam.scale), topLeft + topOffset);
-                        overlayCtx.stroke();
-                    } else firstNote = false;
-
+                // draw title
+                if (activeObject.name) {
+                    if(!activeObject.notes) rectHeight += 1.5 * textHeight;
+                    overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft - (20 / cam.scale), 500 / cam.scale, rectHeight);
+                    overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft - (20 / cam.scale), 500 / cam.scale, rectHeight);
 
                     overlayCtx.fillStyle = colour;
-                    if(note.src){
-                        console.log(note.src);
-                        overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset, textHeight * 2, textHeight * 2);
-                        overlayCtx.fillText(note.title, bottomLeftX + (textHeight * 2) + (5 / cam.scale), topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);   
-                    }
-                    else overlayCtx.fillText(note.title, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
-                    
-                    topOffset += textHeight * 2;
-
-                    overlayCtx.fillStyle = "#666666";
-                    let prev = 0;
-                    for(const breakPoint of note.charNL){
-                        var temp = note.desc.slice(prev, breakPoint);
-                        prev = breakPoint;
-                        overlayCtx.fillText(temp, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
-                        topOffset += textHeight;
-                    }
-                    overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
-                    topOffset += textHeight + (20 / cam.scale);
+                    overlayCtx.font = `${starScale / 2}px C6-font`;
+                    overlayCtx.fillText(activeObject.name, bottomLeftX, topLeft, 500 / cam.scale);
                 }
+                else{
+                    overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight + (15 / cam.scale));
+                    overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft, 500 / cam.scale, rectHeight + (15 / cam.scale));
+                }
+
+                overlayCtx.font = `${textHeight}px C6-font`;
+
+                overlayCtx.fillStyle = "#666666";
+                overlayCtx.fillText(activeObject.fedName, bottomLeftX, topLeft + topOffset + (7 / cam.scale), 500 / cam.scale);
+                topOffset += textHeight + (20 / cam.scale);
+
+                overlayCtx.beginPath();
+                overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (50 / cam.scale), topLeft + topOffset);
+                overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (430 / cam.scale), topLeft + topOffset);
+                overlayCtx.stroke();
+                topOffset += (20 / cam.scale) + overlayCtx.lineWidth;
+
+                overlayCtx.fillStyle = colour;
+                overlayCtx.textAlign = "center";
+                overlayCtx.textBaseline = "middle";
+                var factionText = factionMap.get(faction) ? faction + "-Controlled Territory" : "Uncontrolled Territory"
+                overlayCtx.fillText(factionText, activeObject.x, topLeft + topOffset, 500 / cam.scale);
+                topOffset += 1 * textHeight;
+
+
+                if (activeObject.notes) {
+                    topOffset += 0.5 * textHeight;
+
+                    overlayCtx.beginPath();
+                    overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (50 / cam.scale), topLeft + topOffset);
+                    overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (430 / cam.scale), topLeft + topOffset);
+                    overlayCtx.stroke();
+
+
+                    overlayCtx.strokeStyle = "#666666";
+                    var firstNote = true;
+                    overlayCtx.textAlign = "left";
+                    overlayCtx.textBaseline = "alphabetic";
+                    overlayCtx.fillStyle = "#666666";
+                    overlayCtx.lineWidth = overlayCtx.lineWidth / 3;
+                    for (const note of activeObject.notes) {
+                        if (!firstNote) {
+                            overlayCtx.beginPath();
+                            overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (10 / cam.scale), topLeft + topOffset);
+                            overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (470 / cam.scale), topLeft + topOffset);
+                            overlayCtx.stroke();
+                        } else firstNote = false;
+
+
+                        overlayCtx.fillStyle = colour;
+                        if (note.src) {
+                            //console.log(note.src);
+                            overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset, textHeight * 2, textHeight * 2);
+                            overlayCtx.fillText(note.title, bottomLeftX + (textHeight * 2) + (5 / cam.scale), topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+                        }
+                        else overlayCtx.fillText(note.title, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
+
+                        topOffset += textHeight * 2;
+
+                        overlayCtx.fillStyle = "#666666";
+                        let prev = 0;
+                        for (const breakPoint of note.charNL) {
+                            var temp = note.desc.slice(prev, breakPoint);
+                            prev = breakPoint;
+                            overlayCtx.fillText(temp, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                            topOffset += textHeight;
+                        }
+                        overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                        topOffset += textHeight + (20 / cam.scale);
+                    }
+                }
+            }
+
+
+
+            else {
+                var colour = activeObject.color ?? "#FFFFFF";
+                overlayCtx.fillStyle = "#000000";
+                overlayCtx.strokeStyle = colour;
+                overlayCtx.lineWidth = 5 / cam.scale;
+
+                const textHeight = starScale / 3;
+                overlayCtx.textAlign = "start";
+                overlayCtx.textBaseline = "top";
+
+                var rectHeight = 2 * overlayCtx.lineWidth;
+                rectHeight += 4 * textHeight;
+
+                const bottomLeftX = activeObject.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
+                var bottomLeftY = activeObject.y - starScale;
+
+                overlayCtx.strokeStyle = colour;
+
+                overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), bottomLeftY - rectHeight, 500 / cam.scale, rectHeight);
+                overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), bottomLeftY - rectHeight, 500 / cam.scale, rectHeight);
+
+                overlayCtx.fillStyle = colour;
+
+                overlayCtx.drawImage(activeObject.img, bottomLeftX, bottomLeftY - rectHeight + (10 / cam.scale), textHeight * 2, textHeight * 2);
+
+                overlayCtx.font = `${starScale / 2}px C6-font`;
+                overlayCtx.fillText(activeObject.name, bottomLeftX + (textHeight * 2) + (5 / cam.scale), bottomLeftY - rectHeight + (textHeight * 0.5) + (10 / cam.scale), 500 / cam.scale);
+
+                overlayCtx.font = `${textHeight}px C6-font`;
+                overlayCtx.fillStyle = "#666666";
+                overlayCtx.fillText(activeObject.desc, bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale), 500 / cam.scale);
             }
         }
     }
@@ -756,17 +821,42 @@
 
 
 
-    function checkClickedStar(a){
+    const MAX_RADIUS = 200;
+    function checkClickedStar(a, radius, isForInfoPanel = false){
+        var stored = {dist:MAX_RADIUS * MAX_RADIUS + 1, s:null};
         for(const [key, s] of sectors){
             var starX = s.x ;
             var starY = s.y ;
             var dist = ((starX - a.x) * (starX - a.x)) + ((starY - a.y) * (starY - a.y))
             
-            if(dist <= starScale * starScale)
-                return s;
+            if(dist <= radius * radius){
+                if(dist < stored.dist)
+                    stored = {dist, s};
+            }
         }
-        return null;
+
+        if(isForInfoPanel)
+            isActiveObjectStar = true;
+
+        return stored.s;
     }
+
+    function checkClickedToken(a){
+        var stored = {dist:MAX_RADIUS * MAX_RADIUS + 1, s:null};
+        //console.warn(a);
+        for(const t of tokens){
+            var dist = ((t.x - a.x) * (t.x - a.x)) + ((t.y - a.y) * (t.y - a.y))
+
+            if(dist <= MAX_RADIUS * MAX_RADIUS)
+                if(dist < stored.dist)
+                    stored = {dist, s: t};
+        }
+
+        isActiveObjectStar = false;
+        console.log(stored.s);
+        return stored.s;
+    }
+
 
     // extracts the ID of a star from its fedName
     function getStarFedHash(name){
@@ -824,6 +914,7 @@
     // Pan: pointer drag
     let LClickTime = null;
     let trinket = null;
+    let newToken = false;
     mapCanvas.addEventListener("pointerdown", (e) => {
         LClickTime = Date.now();
         
@@ -845,15 +936,18 @@
             var leftX = newsCanvas.getBoundingClientRect().width - 80;
             if(e.clientX >= leftX && e.clientY >= 30 && e.clientX <= leftX + 50 && e.clientY <= 80)
                 showTokenTray = !showTokenTray;
-            console.log(showTokenTray);
+            //console.log(showTokenTray);
         }
-        else
-        {
-            if(showTokenTray){
-                for(const t of tokenList)
-                {
-                    
+        if(showTokenTray){
+            var i = 0;
+            for(const t of tokenList)
+            {
+                if(e.clientX >= 25 && e.clientY >= 70 * i + 50 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 100){
+                    newToken = true;
+                    trinket = t;
+                    break;
                 }
+                i++;
             }
         }
     });
@@ -875,30 +969,43 @@
         }
     });
 
+
+    let freeList = [];
     mapCanvas.addEventListener("pointerup", (e) => {
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
-            activeStar = checkClickedStar(screenToWorld(e.clientX, e.clientY));
+            activeObject = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
             draw();
-            if(activeStar){
-                //console.warn(activeStar);
-            }
-            else{
-                //var a = checkSectorVertex(screenToWorld(e.clientX, e.clientY));
-                //if(a === null){
-                //    galacticSectors.push({name: "newSector", vertices: tempSector});
-                //    for (const v of tempSector) {
-                //        console.log("{\"x\":",v.x, ", \"y\":", v.y,"},");
-                //    }
-                //    tempSector = [];
-                //    draw();
-                //}
-                //else tempSector.push(a);
+        }
+        if(newToken && e.clientX > 100)
+        {
+            //try{
+            trinket.id = freeList.length > 0 ? freeList.pop() : tokens.length;
+            console.log(trinket.id);
+            tokens.push({...trinket});
+            //} catch(e){}
+            trinket = null;
+            draw();
+        }
+
+        if(trinket && showTokenTray)
+        {
+            if(e.clientX < 100)
+            {
+                freeList.push(trinket.id);
+                console.log("deletion", trinket.id, tokens.length);
+                tokens = tokens.filter(obj => obj.id !== trinket.id);
+                trinket = null;
+                draw();
             }
         }
+        newToken = false;
+        // TODO:
+        // add to a sector every token that's within range
+        // thats what the modded checkClickedStar function is for
         cam.dragging = false;
         LClickTime = null;
-        console.log(trinket);
+        //console.log(trinket);
         trinket = null;
     });
 
@@ -984,6 +1091,12 @@
         before = screenToWorld(e.clientX, e.clientY);
         mouseRaw = {x: e.clientX, y:e.clientY};
     }, { passive: false });
+
+
+
+    //window.addEventListener("keydown", (e) => {
+    //    console.log(e.code);
+    //});
 
 
 

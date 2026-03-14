@@ -1,6 +1,6 @@
 {
-    "userData":{
-        "name": "Kaelin",
+    "Kaelin":{
+        "displayName":"Kaelin Moya",
         "flags": {
             "hideWVP":false,
             "hideMEWAO":true,
@@ -36,8 +36,22 @@
         ],
 
         "icons":[
-            "assets/icons/fed.png",
-            "assets/icons/wvp.png"
+            {
+                "src":"assets/icons/fed.png",
+                "name":"Federation Forces",
+                "desc":"Miscellaneous Federation task force",
+                "color":"#00FFFF"
+            },
+            {
+                "src":"assets/icons/wvp.png",
+                "name":"WVP Forces",
+                "desc":"Miscellaneous WVP task force",
+                "color":"#FF00DC"
+            }
+        ],
+
+        "tokens":[
+
         ]
     }
 }
