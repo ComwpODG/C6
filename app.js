@@ -245,7 +245,7 @@
             scope: SCOPES,
             callback: (resp) => {
                 if (resp.error) {
-                    console.error(resp);
+                    console.warn(resp);
                     return;
                 }
 
@@ -983,7 +983,7 @@
         }
 
         isActiveObjectStar = false;
-        console.log(stored.s);
+        //console.log(stored.s);
         return stored.s;
     }
 
@@ -1113,7 +1113,7 @@
         {
             //try{
             trinket.id = freeList.length > 0 ? freeList.pop() : tokens.length;
-            console.log(trinket.id);
+            //console.log(trinket.id);
             tokens.push({...trinket});
             //} catch(e){}
             trinket = null;
@@ -1125,7 +1125,7 @@
             if(e.clientX < 100)
             {
                 freeList.push(trinket.id);
-                console.log("deletion", trinket.id, tokens.length);
+                //console.log("deletion", trinket.id, tokens.length);
                 tokens = tokens.filter(obj => obj.id !== trinket.id);
                 trinket = null;
                 draw();
