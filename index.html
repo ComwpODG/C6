@@ -1,4 +1,3 @@
-<!--
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Galaxy Map (Canvas)</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div id="appRoot">
@@ -23,117 +23,5 @@
 
 
     <script src="app.js"></script>
-</body>
-</html>
--->
-
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Sheets test</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-  <button id="authorize_button">Authorize</button>
-  <button id="read_button" disabled>Read Sheet Range</button>
-  <button id="messing_around">test_no_authorize</button>
-
-  <pre id="output"></pre>
-
-  <script>
-    const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
-    const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
-    const RANGE = "Sheet1!A1:B2";
-    const API_KEY = "AIzaSyDmL9dl6qPa3dvd_qFkB3opNUMBsSB_prQ";
-
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
-
-    let tokenClient = null;
-    let accessToken = null;
-
-    const output = document.getElementById("output");
-    const authButton = document.getElementById("authorize_button");
-    const readButton = document.getElementById("read_button");
-    const testButton = document.getElementById("messing_around");
-
-    function log(obj) {
-      output.textContent =
-        typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
-    }
-
-    window.onload = () => {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: (resp) => {
-          if (resp.error) {
-            console.error(resp);
-            log(resp);
-            return;
-          }
-
-          accessToken = resp.access_token;
-          readButton.disabled = false;
-          log("Authorization successful.");
-        },
-      });
-    };
-
-    authButton.onclick = () => {
-      tokenClient.requestAccessToken();
-    };
-
-    readButton.onclick = async () => {
-      if (!accessToken) {
-        log("No access token yet.");
-        return;
-      }
-
-      const url =
-        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/` +
-        encodeURIComponent(RANGE);
-
-      try {
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error(data);
-          log(data);
-          return;
-        }
-
-        log(data);
-      } catch (err) {
-        console.error(err);
-        log(String(err));
-      }
-    };
-
-    testButton.onclick = async () => {
-        try{
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
-            const res = await fetch(url);
-            const data = await res.json();
-
-            if (!res.ok) {
-            console.error(data);
-            log(data);
-            return;
-            }
-
-            log(data);
-        } catch (err) {
-        console.error(err);
-        log(String(err));
-      }
-    };
-  </script>
 </body>
 </html>

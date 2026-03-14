@@ -196,7 +196,7 @@
             lanes = await loadLanesJson("data/lanes.json");
 
 
-            hamburgerButton = await getImageCached("assets/icons/hamburger.png");
+            hamburgerButton = await getImageCached("assets/icons/login.png");
             trayImage = await getImageCached("assets/icons/tray.png");
             await loadFonts();
 
@@ -230,6 +230,64 @@
         }
     }
 
+
+    const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
+    const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
+    const RANGE = "Sheet1!A1:B2";
+
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+
+    let tokenClient = null;
+    let accessToken = null;
+    function authorize() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: (resp) => {
+                if (resp.error) {
+                    console.error(resp);
+                    return;
+                }
+
+                accessToken = resp.access_token;
+                readButton.disabled = false;
+                console.log("Authorization successful.");
+            },
+        });
+
+        tokenClient.requestAccessToken();
+    }
+    
+    async function getPlayerData() {
+        if (!accessToken) {
+            console.log("No access token yet.");
+            return;
+        }
+
+        const url =
+            `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/` +
+            encodeURIComponent(RANGE);
+
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error(data);
+                return;
+            }
+
+            console.log(data);
+        } catch (err) {
+            console.error(err);
+            console.warn(String(err));
+        }
+    }
 
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
@@ -1007,7 +1065,8 @@
         if(!trinket){
             var leftX = newsCanvas.getBoundingClientRect().width - 80;
             if(e.clientX >= leftX && e.clientY >= 30 && e.clientX <= leftX + 50 && e.clientY <= 80)
-                showTokenTray = !showTokenTray;
+                //showTokenTray = !showTokenTray;
+                authorize();
             //console.log(showTokenTray);
         }
         if(showTokenTray){
