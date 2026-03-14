@@ -726,7 +726,7 @@
                         overlayCtx.fillStyle = colour;
                         if (note.src) {
                             //console.log(note.src);
-                            overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset, textHeight * 2, textHeight * 2);
+                            overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset + (5 /cam.scale), textHeight * 2, textHeight * 2);
                             overlayCtx.fillText(note.title, bottomLeftX + (textHeight * 2) + (5 / cam.scale), topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
                         }
                         else overlayCtx.fillText(note.title, bottomLeftX, topLeft + topOffset + (textHeight * 1.5), 500 / cam.scale);
@@ -849,7 +849,7 @@
         for(const t of tokens){
             var dist = ((t.x - a.x) * (t.x - a.x)) + ((t.y - a.y) * (t.y - a.y))
 
-            if(dist <= MAX_RADIUS * MAX_RADIUS)
+            if(dist <= (40/cam.scale) * (40/cam.scale))
                 if(dist < stored.dist)
                     stored = {dist, s: t};
         }
