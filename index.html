@@ -27,45 +27,91 @@
 </html>
 -->
 
-<script src="https://apis.google.com/js/api.js"></script>
-<script>
-  /**
-   * Sample JavaScript code for sheets.spreadsheets.get
-   * See instructions for running APIs Explorer code samples locally:
-   * https://developers.google.com/explorer-help/code-samples#javascript
-   */
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Sheets test</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <button id="authorize_button">Authorize</button>
+  <button id="read_button" disabled>Read Sheet Range</button>
 
-  function authenticate() {
-    return gapi.auth2.getAuthInstance()
-        .signIn({scope: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets"})
-        .then(function() { console.log("Sign-in successful"); },
-              function(err) { console.error("Error signing in", err); });
-  }
-  function loadClient() {
-    gapi.client.setApiKey("AIzaSyDmL9dl6qPa3dvd_qFkB3opNUMBsSB_prQ");
-    return gapi.client.load("https://sheets.googleapis.com/$discovery/rest?version=v4")
-        .then(function() { console.log("GAPI client loaded for API"); },
-              function(err) { console.error("Error loading GAPI client for API", err); });
-  }
-  // Make sure the client is loaded and sign-in is complete before calling this method.
-  function execute() {
-    return gapi.client.sheets.spreadsheets.get({
-      "spreadsheetId": "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM",
-      "excludeTablesInBandedRanges": false,
-      "includeGridData": true,
-      "ranges": [
-        "Sheet1!A1:B2"
-      ]
-    })
-        .then(function(response) {
-                // Handle the results here (response.result has the parsed body).
-                console.log("Response", response);
-              },
-              function(err) { console.error("Execute error", err); });
-  }
-  gapi.load("client:auth2", function() {
-    gapi.auth2.init({client_id: "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com"});
-  });
-</script>
-<button onclick="authenticate().then(loadClient)">authorize and load</button>
-<button onclick="execute()">execute</button>
+  <pre id="output"></pre>
+
+  <script>
+    const CLIENT_ID = "YOUR_OAUTH_WEB_CLIENT_ID";
+    const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
+    const RANGE = "Sheet1!A1:B2";
+
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+
+    let tokenClient = null;
+    let accessToken = null;
+
+    const output = document.getElementById("output");
+    const authButton = document.getElementById("authorize_button");
+    const readButton = document.getElementById("read_button");
+
+    function log(obj) {
+      output.textContent =
+        typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+    }
+
+    window.onload = () => {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: (resp) => {
+          if (resp.error) {
+            console.error(resp);
+            log(resp);
+            return;
+          }
+
+          accessToken = resp.access_token;
+          readButton.disabled = false;
+          log("Authorization successful.");
+        },
+      });
+    };
+
+    authButton.onclick = () => {
+      tokenClient.requestAccessToken();
+    };
+
+    readButton.onclick = async () => {
+      if (!accessToken) {
+        log("No access token yet.");
+        return;
+      }
+
+      const url =
+        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/` +
+        encodeURIComponent(RANGE);
+
+      try {
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error(data);
+          log(data);
+          return;
+        }
+
+        log(data);
+      } catch (err) {
+        console.error(err);
+        log(String(err));
+      }
+    };
+  </script>
+</body>
+</html>
