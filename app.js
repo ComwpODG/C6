@@ -379,14 +379,14 @@
         var playerData = null;
         for(const rawData of file){
             if(!Array.isArray(rawData)) console.warn("Data is not array!");
-            if(rawData[0] === activePlayer) playerData = rawData[1];
+            if(rawData[0] === activePlayer) playerData = rawData[1].json;
         }
 
         if(!playerData) {
             console.warn("No data for player `", activePlayer, "` found!");
             return;
         }
-        console.log("loaded ", playerData);
+        console.log("loaded ", playerData[activePlayer]);
         const data = playerData[activePlayer];
 
         newsContainer = data["newsFeed"];
