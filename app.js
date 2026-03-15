@@ -256,16 +256,17 @@
     let tokenClient = null;
     let accessToken = null;
     function authorize() {
-        document.getElementById("authButton").style.display = "none";
-        document.getElementById("saveButton").style.display = "block";
-        document.getElementById("loadButton").style.display = "block";
-        document.getElementById("players").style.display = "block";
+        //document.getElementById("authButton").style.display = "none";
+        //document.getElementById("saveButton").style.display = "block";
+        //document.getElementById("loadButton").style.display = "block";
+        //document.getElementById("players").style.display = "block";
 
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: SCOPES,
             callback: (resp) => {
                 if (resp.error) {
+                    console.log("error!");
                     console.warn(resp);
                     return;
                 }
@@ -309,7 +310,7 @@
             }
 
             console.log(data);
-
+            console.log("Attempting to load:");
             await loadPlayerOverrides(data["values"]);
         } catch (err) {
             console.error(err);
@@ -385,6 +386,7 @@
             console.warn("No data for player `", activePlayer, "` found!");
             return;
         }
+        console.log("loaded ", playerData);
         const data = playerData[activePlayer];
 
         newsContainer = data["newsFeed"];
