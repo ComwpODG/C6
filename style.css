@@ -101,8 +101,9 @@ html, body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    top: 20px;
-    left: 20px;
+    display: block;
+    top: 0px;
+    left: 0px;
 }
 
 #authButton:hover {
@@ -115,12 +116,43 @@ html, body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    top: 100px;
-    left: 20px;
+    display: none;
+    top: 32px;
+    left: 0px;
 }
 
 #loadButton:hover {
     filter: brightness(1.3);
+}
+
+#saveButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: absolute;
+    display: none;
+    top: 0px;
+    left: 0px;
+}
+
+#saveButton:hover {
+    filter: brightness(1.3);
+}
+
+
+#players {
+    cursor: pointer;
+    padding: 0;
+    position: absolute;
+    display: block;
+    padding: 2px;
+    border: 2px solid #00FFFF;
+    color: #00FFFF;
+    background: #00000073;
+    display: none;
+    top: 64px;
+    left: 13px;
 }
 
 

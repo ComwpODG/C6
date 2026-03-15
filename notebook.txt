@@ -9,18 +9,18 @@ here's what needs to happen
 - Inject spaces in news feed ✔
 - fix the wave to not fade on zoom / no inner fill ✔
 
-- Research on google drive Apps Script API
-- If successful research, then use google sheets to store player data. if not, use players.json
+- Research on google drive Apps Script API ✔
+- If successful research, then use google sheets to store player data. if not, use players.json ✔
 - sector overrides ✔
 - This includes making a drop down for players
 
 - music loop
 - Territorial Polygons (and a way to make them within reason) - LOWEST PRIORITY
-- Spawnable, Movable, and Deletable ship tokens, that show up at the nearest sector's info panel
-*If you do the last one right, you might be able to get away with ion storms just secretly being the same internal object as ships. haha*
+- Spawnable, Movable, and Deletable ship tokens, that show up at the nearest sector's info panel ✔
+*If you do the last one right, you might be able to get away with ion storms just secretly being the same internal object as ships. haha* ✔
 
 My plans for after the end
-- Look into CRT style filtering - doable, hard
+- Look into CRT style filtering ✔
 - Darken background and add stars to fill the intergalactic void
 
 
@@ -36,15 +36,15 @@ You neeeeeeed to key a hashmap of stars by their name (you can condense it to a 
 so that when you read the player file you can identify and update these stars quickly ✔
 i'm telling you to use a hashmap where the star is stored as the value for the ID that is it's name converted into a number.  ✔
 When you load the stars, you load them into that hashmap. Then you load the player file. ✔
-Player file should be human-readable
+Player file should be human-readable ✔
     - i want to be able to type the name of the star system (wether it is ENI or FED name for it, IDFK lol, that one i leave to you.)
-    - player file has the same algorithm to determine ID, so you will be able to do a lookup on the hashmap and get the star data / modify it for display.
+    - player file has the same algorithm to determine ID, so you will be able to do a lookup on the hashmap and get the star data / modify it for display. ✔
 
 
 
 Wishful thinking / later exploration
-- moving ships around through the UI
-    - should also have status box on click
+- moving ships around through the UI ✔
+    - should also have status box on click ✔
 - Add completely client-side drawing on the map
 - Automatic territory generation from owned systems, if possible
 - Add CRT filter ✔

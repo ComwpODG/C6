@@ -202,7 +202,7 @@
 
 
             // THE FINAL STEP: throw everything away
-            await loadPlayerOverrides("Kaelin");
+            //await loadPlayerOverrides("Kaelin");
 
 
             // little intro animation
@@ -220,6 +220,12 @@
 
             document.getElementById("loadButton").onclick = () => {
                 getPlayerData();
+            };
+
+            document.getElementById("players").onchange = () => {
+                var userVal = document.getElementById("players").options[document.getElementById("players").selectedIndex].value;
+                //console.log(userVal);
+                activePlayer = userVal;
             };
 
 
@@ -240,6 +246,7 @@
     }
 
 
+    let activePlayer = null;
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
     const RANGE = "Sheet1!A1:B2";
@@ -249,6 +256,11 @@
     let tokenClient = null;
     let accessToken = null;
     function authorize() {
+        document.getElementById("authButton").style.display = "none";
+        document.getElementById("saveButton").style.display = "block";
+        document.getElementById("loadButton").style.display = "block";
+        document.getElementById("players").style.display = "block";
+
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: SCOPES,
@@ -257,6 +269,11 @@
                     console.warn(resp);
                     return;
                 }
+
+                document.getElementById("authButton").style.display = "none";
+                document.getElementById("saveButton").style.display = "block";
+                document.getElementById("loadButton").style.display = "block";
+                document.getElementById("players").style.display = "block";
 
                 accessToken = resp.access_token;
                 readButton.disabled = false;
@@ -292,6 +309,8 @@
             }
 
             console.log(data);
+
+            await loadPlayerOverrides(data["values"]);
         } catch (err) {
             console.error(err);
             console.warn(String(err));
@@ -355,12 +374,18 @@
 
 
     // TODO: rewrite this function to do the same thing but fetch from sheet
-    async function loadPlayerOverrides(player){
-        //for now, player is source file. This function doesn't return, though
-        const res = await fetch("data/playerData.json");
-        if (!res.ok) throw new Error(`Failed to fetch data/playerData.json: HTTP ${res.status}`);
-        const temp = await res.json();
-        const data = temp[player];
+    async function loadPlayerOverrides(file){
+        var playerData = null;
+        for(const rawData of file){
+            if(!Array.isArray(rawData)) console.warn("Data is not array!");
+            if(rawData[0] === activePlayer) playerData = rawData[1];
+        }
+
+        if(!playerData) {
+            console.warn("No data for player `", activePlayer, "` found!");
+            return;
+        }
+        const data = playerData[activePlayer];
 
         newsContainer = data["newsFeed"];
 
@@ -663,11 +688,11 @@
             newsCtx.drawImage(
                 t.img,
                 30,
-                70 * i + 60,
+                70 * i + 90,
                 40,
                 40
             );
-            newsCtx.fillText(t.name, 50, 70 * i + 100);
+            newsCtx.fillText(t.name, 50, 70 * i + 130);
             i++;
         }
         
@@ -1065,7 +1090,7 @@
         var i = 0;
         for(const t of tokenList)
         {
-            if(e.clientX >= 25 && e.clientY >= 70 * i + 50 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 100){
+            if(e.clientX >= 25 && e.clientY >= 70 * i + 90 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 140){
                 newToken = true;
                 trinket = t;
                 break;
