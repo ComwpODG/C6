@@ -211,15 +211,17 @@
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
 
-            /*
+            
+
+
             document.getElementById("authButton").onclick = () => {
                 authorize();
             };
 
             document.getElementById("loadButton").onclick = () => {
-                authorize();
+                getPlayerData();
             };
-            */
+
 
             azapallAnomaly = sectors.get(2466);
             draw();

@@ -95,7 +95,6 @@ html, body {
 }
 
 
-/*
 #authButton {
     background: none;
     border: none;
@@ -116,14 +115,13 @@ html, body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    top: 20px;
+    top: 100px;
     left: 20px;
 }
 
 #loadButton:hover {
     filter: brightness(1.3);
 }
-*/
 
 
 
