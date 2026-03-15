@@ -379,7 +379,7 @@
         var playerData = null;
         for(const rawData of file){
             if(!Array.isArray(rawData)) console.warn("Data is not array!");
-            if(rawData[0] === activePlayer) playerData = rawData[1].json;
+            if(rawData[0] === activePlayer) playerData = JSON.parse(rawData[1]);
         }
 
         if(!playerData) {
