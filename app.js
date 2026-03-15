@@ -222,10 +222,15 @@
                 getPlayerData();
             };
 
+            document.getElementById("saveButton").onclick = () => {
+                saveData();
+            };
+
             document.getElementById("players").onchange = () => {
-                var userVal = document.getElementById("players").options[document.getElementById("players").selectedIndex].value;
-                //console.log(userVal);
+                playerIndex = document.getElementById("players").selectedIndex;
+                var userVal = document.getElementById("players").options[playerIndex].value;
                 activePlayer = userVal;
+                draw();
             };
 
 
@@ -247,11 +252,12 @@
 
 
     let activePlayer = null;
+    let playerIndex = -1;
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
-    const RANGE = "Sheet1!A1:B2";
+    const RANGE = "Sheet1!A1:B4";
 
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
 
     let tokenClient = null;
     let accessToken = null;
@@ -316,6 +322,23 @@
             console.error(err);
             console.warn(String(err));
         }
+    }
+
+    async function saveData(){
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!B${playerIndex + 1}?valueInputOption=RAW`;
+
+        const res = await fetch(url, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                range: RANGE,
+                majorDimension: "ROWS",
+                values: [["notices your sheet OWO"]]
+            })
+        });
     }
 
     async function loadGalaxiesJson() {
