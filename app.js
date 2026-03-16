@@ -371,7 +371,7 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                values: [[JSON.stringify(createSaveFile())]]
+                values: [[JSON.stringify(await createSaveFile())]]
             })
         });
     }
