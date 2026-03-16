@@ -214,8 +214,9 @@
             
 
 
-            document.getElementById("authButton").onclick = () => {
-                authorize();
+            document.getElementById("authButton").onclick = async () => {
+                await authorize();
+                setPlayerList(await getSpreadsheetData())
             };
 
             document.getElementById("loadButton").onclick = () => {
@@ -261,7 +262,7 @@
 
     let tokenClient = null;
     let accessToken = null;
-    function authorize() {
+    async function authorize() {
         //document.getElementById("authButton").style.display = "none";
         //document.getElementById("saveButton").style.display = "block";
         //document.getElementById("loadButton").style.display = "block";
@@ -292,27 +293,35 @@
     }
 
     //This method is to be called from the moment they sign in, and the players const should be populated with column A.
-    async function getPlayerList() {
+    function setPlayerList(rawData) {
+        
+        if(!rawData)
+        {
+            console.error("Warning! Fetched data is null!");
+            console.log(rawData)
+            return;
+        }
 
-        //TODO: fetch this from the sheet id 0 column A (instead of hardcoding it like we have now), but for now this is easier to test with
-
-        const players = ["none", "Kaelin", "Europa", "Sabered", "Aeonyx", "Rogusdra"];
+        if(!Array.isArray(rawData)){
+            console.error("Warning! Fetched data is not an array!");
+            console.log(rawData)
+            return;
+        }
 
         const select = document.getElementById("players");
-
         // Clear existing options
         select.innerHTML = "";
 
-        // Add options from sheet (array right now)
-        for (const player of players) {
+        // Crete new entires
+        for(const entry of rawData){
             const option = document.createElement("option");
-            option.value = player;
-            option.textContent = player;
+            option.value = entry[0];
+            option.textContent = entry[0];
             select.appendChild(option);
         }
     }
     
-    async function getPlayerData() {
+     async function getSpreadsheetData() {
         if (!accessToken) {
             console.log("No access token yet.");
             return;
@@ -336,9 +345,9 @@
                 return;
             }
 
-            console.log(data);
-            console.log("Attempting to load:");
-            await loadPlayerOverrides(data["values"]);
+
+            console.log("Fetched ", data);
+            return data["values"];
         } catch (err) {
             console.error(err);
             console.warn(String(err));
