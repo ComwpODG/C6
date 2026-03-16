@@ -216,11 +216,10 @@
 
             document.getElementById("authButton").onclick = () => {
                 authorize();
-                setPlayerList(getSpreadsheetData());
             };
 
             document.getElementById("loadButton").onclick = () => {
-                loadPlayerOverrides(getSpreadsheetData());
+                getPlayerData();
             };
 
             document.getElementById("saveButton").onclick = () => {
@@ -228,9 +227,10 @@
             };
 
             document.getElementById("players").onchange = () => {
-                var userVal = document.getElementById("players").options[document.getElementById("players").selectedIndex].value;
-                //console.log(userVal);
+                playerIndex = document.getElementById("players").selectedIndex;
+                var userVal = document.getElementById("players").options[playerIndex].value;
                 activePlayer = userVal;
+                draw();
             };
 
 
@@ -252,11 +252,12 @@
 
 
     let activePlayer = null;
+    let playerIndex = -1;
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
-    const RANGE = "Sheet1!A1:B999";
+    const RANGE = "Sheet1!A1:B4";
 
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
 
     let tokenClient = null;
     let accessToken = null;
@@ -289,8 +290,29 @@
 
         tokenClient.requestAccessToken();
     }
+
+    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
+    async function getPlayerList() {
+
+        //TODO: fetch this from the sheet id 0 column A (instead of hardcoding it like we have now), but for now this is easier to test with
+
+        const players = ["none", "Kaelin", "Europa", "Sabered", "Aeonyx", "Rogusdra"];
+
+        const select = document.getElementById("players");
+
+        // Clear existing options
+        select.innerHTML = "";
+
+        // Add options from sheet (array right now)
+        for (const player of players) {
+            const option = document.createElement("option");
+            option.value = player;
+            option.textContent = player;
+            select.appendChild(option);
+        }
+    }
     
-    async function getSpreadsheetData() {
+    async function getPlayerData() {
         if (!accessToken) {
             console.log("No access token yet.");
             return;
@@ -314,41 +336,12 @@
                 return;
             }
 
-
-            console.log("Fetched ", data);
-            return data["values"];
+            console.log(data);
+            console.log("Attempting to load:");
+            await loadPlayerOverrides(data["values"]);
         } catch (err) {
             console.error(err);
             console.warn(String(err));
-        }
-    }
-
-    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
-    function setPlayerList(rawData) {
-        
-        if(!rawData)
-        {
-            console.error("Warning! Fetched data is invalid!");
-            console.log(rawData)
-            return;
-        }
-
-        if(!Array.isArray(rawData)){
-            console.error("Warning! Fetched data is not an array!");
-            console.log(rawData)
-            return;
-        }
-
-        const select = document.getElementById("players");
-        // Clear existing options
-        select.innerHTML = "";
-
-        // Crete new entires
-        for(const entry of rawData){
-            const option = document.createElement("option");
-            option.value = entry[0];
-            option.textContent = entry[0];
-            select.appendChild(option);
         }
     }
 
@@ -362,16 +355,10 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                //values: [[JSON.stringify(await createSaveFile())]]
                 values: [["test"]]
             })
         });
     }
-
-    async function createSaveFile(){
-
-    }
-
 
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
