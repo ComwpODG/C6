@@ -216,11 +216,10 @@
 
             document.getElementById("authButton").onclick = async () => {
                 authorize();
-                setPlayerList(await getSpreadsheetData())
             };
 
             document.getElementById("loadButton").onclick = () => {
-                loadPlayerOverrides(getPlayerData());
+                loadPlayerOverrides(getSpreadsheetData());
             };
 
             document.getElementById("saveButton").onclick = () => {
@@ -271,7 +270,7 @@
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: SCOPES,
-            callback: (resp) => {
+            callback: async (resp) => {
                 if (resp.error) {
                     console.log("error!");
                     console.warn(resp);
@@ -284,6 +283,8 @@
                 document.getElementById("players").style.display = "block";
 
                 accessToken = resp.access_token;
+                setPlayerList(await getSpreadsheetData())
+
                 readButton.disabled = false;
                 console.log("Authorization successful.");
             },
