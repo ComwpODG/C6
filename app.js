@@ -70,7 +70,6 @@
     let hideMEWAO = true;
     let hideVeils = true;
     let hideWave = true;
-x
 
     async function init() {
         try {
@@ -129,16 +128,18 @@ x
 
 
             for (const g of galaxies){
-                rawSectors = [...rawSectors, ...await loadSectorsJson(g)];
-                rawGalacticSectors = [...rawGalacticSectors, ...await loadGalacticSectorsJson(g)];
+                const result = await loadSectorsJson(g);
+                rawSectors = [...rawSectors, ...result.data.map(d => ({data: d, src: g}))];
+                const gResult = await loadGalacticSectorsJson(g);
+                rawGalacticSectors = [...rawGalacticSectors, ...gResult.data.map(d => ({data: d, src: g}))];
             }
 
 
 
             //Do the same for sectors
             rawSectors.forEach((s, i) => {
-                const x = Number.isFinite(s.data.x) ? s.x / 2.5 + s.src.x : 0;
-                const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.x : 0;
+                const x = Number.isFinite(s.data.x) ? s.data.x / 2.5 + s.src.x : 0;
+                const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.y : 0;
                 const src = (typeof s.data.src === "string" && s.data.src.trim()) ? s.data.src.trim() : null;
                 const fedName = (s.data.name ?? `Sector ${i + 1}`).toString();
 
@@ -377,17 +378,18 @@ x
 
     async function createSaveFile(){
 
-        var rawSectors;
+        var rawSectors = [];
 
         for (const g of galaxies){
-            rawSectors = [...rawSectors, ...await loadSectorsJson(g)];
+            const result = await loadSectorsJson(g);
+            rawSectors = [...rawSectors, ...result.data.map(d => ({data: d, src: g}))];
         }
 
 
         //Do the same for sectors
         var tempSectors = rawSectors.map((s, i) => {
-            const x = Number.isFinite(s.data.x) ? s.x / 2.5 + s.src.x : 0;
-            const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.x : 0;
+            const x = Number.isFinite(s.data.x) ? s.data.x / 2.5 + s.src.x : 0;
+            const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.y : 0;
             const src = (typeof s.data.src === "string" && s.data.src.trim()) ? s.data.src.trim() : null;
             const fedName = (s.data.name ?? `Sector ${i + 1}`).toString();
 
