@@ -216,16 +216,14 @@
 
             document.getElementById("authButton").onclick = () => {
                 authorize();
-                var data = getSpreadsheetData();
-                setPlayerList(data);
             };
 
             document.getElementById("loadButton").onclick = () => {
-                getSpreadsheetData();
+                getPlayerData();
             };
 
             document.getElementById("saveButton").onclick = () => {
-                //saveData();
+                saveData();
             };
 
             document.getElementById("players").onchange = () => {
@@ -292,8 +290,29 @@
 
         tokenClient.requestAccessToken();
     }
+
+    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
+    async function getPlayerList() {
+
+        //TODO: fetch this from the sheet id 0 column A (instead of hardcoding it like we have now), but for now this is easier to test with
+
+        const players = ["none", "Kaelin", "Europa", "Sabered", "Aeonyx", "Rogusdra"];
+
+        const select = document.getElementById("players");
+
+        // Clear existing options
+        select.innerHTML = "";
+
+        // Add options from sheet (array right now)
+        for (const player of players) {
+            const option = document.createElement("option");
+            option.value = player;
+            option.textContent = player;
+            select.appendChild(option);
+        }
+    }
     
-    async function getSpreadsheetData() {
+    async function getPlayerData() {
         if (!accessToken) {
             console.log("No access token yet.");
             return;
@@ -317,34 +336,12 @@
                 return;
             }
 
-
-            console.log("Fetched ", data);
-            return data["values"];
+            console.log(data);
+            console.log("Attempting to load:");
+            await loadPlayerOverrides(data["values"]);
         } catch (err) {
             console.error(err);
             console.warn(String(err));
-        }
-    }
-
-    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
-    function setPlayerList(rawData) {
-        
-        if(!rawData || !rawData.isArray())
-        {
-            console.error("Warning! Fetched data is invalid!");
-            return;
-        }
-
-        const select = document.getElementById("players");
-        // Clear existing options
-        select.innerHTML = "";
-
-        // Crete new entires
-        for(const entry of rawData){
-            const option = document.createElement("option");
-            option.value = entry[0];
-            option.textContent = entry[0];
-            select.appendChild(option);
         }
     }
 
@@ -358,15 +355,10 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                values: [[JSON.stringify(await createSaveFile())]]
+                values: [["test"]]
             })
         });
     }
-
-    async function createSaveFile(){
-
-    }
-
 
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
