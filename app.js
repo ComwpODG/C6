@@ -377,7 +377,7 @@
     }
 
     async function createSaveFile(){
-
+        console.log("saving...");
         var rawSectors = [];
 
         for (const g of galaxies){
@@ -404,7 +404,11 @@
 
         var savedSectors = [];
         for(const s of tempSectors){
-            const inMemory = sectors[s.fedName];
+            const inMemory = sectors.get(s.fedName);
+            if(!inMemory){
+                console.warn("Could not find ", s.fedName);
+                continue;
+            }
 
             if( s.faction !== inMemory.faction ||
                 s.name !== inMemory.name ||
@@ -425,6 +429,7 @@
             }
         }
 
+        console.log("Save file created!");
         return saveData;
     }
 
