@@ -70,7 +70,7 @@
     let hideMEWAO = true;
     let hideVeils = true;
     let hideWave = true;
-
+x
 
     async function init() {
         try {
@@ -129,26 +129,26 @@
 
 
             for (const g of galaxies){
-                rawSectors = [...rawSectors, ...await loadSectorsJson(g.sectorFile)];
-                rawGalacticSectors = [...rawGalacticSectors, ...await loadGalacticSectorsJson(g.gsectorFile)];
+                rawSectors = [...rawSectors, ...await loadSectorsJson(g)];
+                rawGalacticSectors = [...rawGalacticSectors, ...await loadGalacticSectorsJson(g)];
             }
 
 
 
             //Do the same for sectors
             rawSectors.forEach((s, i) => {
-                const x = Number.isFinite(s.x) ? s.x / 2.5 : 0;
-                const y = Number.isFinite(s.y) ? s.y / 2.5 : 0;
-                const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
-                const fedName = (s.name ?? `Sector ${i + 1}`).toString();
+                const x = Number.isFinite(s.data.x) ? s.x / 2.5 + s.src.x : 0;
+                const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.x : 0;
+                const src = (typeof s.data.src === "string" && s.data.src.trim()) ? s.data.src.trim() : null;
+                const fedName = (s.data.name ?? `Sector ${i + 1}`).toString();
 
                 //prioritize properName
-                const name = (typeof s.properName === "string" && s.properName.trim()) ? s.properName.trim() : null;
-                const faction = (typeof s.faction === "string" && s.faction.trim()) ? s.faction.trim() : null;
+                const name = (typeof s.data.properName === "string" && s.data.properName.trim()) ? s.data.properName.trim() : null;
+                const faction = (typeof s.data.faction === "string" && s.data.faction.trim()) ? s.data.faction.trim() : null;
 
                 if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                sectors.set(getStarFedHash(fedName), { x, y, src, name, fedName, faction, nearbyToken: null, img: null});
+                sectors.set(fedName, { x, y, src, name, fedName, faction, nearbyToken: null, img: null});
             });
 
             // Preload star images ONCE per unique src, then assign to every sector
@@ -165,8 +165,8 @@
 
             // Load galactic sectors
             galacticSectors = rawGalacticSectors.map((s, i) => {
-                const name = (s.name ?? `Sector ${i + 1}`).toString();
-                let vertices = s.vertices;
+                const name = (s.data.name ?? `Sector ${i + 1}`).toString();
+                let vertices = s.data.vertices;
 
                 return {name, vertices};
             });
@@ -218,8 +218,8 @@
                 authorize();
             };
 
-            document.getElementById("loadButton").onclick = () => {
-                loadPlayerOverrides(getSpreadsheetData());
+            document.getElementById("loadButton").onclick = async () => {
+                loadPlayerOverrides(await getSpreadsheetData());
             };
 
             document.getElementById("saveButton").onclick = () => {
@@ -252,10 +252,14 @@
 
 
     let activePlayer = null;
+    let displayName = null;
+    let flags = [];
+
+
     let playerIndex = -1;
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
-    const RANGE = "Sheet1!A1:B4";
+    const RANGE = "Sheet1!A1:B999";
 
     const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
 
@@ -314,10 +318,12 @@
 
         // Crete new entires
         for(const entry of rawData){
-            const option = document.createElement("option");
-            option.value = entry[0];
-            option.textContent = entry[0];
-            select.appendChild(option);
+            if(entry[0]){
+                const option = document.createElement("option");
+                option.value = entry[0];
+                option.textContent = entry[0];
+                select.appendChild(option);
+            }
         }
     }
     
@@ -364,9 +370,60 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                values: [["test"]]
+                values: [[JSON.stringify(createSaveFile())]]
             })
         });
+    }
+
+    async function createSaveFile(){
+
+        var rawSectors;
+
+        for (const g of galaxies){
+            rawSectors = [...rawSectors, ...await loadSectorsJson(g)];
+        }
+
+
+        //Do the same for sectors
+        var tempSectors = rawSectors.map((s, i) => {
+            const x = Number.isFinite(s.data.x) ? s.x / 2.5 + s.src.x : 0;
+            const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.x : 0;
+            const src = (typeof s.data.src === "string" && s.data.src.trim()) ? s.data.src.trim() : null;
+            const fedName = (s.data.name ?? `Sector ${i + 1}`).toString();
+
+            //prioritize properName
+            const name = (typeof s.data.properName === "string" && s.data.properName.trim()) ? s.data.properName.trim() : null;
+            const faction = (typeof s.data.faction === "string" && s.data.faction.trim()) ? s.data.faction.trim() : null;
+
+            if (!src) throw new Error(`Sector entry ${i} missing "src"`);
+
+            return { x, y, src, name, fedName, faction, nearbyToken: null, img: null};
+        });
+
+        var savedSectors = [];
+        for(const s of tempSectors){
+            const inMemory = sectors[s.fedName];
+
+            if( s.faction !== inMemory.faction ||
+                s.name !== inMemory.name ||
+                inMemory.notes
+            ){
+                savedSectors.push(inMemory);
+            }
+        }
+
+        var saveData = {
+            activePlayer:{
+                displayName,
+                flags,
+                sectorOverrides:savedSectors,
+                newsFeed:newsContainer,
+                icons:tokenList,
+                tokens:tokens
+            }
+        }
+
+        return saveData;
     }
 
     async function loadGalaxiesJson() {
@@ -379,25 +436,24 @@
         return data;
     }
 
-    //TODO: instead of one monolithic sectors.json, have individual files for each galaxy
     async function loadSectorsJson(src) {
         // cache-bust so updates show up quickly on GitHub Pages
         //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(src);
-        if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
+        const res = await fetch(src.sectorFile);
+        if (!res.ok) throw new Error(`Failed to fetch ${src.sectorFile}: HTTP ${res.status}`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("data/sectors.json must be a JSON array");
-        return data;
+        return {data, src};
     }
 
     async function loadGalacticSectorsJson(src) {
         // cache-bust so updates show up quickly on GitHub Pages
         //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(src);
-        if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
+        const res = await fetch(src.gsectorFile);
+        if (!res.ok) throw new Error(`Failed to fetch ${src.gsectorFile}: HTTP ${res.status}`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("data/galacticSectors.json must be a JSON array");
-        return data;
+        return {data, src};
     }
 
     async function loadLanesJson(src) {
@@ -443,7 +499,7 @@
         newsContainer = data["newsFeed"];
 
         for(const s of data["sectorOverrides"]){
-            var sector = sectors.get(getStarFedHash(s.name));
+            var sector = sectors.get(s.name);
 
             sector.name = s.properName ? (s.properName === "" ? null : s.properName) : sector.name;
             sector.src = s.src ? (s.src === "" ? null : s.src) : sector.src;
@@ -457,7 +513,7 @@
                     }
                 }
             }
-            sectors.set(getStarFedHash(s.name), sector);
+            sectors.set(s.name, sector);
         }
 
         // TODO: add an info panel for tokens that shows name, desc and sprite
@@ -473,6 +529,9 @@
         hideVeils   = data["flags"].hideVeils ?? hideVeils;
         hideWVP     = data["flags"].hideWVP ?? hideWVP;
         hideWave    = data["flags"].hideWave ?? hideWave;
+
+        displayName = data["displayName"];
+        flags = data["flags"];
     }
 
     let diamondFrame = null;
@@ -608,9 +667,9 @@
             mapCtx.globalAlpha = 0.5;
             mapCtx.strokeStyle = "#FFFFFF";
             for(const l of lanes){
-                var star1 = getStarFedHash(l.star1);
+                var star1 = l.star1;
                 var coords1 = {x:sectors.get(star1).x, y:sectors.get(star1).y};
-                var star2 = getStarFedHash(l.star2);
+                var star2 = l.star2;
                 var coords2 = {x:sectors.get(star2).x, y:sectors.get(star2).y};
                 mapCtx.beginPath();
                 mapCtx.moveTo(coords1.x, coords1.y);
@@ -1064,15 +1123,6 @@
         return stored.s;
     }
 
-
-    // extracts the ID of a star from its fedName
-    function getStarFedHash(name){
-        var id = parseInt(name.slice(-4));
-        return id;
-    }
-    function getStarENIHash(name){
-
-    }
 
     async function loadFonts() {
         const font = new FontFace("C6-font", "url(assets/20_Arial_12pt_st.ttf)", {
