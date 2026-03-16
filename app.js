@@ -259,7 +259,7 @@
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
     const RANGE = "Sheet1!A1:B4";
 
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
     let tokenClient = null;
     let accessToken = null;
@@ -329,7 +329,7 @@
     //This method is to be called from the moment they sign in, and the players const should be populated with column A.
     function setPlayerList(rawData) {
         
-        if(!rawData || !rawData.isArray())
+        if(!rawData || !Array.isArray(rawData))
         {
             console.error("Warning! Fetched data is invalid!");
             return;
