@@ -219,7 +219,7 @@
             };
 
             document.getElementById("loadButton").onclick = () => {
-                getPlayerData();
+                loadPlayerOverrides(getSpreadsheetData());
             };
 
             document.getElementById("players").onchange = () => {
@@ -249,9 +249,9 @@
     let activePlayer = null;
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
-    const RANGE = "Sheet1!A1:B2";
+    const RANGE = "Sheet1!A1:B999";
 
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
     let tokenClient = null;
     let accessToken = null;
@@ -284,8 +284,31 @@
 
         tokenClient.requestAccessToken();
     }
+
+    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
+    function setPlayerList(rawData) {
+        
+        if(!rawData || !Array.isArray(rawData))
+        {
+            console.error("Warning! Fetched data is invalid!");
+            console.log(rawData)
+            return;
+        }
+
+        const select = document.getElementById("players");
+        // Clear existing options
+        select.innerHTML = "";
+
+        // Crete new entires
+        for(const entry of rawData){
+            const option = document.createElement("option");
+            option.value = entry[0];
+            option.textContent = entry[0];
+            select.appendChild(option);
+        }
+    }
     
-    async function getPlayerData() {
+    async function getSpreadsheetData() {
         if (!accessToken) {
             console.log("No access token yet.");
             return;
@@ -309,14 +332,34 @@
                 return;
             }
 
-            console.log(data);
-            console.log("Attempting to load:");
-            await loadPlayerOverrides(data["values"]);
+
+            console.log("Fetched ", data);
+            return data["values"];
         } catch (err) {
             console.error(err);
             console.warn(String(err));
         }
     }
+
+    async function saveData(){
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!B${playerIndex + 1}?valueInputOption=RAW`;
+
+        const res = await fetch(url, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                values: [[JSON.stringify(await createSaveFile())]]
+            })
+        });
+    }
+
+    async function createSaveFile(){
+
+    }
+
 
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
