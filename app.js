@@ -251,7 +251,7 @@
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
     const RANGE = "Sheet1!A1:B2";
 
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
 
     let tokenClient = null;
     let accessToken = null;
