@@ -215,12 +215,12 @@
 
 
             document.getElementById("authButton").onclick = async () => {
-                await authorize();
+                authorize();
                 setPlayerList(await getSpreadsheetData())
             };
 
             document.getElementById("loadButton").onclick = () => {
-                getPlayerData();
+                loadPlayerOverrides(getPlayerData());
             };
 
             document.getElementById("saveButton").onclick = () => {
@@ -262,7 +262,7 @@
 
     let tokenClient = null;
     let accessToken = null;
-    async function authorize() {
+    function authorize() {
         //document.getElementById("authButton").style.display = "none";
         //document.getElementById("saveButton").style.display = "block";
         //document.getElementById("loadButton").style.display = "block";
