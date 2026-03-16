@@ -216,8 +216,6 @@
 
             document.getElementById("authButton").onclick = () => {
                 authorize();
-                var data = getSpreadsheetData();
-                setPlayerList(data);
             };
 
             document.getElementById("loadButton").onclick = () => {
@@ -259,11 +257,11 @@
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
     const RANGE = "Sheet1!A1:B4";
 
-    const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
 
     let tokenClient = null;
     let accessToken = null;
-    function authorize() {
+    async function authorize() {
         //document.getElementById("authButton").style.display = "none";
         //document.getElementById("saveButton").style.display = "block";
         //document.getElementById("loadButton").style.display = "block";
@@ -287,6 +285,10 @@
                 accessToken = resp.access_token;
                 readButton.disabled = false;
                 console.log("Authorization successful.");
+
+                getSpreadsheetData();
+                var data = getSpreadsheetData();
+                setPlayerList(data);
             },
         });
 
@@ -332,6 +334,7 @@
         if(!rawData || !Array.isArray(rawData))
         {
             console.error("Warning! Fetched data is invalid!");
+            console.log(rawData);
             return;
         }
 
