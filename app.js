@@ -235,7 +235,7 @@
             };
 
 
-            azapallAnomaly = sectors.get(2466);
+            azapallAnomaly = sectors.get("Sector 2466");
             draw();
 
             requestAnimationFrame(animationLoop);
