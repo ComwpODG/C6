@@ -419,7 +419,7 @@
         }
 
         var saveData = {
-            activePlayer:{
+            [activePlayer]:{
                 displayName,
                 flags,
                 sectorOverrides:savedSectors,
@@ -531,6 +531,8 @@
         for(const t of tokenList){
             t.img = await getImageCached(t.src);
         }
+
+        tokens = data.tokens;
 
         hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
         hideVeils   = data["flags"].hideVeils ?? hideVeils;
