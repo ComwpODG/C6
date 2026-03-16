@@ -290,6 +290,27 @@
 
         tokenClient.requestAccessToken();
     }
+
+    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
+    async function getPlayerList() {
+
+        //TODO: fetch this from the sheet id 0 column A (instead of hardcoding it like we have now), but for now this is easier to test with
+
+        const players = ["none", "Kaelin", "Europa", "Sabered", "Aeonyx", "Rogusdra"];
+
+        const select = document.getElementById("players");
+
+        // Clear existing options
+        select.innerHTML = "";
+
+        // Add options from sheet (array right now)
+        for (const player of players) {
+            const option = document.createElement("option");
+            option.value = player;
+            option.textContent = player;
+            select.appendChild(option);
+        }
+    }
     
     async function getPlayerData() {
         if (!accessToken) {
@@ -334,9 +355,7 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                range: RANGE,
-                majorDimension: "ROWS",
-                values: [["notices your sheet OWO"]]
+                values: [["test"]]
             })
         });
     }
