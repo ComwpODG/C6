@@ -216,10 +216,15 @@
 
             document.getElementById("authButton").onclick = () => {
                 authorize();
+                setPlayerList(getSpreadsheetData());
             };
 
             document.getElementById("loadButton").onclick = () => {
                 loadPlayerOverrides(getSpreadsheetData());
+            };
+
+            document.getElementById("saveButton").onclick = () => {
+                saveData();
             };
 
             document.getElementById("players").onchange = () => {
@@ -284,29 +289,6 @@
 
         tokenClient.requestAccessToken();
     }
-
-    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
-    function setPlayerList(rawData) {
-        
-        if(!rawData || !Array.isArray(rawData))
-        {
-            console.error("Warning! Fetched data is invalid!");
-            console.log(rawData)
-            return;
-        }
-
-        const select = document.getElementById("players");
-        // Clear existing options
-        select.innerHTML = "";
-
-        // Crete new entires
-        for(const entry of rawData){
-            const option = document.createElement("option");
-            option.value = entry[0];
-            option.textContent = entry[0];
-            select.appendChild(option);
-        }
-    }
     
     async function getSpreadsheetData() {
         if (!accessToken) {
@@ -341,6 +323,35 @@
         }
     }
 
+    //This method is to be called from the moment they sign in, and the players const should be populated with column A.
+    function setPlayerList(rawData) {
+        
+        if(!rawData)
+        {
+            console.error("Warning! Fetched data is invalid!");
+            console.log(rawData)
+            return;
+        }
+
+        if(!Array.isArray(rawData)){
+            console.error("Warning! Fetched data is not an array!");
+            console.log(rawData)
+            return;
+        }
+
+        const select = document.getElementById("players");
+        // Clear existing options
+        select.innerHTML = "";
+
+        // Crete new entires
+        for(const entry of rawData){
+            const option = document.createElement("option");
+            option.value = entry[0];
+            option.textContent = entry[0];
+            select.appendChild(option);
+        }
+    }
+
     async function saveData(){
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!B${playerIndex + 1}?valueInputOption=RAW`;
 
@@ -351,7 +362,8 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                values: [[JSON.stringify(await createSaveFile())]]
+                //values: [[JSON.stringify(await createSaveFile())]]
+                values: [["test"]]
             })
         });
     }
