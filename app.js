@@ -285,7 +285,6 @@
                 accessToken = resp.access_token;
                 setPlayerList(await getSpreadsheetData())
 
-                readButton.disabled = false;
                 console.log("Authorization successful.");
             },
         });
