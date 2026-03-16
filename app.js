@@ -418,7 +418,8 @@
                     faction:inMemory.faction,
                     name:inMemory.fedName,
                     properName:inMemory.name,
-                    src:inMemory.src
+                    src:inMemory.src,
+                    notes:inMemory.notes
                 });
             }
         }
@@ -537,7 +538,12 @@
             t.img = await getImageCached(t.src);
         }
 
-        tokens = data.tokens;
+        tokens = data.tokens.map((t, i) => {
+            return{name: t["name"], desc: t["desc"], nearbySector: null, x: t.x, y: t.y, src: t["src"], color: t["color"], img: null, id:null};
+        });
+        for(const t of tokens){
+            t.img = await getImageCached(t.src);
+        }
 
         hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
         hideVeils   = data["flags"].hideVeils ?? hideVeils;
