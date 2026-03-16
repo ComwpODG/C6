@@ -414,7 +414,12 @@
                 s.name !== inMemory.name ||
                 inMemory.notes
             ){
-                savedSectors.push(inMemory);
+                savedSectors.push({
+                    faction:inMemory.faction,
+                    name:inMemory.fedName,
+                    properName:inMemory.name,
+                    src:inMemory.src
+                });
             }
         }
 
