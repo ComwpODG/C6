@@ -285,11 +285,6 @@
     let tokenClient = null;
     let accessToken = null;
     function authorize() {
-        //document.getElementById("authButton").style.display = "none";
-        //document.getElementById("saveButton").style.display = "block";
-        //document.getElementById("loadButton").style.display = "block";
-        //document.getElementById("players").style.display = "block";
-
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: SCOPES,
@@ -559,8 +554,9 @@
         tokens = data.tokens.map((t, i) => {
             return{name: t["name"], desc: t["desc"], nearbySector: null, x: t.x, y: t.y, src: t["src"], color: t["color"], img: null, id:null};
         });
-        for(const t of tokens){
+        for(const [i, t] of tokens.entries()){
             t.img = await getImageCached(t.src);
+            t.id = i;
         }
 
         hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
@@ -1035,7 +1031,7 @@
 
 
 
-                        overlayCtx.fillStyle = colour;
+                        overlayCtx.fillStyle = note.color;
                         if (note.src) {
                             //console.log(note.src);
                             overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset + (5 /cam.scale), textHeight * 2, textHeight * 2);
