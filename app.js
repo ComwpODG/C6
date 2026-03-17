@@ -625,7 +625,7 @@
             newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
             const width = mapCanvas.getBoundingClientRect().width;
             while(newsCtx.measureText(newsText).width < width + 20){
-                if(newsFeedIndex == newsContainer.length) newsFeedIndex = 0;
+                if(newsFeedIndex >= newsContainer.length) newsFeedIndex = 0;
                 newsText += ' '.repeat(40);
                 newsText += newsContainer[newsFeedIndex].text;
                 newsFeedIndex++;
