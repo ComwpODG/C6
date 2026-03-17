@@ -861,7 +861,7 @@
         mapCtx.restore();
         overlayCtx.restore();
 
-        newsCtx.fillStyle = "#00FFFF";
+        newsCtx.fillStyle = "#FFFFFF";
         newsCtx.font = `10px C6-font`;
         newsCtx.textAlign = "center";
         newsCtx.textBaseline = "top";
