@@ -259,8 +259,25 @@
 
 
     let playerIndex = -1;
+
+    //This client_id is restricted to only requests originating from this website,
+    //so don't try to piggyback off of it- it won't work for you. But you CAN make one for yourself. Here's how.
+    //You'll need to create your own OAuth client ID in the Google Cloud Console and replace this string with it.
+    //Make sure to set the authorized JavaScript origins to the URL you are hosting this on(e.g.http://localhost:5500 or https://myusername.github.io)
     const CLIENT_ID = "571503823704-kurnmrskg05hgfkaqis8cmqmf65pljg3.apps.googleusercontent.com";
+    //And finally, lock down your client id authorized origins to prevent abuse.
+    //If you don't, someone could use your client ID on their own malicious website and phish for your users'
+    //Google login credentials. It's not super likely but better safe than sorry.
+
+
+    //Whatever the sheet looks like, it needs to 
+    //have player names in column A
+    //their corresponding save data in column B, starting from row 1. 
+    //So A1 is player one's name, B1 is player one's data, 
+    //A2 is player two's name, B2 is player two's data etc.
+    //The script will look for the active player's name in column A and load/save data from/to the corresponding cell in column B.
     const SHEET_ID = "1S-gIpNs-FL5PdXNg1y7oQrBfW9s4NfE8DsdmwscXifM";
+
     const RANGE = "Sheet1!A1:B999";
 
     const SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/spreadsheets";
@@ -911,7 +928,7 @@
                 const topLeft = bottomLeftY - rectHeight;
 
                 // draw title
-                if (activeObject.name) {
+                if (activeObject.name && !hideENINames) {
                     if(!activeObject.notes) rectHeight += 1.5 * textHeight;
                     overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft - (20 / cam.scale), 500 / cam.scale, rectHeight);
                     overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8) - (20 / cam.scale), topLeft - (20 / cam.scale), 500 / cam.scale, rectHeight);
@@ -940,7 +957,7 @@
                 overlayCtx.fillStyle = colour;
                 overlayCtx.textAlign = "center";
                 overlayCtx.textBaseline = "middle";
-                var factionText = factionMap.get(faction) ? faction + "-Controlled Territory" : "Uncontrolled Territory"
+                var factionText = factionMap.get(faction) ? faction + " - Controlled Territory" : "Uncontrolled Territory"
                 overlayCtx.fillText(factionText, activeObject.x, topLeft + topOffset, 500 / cam.scale);
                 topOffset += 1 * textHeight;
 
