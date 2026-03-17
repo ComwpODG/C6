@@ -70,6 +70,7 @@
     let hideMEWAO = true;
     let hideVeils = true;
     let hideWave = true;
+    let hideENINames = true;
 
     async function init() {
         try {
@@ -548,7 +549,8 @@
         hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
         hideVeils   = data["flags"].hideVeils ?? hideVeils;
         hideWVP     = data["flags"].hideWVP ?? hideWVP;
-        hideWave    = data["flags"].hideWave ?? hideWave;
+        hideWave = data["flags"].hideWave ?? hideWave;
+        hideENINames = data["flags"].hideENINames ?? hideENINames;
 
         displayName = data["displayName"];
         flags = data["flags"];
@@ -745,8 +747,11 @@
 
 
                 overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
+
+                var dispName = hideENINames ? (s.fedName) : (s.name ?? s.fedName);
+
                 overlayCtx.fillText(
-                    s.name ?? s.fedName,
+                    dispName,
                     s.x,
                     s.y - (starScale / 2) + (starScale / 5 + starScale)
                 );
