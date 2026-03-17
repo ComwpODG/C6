@@ -561,6 +561,7 @@
         const data = playerData[activePlayer];
 
         newsContainer = data["newsFeed"];
+        newsText = "";
 
         for(const s of data["sectorOverrides"]){
             var sector = sectors.get(s.name);
