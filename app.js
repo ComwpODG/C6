@@ -76,6 +76,11 @@
         try {
             await loadDefaultStars();
 
+            // Start camera centered on the first galaxy in the JSON
+            const g1 = galaxies[0];
+            cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
+            cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
+
             diamondFrame = await getImageCached("assets/stars/star frame.bmp");
 
             // pre-render coloured diamonds for performance reasons
@@ -93,10 +98,6 @@
 
                 factionFrames.set(faction, off);
             }
-
-
-
-            lanes = await loadLanesJson("data/lanes.json");
 
 
             trayImage = await getImageCached("assets/icons/tray.png");
@@ -292,7 +293,7 @@
     }
 
     async function saveData(){
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!B${playerIndex + 1}?valueInputOption=RAW`;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!B${playerIndex}?valueInputOption=RAW`;
 
         const res = await fetch(url, {
             method: "PUT",
@@ -301,7 +302,7 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                values: [[JSON.stringify(await createSaveFile())]]
+                values: [[JSON.stringify(await createSaveFile(), null, 4)]]
             })
         });
     }
@@ -482,11 +483,6 @@
                 galaxies[i].img = images[i];
             }
 
-            // Start camera centered on the first galaxy in the JSON
-            const g1 = galaxies[0];
-            cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
-            cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
-
 
             for (const g of galaxies){
                 const result = await loadSectorsJson(g);
@@ -532,6 +528,7 @@
             });
 
 
+            lanes = await loadLanesJson("data/lanes.json");
 
         }catch (err) {
             console.error(err);
@@ -624,6 +621,7 @@
     function handleNewsFeed(dt){
         if(newsContainer){
             newsCtx.textAlign = "left";
+            newsCtx.textBaseline = "top";
             newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
             const width = mapCanvas.getBoundingClientRect().width;
             while(newsCtx.measureText(newsText).width < width + 20){
@@ -938,7 +936,7 @@
 
                 rectHeight += 2 * textHeight + (40 / cam.scale) + overlayCtx.lineWidth; // fed name and faction
 
-                if (activeObject.name) {
+                if (activeObject.name && !hideENINames) {
                     rectHeight += (starScale / 2);
                     topOffset += (starScale / 2);
                 }
