@@ -765,7 +765,7 @@
 
                 overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
 
-                var dispName = hideENINames ? (s.fedName) : (s.fedName ?? s.name);
+                var dispName = hideENINames ? (s.fedName) : (s.name??s.fedName);
 
                 overlayCtx.fillText(
                     dispName,
