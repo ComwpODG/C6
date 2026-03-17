@@ -239,8 +239,8 @@
 
         // guide user into selecting an option (otherwise code doesn't work)
         const firstOption = document.createElement("option");
-        option.value = "none";
-        option.textContent = "none";
+        firstOption.value = "none";
+        firstOption.textContent = "none";
         select.appendChild(firstOption);
 
         // Crete new entires
@@ -549,7 +549,7 @@
     async function loadPlayerOverrides(file){
         await loadDefaultStars();
 
-        
+
         var playerData = null;
         for(const rawData of file){
             if(!Array.isArray(rawData)) console.warn("Data is not array!");
