@@ -1321,6 +1321,7 @@
     },
     {
         "name": "Sector 0523",
+        "properName": "Dichroma",
         "src": "assets\\stars\\frame_00_delay-0.1s.bmp",
         "x": 7731,
         "y": 3731
@@ -1640,6 +1641,7 @@
     {
         "faction": "WVP",
         "name": "Sector 4389",
+        "properName": "Ontregos Pass",
         "src": "assets\\stars\\frame_09_delay-0.1s.bmp",
         "x": 7682,
         "y": 4356
@@ -1731,6 +1733,7 @@
     {
         "faction": "WVP",
         "name": "Sector 4182",
+        "properName": "Stygia",
         "src": "assets\\stars\\frame_10_delay-0.1s.bmp",
         "x": 8419,
         "y": 4576
@@ -1947,6 +1950,7 @@
     {
         "faction": "WVP",
         "name": "Sector 2949",
+        "properName": "Iyona",
         "src": "assets\\stars\\frame_14_delay-0.1s.bmp",
         "x": 8343,
         "y": 4873
