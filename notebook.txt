@@ -1,9 +1,5 @@
 Kaelin's notes:
 
-- Stars should be upright
-    - find world coordinate on the screen and don't apply the slant modifier
-    - create function that computes screen position from slanted plane and add it to stars
-
 here's what needs to happen
 - Reduce news_size ✔
 - Inject spaces in news feed ✔
@@ -12,16 +8,23 @@ here's what needs to happen
 - Research on google drive Apps Script API ✔
 - If successful research, then use google sheets to store player data. if not, use players.json ✔
 - sector overrides ✔
-- This includes making a drop down for players
+- This includes making a drop down for players ✔
 
-- music loop
-- Territorial Polygons (and a way to make them within reason) - LOWEST PRIORITY
 - Spawnable, Movable, and Deletable ship tokens, that show up at the nearest sector's info panel ✔
 *If you do the last one right, you might be able to get away with ion storms just secretly being the same internal object as ships. haha* ✔
 
 My plans for after the end
 - Look into CRT style filtering ✔
 - Darken background and add stars to fill the intergalactic void
+
+
+TODO:
+- integreate azapallGalacticSectors, azapallSectors and lanes.json into galaxies.json
+    - fields for galacticSectors, sectors and lanes                 ✔
+    - all of them can be dumped into the file as is, via a script   ✔
+- music loop (com says new Audio("path.mp3");)
+- from Com: I also consider the repository clean when token images don't need their dimensions listed unless that is absolutely unavoidable
+
 
 
 Note:

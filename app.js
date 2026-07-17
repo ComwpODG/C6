@@ -29,13 +29,13 @@
 
 
     // --- Galaxies in world space (loaded from JSON) ---
-    let galaxies = []; // each: {id, src, x, y, scale, img}
+    let galaxies = []; // each: { id, src, x, y, scale, name, desc, img}
     // sectors also in world space
-    const sectors = new Map(); // each: {x, y, src, name, img}
+    const sectors = new Map(); // each: key: fedName, val: { x, y, srcImgString, name, fedName, faction, nearbyToken: null, img: null }
     // galactic sectors in world space
     let galacticSectors = []; // each {name, vertices:{x1, y1}, ...]}
 
-    let lanes = [];  //each: {{x1, y1, x2, y2}, ...}
+    let lanes = [];  //each: {{sector1, sector2}, ...}
 
 
     let tokenList = [];
@@ -106,10 +106,6 @@
             //await getNewsFeed();
             newsCtx.font = `${NEWS_FEED_SIZE}px C6-font`;
             newsCtx.textBaseline = "top";
-
-
-            // THE FINAL STEP: throw everything away
-            //await loadPlayerOverrides("Kaelin");
 
 
             // little intro animation
@@ -370,6 +366,10 @@
         return saveData;
     }
 
+
+
+
+
     async function loadGalaxiesJson() {
         // cache-bust so updates show up quickly on GitHub Pages
         //const res = await fetch(`data/galaxies.json?cb=${Date.now()}`);
@@ -377,36 +377,6 @@
         if (!res.ok) throw new Error(`Failed to fetch data/galaxies.json: HTTP ${res.status}`);
         const data = await res.json();
         if (!Array.isArray(data)) throw new Error("data/galaxies.json must be a JSON array");
-        return data;
-    }
-
-    async function loadSectorsJson(src) {
-        // cache-bust so updates show up quickly on GitHub Pages
-        //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(src.sectorFile);
-        if (!res.ok) throw new Error(`Failed to fetch ${src.sectorFile}: HTTP ${res.status}`);
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("data/sectors.json must be a JSON array");
-        return {data, src};
-    }
-
-    async function loadGalacticSectorsJson(src) {
-        // cache-bust so updates show up quickly on GitHub Pages
-        //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(src.gsectorFile);
-        if (!res.ok) throw new Error(`Failed to fetch ${src.gsectorFile}: HTTP ${res.status}`);
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("data/galacticSectors.json must be a JSON array");
-        return {data, src};
-    }
-
-    async function loadLanesJson(src) {
-        // cache-bust so updates show up quickly on GitHub Pages
-        //const res = await fetch(`data/sectors.json?cb=${Date.now()}`);
-        const res = await fetch(src);
-        if (!res.ok) throw new Error(`Failed to fetch ${src}: HTTP ${res.status}`);
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("data/lanes.json must be a JSON array");
         return data;
     }
 
@@ -436,8 +406,8 @@
 
 
             const raw = await loadGalaxiesJson();
-            let rawSectors = []; //Load the sectors
-            let rawGalacticSectors = [];
+            //let rawSectors = []; //Load the sectors
+            //let rawGalacticSectors = [];
 
             // Normalize + validate
             // g is the actual object, i is object ID in json array
@@ -454,22 +424,12 @@
                     throw new Error(`Galaxy entry ${i} is missing "src" (or "image")`);
                 }
 
-                const sectorFile = (typeof g.sectors === "string" && g.sectors.trim()) ? g.sectors.trim() : null;
-                if (!sectorFile) {
-                    throw new Error(`Galaxy entry ${i} is missing "sectors"`);
-                }
-
-                const gsectorFile = (typeof g.galacticSectors === "string" && g.galacticSectors.trim()) ? g.galacticSectors.trim() : null;
-                if (!gsectorFile) {
-                    throw new Error(`Galaxy entry ${i} is missing "galacticSectors"`);
-                }
-
                 const x = Number.isFinite(g.x) ? g.x : 0;
                 const y = Number.isFinite(g.y) ? g.y : 0;
                 const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
 
                 // equivalent to saying id: id, src: src etc
-                return { id, src, sectorFile, gsectorFile, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
+                return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
             });
 
             if (galaxies.length === 0) {
@@ -484,51 +444,53 @@
             }
 
 
-            for (const g of galaxies){
-                const result = await loadSectorsJson(g);
-                rawSectors = [...rawSectors, ...result.data.map(d => ({data: d, src: g}))];
-                const gResult = await loadGalacticSectorsJson(g);
-                rawGalacticSectors = [...rawGalacticSectors, ...gResult.data.map(d => ({data: d, src: g}))];
+            // TODO: couple galactic sectors, sectors and lanes to galaxies
+
+            // goes through each galaxies and loads of galactic sectors, sectors and lanes
+            for (const g of raw) {
+                g.sectors.forEach((s, i) => {
+                    const x = Number.isFinite(s.x) ? s.x / 2.5 + g.x : 0;
+                    const y = Number.isFinite(s.y) ? s.y / 2.5 + g.y : 0;
+                    const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
+                    const fedName = (s.name ?? `Sector ${i + 1}`).toString();
+
+                    //prioritize properName
+                    const name = (typeof s.properName === "string" && s.properName.trim()) ? s.properName.trim() : null;
+                    const faction = (typeof s.faction === "string" && s.faction.trim()) ? s.faction.trim() : null;
+
+                    if (!src) throw new Error(`Sector entry ${i} missing "src"`);
+
+                    sectors.set(fedName, { x, y, src, name, fedName, faction, nearbyToken: null, img: null });
+                });
+
+                // Preload star images ONCE per unique src, then assign to every sector
+                const uniqueStarSrcs = [...new Set([...sectors.values()].map((s, key) => s.src))];
+                const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
+                const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
+
+                sectors.forEach((s, key) => {
+                    s.img = starImgBySrc.get(s.src);
+                });
+
+
+                // Load galactic sectors
+                galacticSectors.push(...g.galacticSectors.map((s, i) => {
+                    const name = (s.name ?? `Sector ${i + 1}`).toString();
+                    let vertices = s.vertices;
+
+                    return { name, vertices };
+                }));
+
+                lanes.push(...g.lanes);
             }
 
 
 
             //Do the same for sectors
-            rawSectors.forEach((s, i) => {
-                const x = Number.isFinite(s.data.x) ? s.data.x / 2.5 + s.src.x : 0;
-                const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.y : 0;
-                const src = (typeof s.data.src === "string" && s.data.src.trim()) ? s.data.src.trim() : null;
-                const fedName = (s.data.name ?? `Sector ${i + 1}`).toString();
-
-                //prioritize properName
-                const name = (typeof s.data.properName === "string" && s.data.properName.trim()) ? s.data.properName.trim() : null;
-                const faction = (typeof s.data.faction === "string" && s.data.faction.trim()) ? s.data.faction.trim() : null;
-
-                if (!src) throw new Error(`Sector entry ${i} missing "src"`);
-
-                sectors.set(fedName, { x, y, src, name, fedName, faction, nearbyToken: null, img: null});
-            });
-
-            // Preload star images ONCE per unique src, then assign to every sector
-            const uniqueStarSrcs = [...new Set([...sectors.values()].map((s, key) => s.src))];
-            const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
-            const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
-
-            sectors.forEach((s, key) => {
-                s.img = starImgBySrc.get(s.src);
-            });
+            
 
 
-            // Load galactic sectors
-            galacticSectors = rawGalacticSectors.map((s, i) => {
-                const name = (s.data.name ?? `Sector ${i + 1}`).toString();
-                let vertices = s.data.vertices;
-
-                return {name, vertices};
-            });
-
-
-            lanes = await loadLanesJson("data/lanes.json");
+            //lanes = await loadLanesJson("data/lanes.json");
 
         }catch (err) {
             console.error(err);
@@ -812,11 +774,9 @@
 
             overlayCtx.globalAlpha = 1.0; // reset it after, important
 
-            // only draw info panel when the stars are also visible
         }
-        drawInfoPanel();
-
         
+        // Draw the tokens currently present on the map
         for(const t of tokens){
             overlayCtx.drawImage(
                 t.img,
@@ -827,6 +787,11 @@
                 );
         }
 
+        // The info panel should appear over placed tokens
+        drawInfoPanel();
+
+
+        // Draw the token currently held and dragged by the user
         if(trinket){
             overlayCtx.drawImage(
                 trinket.img,
@@ -861,11 +826,13 @@
         mapCtx.restore();
         overlayCtx.restore();
 
+        // Draw the token tray
         newsCtx.fillStyle = "#FFFFFF";
         newsCtx.font = `10px C6-font`;
         newsCtx.textAlign = "center";
         newsCtx.textBaseline = "top";
         
+        // the token tray exists on the same layer as the ticker
         newsCtx.drawImage(
             trayImage,
             0,
@@ -888,6 +855,7 @@
         }
         
 
+        // Check which galaxy is in frame and update the text at the top
         updateActiveGalaxyLabel();
     }
 
