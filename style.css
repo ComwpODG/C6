@@ -115,9 +115,8 @@ html, body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    display: none;
     width: 100px;
-    top: 64px;
+    top: 70px;
     left: 0px;
 
     opacity: 0;
@@ -126,7 +125,7 @@ html, body {
 #volumeBG {
     padding: 0;
     position: absolute;
-    top: 32px;
+    top: 70px;
     left: 0px;
 
     display: none;
@@ -176,7 +175,7 @@ html, body {
     color: #00FFFF;
     background: #00000073;
     display: none;
-    top: 80px;
+    top: 90px;
     left: 13px;
 }
 

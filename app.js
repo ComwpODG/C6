@@ -18,6 +18,7 @@
     audio.volume = volumeSlider.value;
 
     var volumeBG = document.getElementById("volumeBG");
+    volumeBG.style.clipPath = `inset(0 ${(1-volumeSlider.value) * 100}% 0 0)`;
 
     // Camera in world pixels
     const cam = {
@@ -854,11 +855,11 @@
             newsCtx.drawImage(
                 t.img,
                 30,
-                70 * i + 110,
+                70 * i + 120,
                 40,
                 40
             );
-            newsCtx.fillText(t.name, 50, 70 * i + 130);
+            newsCtx.fillText(t.name, 50, 70 * i + 160);
             i++;
         }
         
