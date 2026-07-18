@@ -12,6 +12,9 @@
     const galaxyDescEl = document.getElementById("galaxyDesc");
     let activeGalaxyId = null;
 
+
+    var audio = new Audio('assets/BGM.mp3');
+
     // Camera in world pixels
     const cam = {
         x: 0,
@@ -119,6 +122,8 @@
 
             document.getElementById("authButton").onclick = async () => {
                 authorize();
+                audio.volume = 0.3;
+                audio.play();
             };
 
             document.getElementById("loadButton").onclick = async () => {
@@ -444,8 +449,6 @@
             }
 
 
-            // TODO: couple galactic sectors, sectors and lanes to galaxies
-
             // goes through each galaxies and loads of galactic sectors, sectors and lanes
             for (const g of raw) {
                 g.sectors.forEach((s, i) => {
@@ -504,7 +507,6 @@
     }
 
 
-    // TODO: rewrite this function to do the same thing but fetch from sheet
     async function loadPlayerOverrides(file){
         await loadDefaultStars();
 
@@ -543,8 +545,7 @@
             sectors.set(s.name, sector);
         }
 
-        // TODO: add an info panel for tokens that shows name, desc and sprite
-        // can be formatted like a note from the main panel
+
         tokenList = data.icons.map((t, i) => {
             return{name: t["name"], desc: t["desc"], nearbySector: null, x: 10 + (500 * i), y: 0, src: t["src"], color: t["color"], img: null, id:null};
         });
@@ -873,8 +874,7 @@
                     for(const t of tokens){
                         var dist = ((t.x - activeObject.x) * (t.x - activeObject.x)) + ((t.y - activeObject.y) * (t.y - activeObject.y))
                         
-                        // TODO:
-                        // make it so only tokens that are closest to this sector than any other sector show up
+                        // only tokens that are closest to this sector than any other sector show up
                         // do this by having every token compute its nearest sector
                         // O(n*m)
                         if(dist <= TOKEN_SEARCH_RADIUS * TOKEN_SEARCH_RADIUS){
@@ -1298,9 +1298,6 @@
             }
         }
         newToken = false;
-        // TODO:
-        // add to a sector every token that's within range
-        // thats what the modded checkClickedStar function is for
         cam.dragging = false;
         LClickTime = null;
         //console.log(trinket);
@@ -1414,15 +1411,11 @@
     }
 
 
-    // TODO: fix such that it accepts slant
     function worldToScreen(x, y) {
         var xP = x;
         var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
         var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
 
-        //mapCanvas.
-        // TODO: make both angle and distance dynamic
-        // 1400 is perspective(1400px)
         return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
     }
 
