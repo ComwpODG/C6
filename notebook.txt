@@ -19,8 +19,9 @@ My plans for after the end
 
 
 TODO:
-- music loop (com says new Audio("path.mp3");)
-- from Com: I also consider the repository clean when token images don't need their dimensions listed unless that is absolutely unavoidable
+- clean the files   ✔
+- music loop with volume slider   ✔   
+- from Com: I also consider the repository clean when token images don't need their dimensions listed unless that is absolutely unavoidable   ?
 - add a way to edit the descriptions of tokens, even if its just a basic input
 - swap the hide bools with a list of names in the player save file
     - a list of galaxy names. If the name of a galaxy is present, the galaxy is enabled

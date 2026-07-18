@@ -101,7 +101,7 @@ html, body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    display: block;
+    display: none;
     top: 0px;
     left: 0px;
 }
@@ -128,7 +128,7 @@ html, body {
     top: 94px;
     left: 0px;
 
-    display: block;
+    display: none;
     width: 100px;
     clip-path: inset(0 0% 0 0);
     overflow: hidden;
@@ -169,12 +169,11 @@ html, body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    display: block;
     padding: 2px;
     border: 2px solid #00FFFF;
     color: #00FFFF;
     background: #00000073;
-    display: block;
+    display: none;
     top: 64px;
     left: 13px;
 }

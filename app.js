@@ -83,7 +83,7 @@
     async function init() {
         try {
             await loadDefaultStars();
-
+            
             // Start camera centered on the first galaxy in the JSON
             const g1 = galaxies[0];
             cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
@@ -147,6 +147,8 @@
                 draw();
             };
 
+            document.getElementById("loadingText").style.display = "none";
+            document.getElementById("authButton").style.display = "block";
 
             azapallAnomaly = sectors.get("Sector 2466");
             draw();
@@ -551,7 +553,7 @@
 
 
         tokenList = data.icons.map((t, i) => {
-            return{name: t["name"], desc: t["desc"], nearbySector: null, x: 10 + (500 * i), y: 0, src: t["src"], color: t["color"], img: null, id:null};
+            return{name: t["name"], desc: t["desc"], nearbySector: null, src: t["src"], color: t["color"], img: null, id:null};
         });
         for(const t of tokenList){
             t.img = await getImageCached(t.src);
@@ -1294,6 +1296,7 @@
             draw();
         }
 
+        // if a token is held and its dragged into the tray, delete it
         if(trinket)
         {
             if(e.clientX < 100)
