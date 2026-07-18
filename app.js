@@ -14,6 +14,10 @@
 
 
     var audio = new Audio('assets/BGM.mp3');
+    var volumeSlider = document.getElementById("volumeSlider");
+    audio.volume = volumeSlider.value;
+
+    var volumeBG = document.getElementById("volumeBG");
 
     // Camera in world pixels
     const cam = {
@@ -122,8 +126,6 @@
 
             document.getElementById("authButton").onclick = async () => {
                 authorize();
-                audio.volume = 0.3;
-                audio.play();
             };
 
             document.getElementById("loadButton").onclick = async () => {
@@ -208,6 +210,7 @@
                 document.getElementById("saveButton").style.display = "block";
                 document.getElementById("loadButton").style.display = "block";
                 document.getElementById("players").style.display = "block";
+                document.getElementById("volumeBG").style.display = "block";
 
                 accessToken = resp.access_token;
                 setPlayerList(await getSpreadsheetData())
@@ -569,6 +572,10 @@
 
         displayName = data["displayName"];
         flags = data["flags"];
+
+
+        // Start the audio as soon as the user loads a player
+        audio.play();
     }
 
     let diamondFrame = null;
@@ -847,7 +854,7 @@
             newsCtx.drawImage(
                 t.img,
                 30,
-                70 * i + 90,
+                70 * i + 110,
                 40,
                 40
             );
@@ -1392,6 +1399,15 @@
     //window.addEventListener("keydown", (e) => {
     //    console.log(e.code);
     //});
+
+    audio.addEventListener("ended", (e) => {
+        audio.play();
+    });
+
+    volumeSlider.oninput = function() {
+        audio.volume = this.value;
+        volumeBG.style.clipPath = `inset(0 ${(1-this.value) * 100}% 0 0)`;
+    }
 
 
 
