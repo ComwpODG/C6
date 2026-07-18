@@ -116,7 +116,7 @@ html, body {
     padding: 0;
     position: absolute;
     width: 100px;
-    top: 70px;
+    top: 94px;
     left: 0px;
 
     opacity: 0;
@@ -125,10 +125,10 @@ html, body {
 #volumeBG {
     padding: 0;
     position: absolute;
-    top: 70px;
+    top: 94px;
     left: 0px;
 
-    display: none;
+    display: block;
     width: 100px;
     clip-path: inset(0 0% 0 0);
     overflow: hidden;
@@ -174,8 +174,8 @@ html, body {
     border: 2px solid #00FFFF;
     color: #00FFFF;
     background: #00000073;
-    display: none;
-    top: 90px;
+    display: block;
+    top: 64px;
     left: 13px;
 }
 
