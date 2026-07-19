@@ -9543,6 +9543,18 @@
         "y": 3800
     },
     {
+        "desc": "Sigg is a galaxy that is not mentioned often in Waivelon Texts... While it is not as violent a wasteland as Azapall, it has a long history.",
+        "galacticSectors": [],
+        "id": "g4",
+        "name": "Sigg",
+        "scale": 3.0,
+        "sectors": [],
+        "lanes": [],
+        "src": "assets/galaxy4.png",
+        "x": -5200,
+        "y": -4800
+    },
+    {
         "desc": "this is a test... or is it",
         "galacticSectors": [],
         "id": "g3",
