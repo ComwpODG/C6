@@ -199,6 +199,11 @@ html, body {
     );
 }
 
+#textbox{
+    position: absolute;
+    display: none;
+}
+
 #appRoot::after {
     content: "";
     position: absolute;

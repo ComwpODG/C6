@@ -13,12 +13,14 @@
     let activeGalaxyId = null;
 
 
-    var audio = new Audio('assets/BGM.mp3');
-    var volumeSlider = document.getElementById("volumeSlider");
+    const audio = new Audio('assets/BGM.mp3');
+    const volumeSlider = document.getElementById("volumeSlider");
     audio.volume = volumeSlider.value;
 
-    var volumeBG = document.getElementById("volumeBG");
+    const volumeBG = document.getElementById("volumeBG");
     volumeBG.style.clipPath = `inset(0 ${(1-volumeSlider.value) * 100}% 0 0)`;
+
+
 
     // Camera in world pixels
     const cam = {
@@ -46,7 +48,10 @@
     let lanes = [];  //each: {{sector1, sector2}, ...}
 
 
+    // tokens available in the tray
     let tokenList = [];
+
+    // tokens actively on the map
     let tokens = [];
 
     let trayImage;
@@ -1250,7 +1255,7 @@
         var i = 0;
         for(const t of tokenList)
         {
-            if(e.clientX >= 25 && e.clientY >= 70 * i + 90 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 140){
+            if(e.clientX >= 25 && e.clientY >= 70 * i + 120 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 170){
                 newToken = true;
                 trinket = t;
                 break;
@@ -1313,6 +1318,13 @@
         LClickTime = null;
         //console.log(trinket);
         trinket = null;
+
+
+        if (activeObject) {
+            if (!isActiveObjectStar){
+                console.log("check for textbox");
+            }
+        }
     });
 
 
