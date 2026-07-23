@@ -38,14 +38,10 @@
     const ZOOM_MAX = 4.0;
 
 
-    // --- Galaxies in world space (loaded from JSON) ---
-    let galaxies = []; // each: { id, src, x, y, scale, name, desc, img}
-    // sectors also in world space
-    const sectors = new Map(); // each: key: fedName, val: { x, y, srcImgString, name, fedName, faction, nearbyToken: null, img: null }
-    // galactic sectors in world space
-    let galacticSectors = []; // each {name, vertices:{x1, y1}, ...]}
+    let galaxies = [];
+    const sectors = new Map();
 
-    let lanes = [];  //each: {{sector1, sector2}, ...}
+    const sectorOverrides = new Map();
 
 
     // tokens available in the tray
@@ -77,13 +73,17 @@
 
     const factionFrames = new Map();
 
+    // progression vars:
+    let unlockedGalaxies = [];
+    let unlockedFactions = [];
 
-    //progression flags:
     let hideWVP = true;
     let hideMEWAO = true;
     let hideVeils = true;
     let hideWave = true;
+
     let hideENINames = true;
+    let ANOMALY_RADIUS = -1; //-1 means disabled
 
     async function init() {
         try {
@@ -415,8 +415,6 @@
         try {
             sectors.clear();
             galaxies = [];
-            galacticSectors = [];
-            lanes = [];
             tokenList = [];
             tokens = [];
 
@@ -427,7 +425,7 @@
 
             // Normalize + validate
             // g is the actual object, i is object ID in json array
-            galaxies = raw.map((g, i) => {
+            galaxies = await Promise.all(raw.map(async (g, i) => {
                 // if null after trim, ID becomes g1, g2 etc
                 const id = (typeof g.id === "string" && g.id.trim()) ? g.id.trim() : `g${i + 1}`;
                 var src = (typeof g.src === "string" && g.src.trim())
@@ -445,24 +443,27 @@
                 const scale = Number.isFinite(g.scale) ? g.scale : 1.0;
 
                 // equivalent to saying id: id, src: src etc
-                return { id, src, x, y, scale, name: g.name ?? "", desc: g.desc ?? "", img: null };
-            });
+                return { 
+                    id, 
+                    x, 
+                    y,
+                    scale, 
+                    name: g.name ?? "", 
+                    desc: g.desc ?? "", 
+                    galacticSectors: g.galacticSectors, 
+                    lanes: g.lanes, 
+                    img: await getImageCached(src), 
+                };
+            }));
 
             if (galaxies.length === 0) {
                 throw new Error("data/galaxies.json contained 0 galaxies");
             }
 
-            // Load all images
-            // promise.all says that if ANY load fails, nothing gets saved
-            const images = await Promise.all(galaxies.map(g => getImageCached(g.src)));
-            for (let i = 0; i < galaxies.length; i++) {
-                galaxies[i].img = images[i];
-            }
-
 
             // goes through each galaxies and loads of galactic sectors, sectors and lanes
             for (const g of raw) {
-                g.sectors.forEach((s, i) => {
+                g.sectors.forEach(async (s, i) => {
                     const x = Number.isFinite(s.x) ? s.x / 2.5 + g.x : 0;
                     const y = Number.isFinite(s.y) ? s.y / 2.5 + g.y : 0;
                     const src = (typeof s.src === "string" && s.src.trim()) ? s.src.trim() : null;
@@ -474,37 +475,9 @@
 
                     if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                    sectors.set(fedName, { x, y, src, name, fedName, faction, nearbyToken: null, img: null });
+                    sectors.set(fedName, { x, y, name, fedName, faction, nearbyToken: null, img: await getImageCached(src), });
                 });
-
-                // Preload star images ONCE per unique src, then assign to every sector
-                const uniqueStarSrcs = [...new Set([...sectors.values()].map((s, key) => s.src))];
-                const starImgs = await Promise.all(uniqueStarSrcs.map(src => getImageCached(src)));
-                const starImgBySrc = new Map(uniqueStarSrcs.map((src, idx) => [src, starImgs[idx]]));
-
-                sectors.forEach((s, key) => {
-                    s.img = starImgBySrc.get(s.src);
-                });
-
-
-                // Load galactic sectors
-                galacticSectors.push(...g.galacticSectors.map((s, i) => {
-                    const name = (s.name ?? `Sector ${i + 1}`).toString();
-                    let vertices = s.vertices;
-
-                    return { name, vertices };
-                }));
-
-                lanes.push(...g.lanes);
             }
-
-
-
-            //Do the same for sectors
-            
-
-
-            //lanes = await loadLanesJson("data/lanes.json");
 
         }catch (err) {
             console.error(err);
@@ -519,9 +492,6 @@
 
 
     async function loadPlayerOverrides(file){
-        await loadDefaultStars();
-
-
         var playerData = null;
         for(const rawData of file){
             if(!Array.isArray(rawData)) console.warn("Data is not array!");
@@ -553,7 +523,9 @@
                     }
                 }
             }
-            sectors.set(s.name, sector);
+
+
+            sectorOverrides.set(s.name, sector);
         }
 
 
@@ -572,14 +544,17 @@
             t.id = i;
         }
 
-        hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
-        hideVeils   = data["flags"].hideVeils ?? hideVeils;
-        hideWVP     = data["flags"].hideWVP ?? hideWVP;
-        hideWave = data["flags"].hideWave ?? hideWave;
-        hideENINames = data["flags"].hideENINames ?? hideENINames;
+        //hideMEWAO   = data["flags"].hideMEWAO ?? hideMEWAO;
+        //hideVeils   = data["flags"].hideVeils ?? hideVeils;
+        //hideWVP     = data["flags"].hideWVP ?? hideWVP;
+        //hideWave = data["flags"].hideWave ?? hideWave;
+        hideENINames = data["hideENINames"] ?? hideENINames;
 
         displayName = data["displayName"];
-        flags = data["flags"];
+        //flags = data["flags"];
+
+
+        unlockedGalaxies = data["unlockedGalaxies"];
 
 
         // Start the audio as soon as the user loads a player
@@ -642,7 +617,6 @@
     let starScale = STAR_SIZE;
 
 
-    const ANOMALY_RADIUS = 4000;
     let azapallAnomaly = null;
 
     function draw() {
@@ -661,6 +635,10 @@
             return;
         }
 
+
+        starScale = STAR_SIZE / cam.scale;
+
+
         // Camera transform
         mapCtx.save();
         mapCtx.translate(vw * 0.5, vh * 0.5);
@@ -673,66 +651,65 @@
         overlayCtx.translate(-cam.x, -cam.y);
 
 
-        // Draw galaxies (in world space)
         for (const g of galaxies) {
+            // Draw galaxies (in world space)
+
             if (!g.img) continue;
-            if (g.name === "Veils" && hideVeils) continue;
+            if (!unlockedGalaxies.includes(g.name)) continue;
             const w = g.img.width * g.scale;
             const h = g.img.height * g.scale;
             mapCtx.drawImage(g.img, g.x, g.y, w, h);
-        }
 
-        // Draw galacic sectors
-        mapCtx.lineWidth = 100;
-        mapCtx.globalAlpha = 0.5;
-        mapCtx.strokeStyle = "#000000";
+            // Draw galacic sectors
+            mapCtx.lineWidth = 100;
+            mapCtx.globalAlpha = 0.5;
+            mapCtx.strokeStyle = "#000000";
 
-        for(const s of galacticSectors)
-        {
-            if(s.vertices.length < 2) continue;
-            var lastPair = {x:null, y:null};
-            for (const v of s.vertices){
-                if(lastPair.x === null)
-                    lastPair = {x:v.x, y:v.y};
-                else
-                {
+
+            for(const s of g["galacticSectors"])
+            {
+                if(s.vertices.length < 2) continue;
+                var lastPair = {x:null, y:null};
+                for (const v of s.vertices){
+                    if(lastPair.x === null)
+                        lastPair = {x:v.x, y:v.y};
+                    else
+                    {
+                        mapCtx.beginPath();
+                        mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+                        mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
+                        mapCtx.stroke();
+
+                        lastPair = {x:v.x, y:v.y};
+                    }
+                }
+                mapCtx.beginPath();
+                mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
+                mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
+                mapCtx.stroke();
+            }
+
+            if (cam.scale >= STAR_SHOW_ZOOM) {
+                mapCtx.lineWidth = 2;
+                mapCtx.globalAlpha = 0.5;
+                mapCtx.strokeStyle = "#FFFFFF";
+                for(const l of g["lanes"]){
+                    var star1 = l.star1;
+                    var coords1 = {x:sectors.get(star1).x, y:sectors.get(star1).y};
+                    var star2 = l.star2;
+                    var coords2 = {x:sectors.get(star2).x, y:sectors.get(star2).y};
                     mapCtx.beginPath();
-                    mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
-                    mapCtx.lineTo(v.x / 2.5, v.y / 2.5);
+                    mapCtx.moveTo(coords1.x, coords1.y);
+                    mapCtx.lineTo(coords2.x, coords2.y);
                     mapCtx.stroke();
-
-                    lastPair = {x:v.x, y:v.y};
                 }
             }
-            mapCtx.beginPath();
-            mapCtx.moveTo(lastPair.x / 2.5, lastPair.y / 2.5);
-            mapCtx.lineTo(s.vertices[0].x / 2.5, s.vertices[0].y / 2.5);
-            mapCtx.stroke();
         }
 
         mapCtx.globalAlpha = 1.0;
 
-        starScale = STAR_SIZE / cam.scale;
-
         // Draw sectors/stars with culling and size rules
         if (cam.scale >= STAR_SHOW_ZOOM) {
-            mapCtx.lineWidth = 2;
-            mapCtx.globalAlpha = 0.5;
-            mapCtx.strokeStyle = "#FFFFFF";
-            for(const l of lanes){
-                var star1 = l.star1;
-                var coords1 = {x:sectors.get(star1).x, y:sectors.get(star1).y};
-                var star2 = l.star2;
-                var coords2 = {x:sectors.get(star2).x, y:sectors.get(star2).y};
-                mapCtx.beginPath();
-                mapCtx.moveTo(coords1.x, coords1.y);
-                mapCtx.lineTo(coords2.x, coords2.y);
-                mapCtx.stroke();
-            }
-
-            mapCtx.globalAlpha = 1.0;
-
-
             // Visible world rect derived from camera + viewport
             const halfW_world = (vw * 0.5) / cam.scale;
             const halfH_world = (vh * 0.5) / cam.scale;
