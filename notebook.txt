@@ -22,12 +22,14 @@ TODO:
 - clean the files   ✔
 - music loop with volume slider   ✔
 - from Com: I also consider the repository clean when token images don't need their dimensions listed unless that is absolutely unavoidable   ✔
-- see why saving doesnt work
-- swap the hide bools with a list of names in the player save file
-    - a list of galaxy names. If the name of a galaxy is present, the galaxy is enabled
-    - a list of faction names. If the name of a faction is present, the faction display is enbaled
-    - exception for the ENI faction to also enable properNames
+- swap the hide bools with a list of names in the player save file  ✔
+    - a list of galaxy names. If the name of a galaxy is present, the galaxy is enabled ✔
+    - a list of faction names. If the name of a faction is present, the faction display is enbaled  ✔
+    - exception for the ENI faction to also enable properNames  ✔
 - add a way to edit the descriptions of tokens, even if its just a basic input  
+    - also allow for swapping of src
+- make saving up to date
+- add a way to edit factions from the web page
 
 
 

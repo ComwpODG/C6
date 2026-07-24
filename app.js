@@ -55,23 +55,23 @@
 
     const factionMap = new Map();
 
-    factionMap.set("PC",         "#FFD800");
-    factionMap.set("WVL",        "#FFD800");
-    factionMap.set("AZ",         "#636363");
-    factionMap.set("VT",         "#05D7AE");
-    factionMap.set("ENI",        "#8F93FF");
-    factionMap.set("BIO",        "#00FF00");
-    factionMap.set("FED",        "#00FFFF");
-    factionMap.set("KGC",        "#FF0000");
-    factionMap.set("WVP",        "#FF00DC");
-    factionMap.set("M.E.W.A.O.", "#A80000");
-    factionMap.set("PTMC",       "#FFC987");
-    factionMap.set("BOTS",       "#E27900");
-    factionMap.set("PHM",        "#BAD300");
-    factionMap.set("SIG",        "#9BFF70");
-    factionMap.set("OSM",        "#7FC9FF");
-    factionMap.set("LVN",        "#FFC600");
-    factionMap.set("GCL",        "#000080");
+    factionMap.set("PC",         {colorA:"#FFD800",colorB:"#FFFFFF"});//Precursor
+    factionMap.set("WVL",        {colorA:"#FFD800",colorB:"#FFFFFF"});//Waivelon High Command/High Council
+    factionMap.set("AZ",         {colorA:"#636363",colorB:"#333333"});//Azaparian Navy
+    factionMap.set("VT",         {colorA:"#05D7AE",colorB:"#888888"});//Vortesian Coalition
+    factionMap.set("ENI",        {colorA:"#8F93FF",colorB:"#FF88FF"});//(Children of the) Enigmata
+    factionMap.set("BIO",        {colorA:"#00FF00",colorB:"#332320"});//Primordial Flow/Biomorphs
+    factionMap.set("FED",        {colorA:"#00FFFF",colorB:"#FFFFFF"});//The Federation of C6
+    factionMap.set("KGC",        {colorA:"#FF0000",colorB:"#757575"});//Kitsvan Gore Chekon Empire
+    factionMap.set("WVP",        {colorA:"#FF00DC",colorB:"#CCCCCC"});//Western Void Pirate
+    factionMap.set("M.E.W.A.O.", {colorA:"#A80000",colorB:"#EEEEEE"});//Mewao
+    factionMap.set("PTMC",       {colorA:"#FFC987",colorB:"#A80000"});//Post Terran Mining Corporation
+    factionMap.set("BOTS",       {colorA:"#E27900",colorB:"#44DD44"});//Robot
+    factionMap.set("PHM",        {colorA:"#BAD300",colorB:"#A8A800"});//Posthuman
+    factionMap.set("SIG",        {colorA:"#9BFF70",colorB:"#E27900"});//Sigg
+    factionMap.set("LVN",        {colorA:"#FFC600",colorB:"#44DD44"});//Laven (Deprecated)
+    factionMap.set("KBL",        {colorA:"#00BBFF",colorB:"#0077AA"});//Kybeline
+    factionMap.set("GCL",        {colorA:"#000080",colorB:"#A0A000"});//spoilers
 
     const factionFrames = new Map();
 
@@ -506,12 +506,14 @@
         newsText = "";
 
         for(const s of data["sectorOverrides"]){
-            var sector = sectors.get(s.name);
+            var sector = {...sectors.get(s.name)};
 
             sector.name = s.properName ? (s.properName === "" ? null : s.properName) : sector.name;
             sector.src = s.src ? (s.src === "" ? null : s.src) : sector.src;
             sector.faction = s.faction ? (s.faction === "" ? null : s.faction) : sector.faction;
 
+            sector.img = await getImageCached(sector.src);
+            
             if(s.notes){
                 sector.notes = s.notes;
                 for(const note of sector.notes){
@@ -730,35 +732,44 @@
             overlayCtx.textBaseline = "middle";
 
             sectors.forEach( (s, key) => {
-                if (!s.img) return;
+                var sector = s;
+                
+                if(sectorOverrides.has(sector.name)){
+                    const n = sectorOverrides.get(sector.name);
+                    sector.name = n.properName ? (n.properName === "" ? null : n.properName) : sector.name;
+                    sector.img = n.img ?? sector.img;
+                    sector.faction = n.faction ? (n.faction === "" ? null : n.faction) : sector.faction;
+                }
+
+                if (!sector.img) return;
 
                 // Cull first (cheap)
-                if (s.x < minX || s.x > maxX || s.y < minY || s.y > maxY) return;
+                if (sector.x < minX || sector.x > maxX || sector.y < minY || sector.y > maxY) return;
 
                 overlayCtx.globalAlpha = starFadeAmt <= 1 ? starFadeAmt : 1;
                 overlayCtx.drawImage(
-                    s.img,
-                    s.x - (starScale / 2), // Center on x
-                    s.y - (starScale / 2), // Center on y
+                    sector.img,
+                    sector.x - (starScale / 2), // Center on x
+                    sector.y - (starScale / 2), // Center on y
                     starScale,
                     starScale
                     );
 
-                if(s.faction && factionFrames.has(s.faction))
+                if(sector.faction && factionFrames.has(sector.faction))
                 {
-                    if(unlockedFactions.includes(s.faction))
-                        overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
+                    if(unlockedFactions.includes(sector.faction))
+                        overlayCtx.drawImage(factionFrames.get(sector.faction), sector.x - (starScale / 2), sector.y - (starScale / 2), starScale, starScale);
                 }
 
 
                 overlayCtx.globalAlpha = textFadeAmt <= 1 ? textFadeAmt : 1;
 
-                var dispName = hideENINames ? (s.fedName) : (s.name??s.fedName);
+                var dispName = hideENINames ? (sector.fedName) : (sector.name??sector.fedName);
 
                 overlayCtx.fillText(
                     dispName,
-                    s.x,
-                    s.y - (starScale / 2) + (starScale / 5 + starScale)
+                    sector.x,
+                    sector.y - (starScale / 2) + (starScale / 5 + starScale)
                 );
             });
 
@@ -1137,8 +1148,32 @@
             }
         }
 
-        if(isForInfoPanel)
+
+
+        if(isForInfoPanel){
             isActiveObjectStar = true;
+
+            const foundSector = {
+                ...stored.s
+            };
+
+            if(sectorOverrides.has(foundSector.name)){
+                const n = sectorOverrides.get(foundSector.name);
+                foundSector.name = n.properName ? (n.properName === "" ? null : n.properName) : foundSector.name;
+                foundSector.img = n.img ?? foundSector.img;
+                foundSector.faction = n.faction ? (n.faction === "" ? null : n.faction) : foundSector.faction;
+
+                if(n.notes){
+                    foundSector.notes = s.notes;
+                    for(const note of foundSector.notes){
+                        if(note.src)
+                            note.img = await getImageCached(note.src);
+                    }
+                }
+            }
+
+            return foundSector;
+        }
 
         return stored.s;
     }
