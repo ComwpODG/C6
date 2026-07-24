@@ -888,7 +888,7 @@
                 if(unlockedFactions.includes(activeObject.faction))
                     faction = activeObject.faction;
 
-                var colour = factionMap.get(faction).colorA ?? "#FFFFFF";
+                var colour = factionMap.get(faction) ? factionMap.get(faction).colorA : "#FFFFFF";
                 overlayCtx.fillStyle = "#000000";
                 overlayCtx.strokeStyle = colour;
                 overlayCtx.lineWidth = 5 / cam.scale;

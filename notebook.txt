@@ -31,6 +31,10 @@ TODO:
 - make saving up to date
 - add a way to edit factions from the web page
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+notes arent loaded into textboxes
+clicking on blank sectors makes it freak out ✔
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 Note:
