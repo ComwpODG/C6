@@ -523,7 +523,9 @@
                 }
             }
 
-
+            console.log(s.name);
+            console.log(s);
+            console.log(sector);
             sectorOverrides.set(s.name, sector);
         }
 
@@ -1159,6 +1161,8 @@
 
             if(sectorOverrides.has(foundSector.name)){
                 const n = sectorOverrides.get(foundSector.name);
+                console.log("textbox! ");
+                console.log(n);
                 foundSector.name = n.properName ? (n.properName === "" ? null : n.properName) : foundSector.name;
                 foundSector.img = n.img ?? foundSector.img;
                 foundSector.faction = n.faction ? (n.faction === "" ? null : n.faction) : foundSector.faction;
@@ -1168,12 +1172,9 @@
                 }
             }
 
-            console.log("textbox! ");
-            console.log(foundSector);
             return foundSector;
         }
 
-        console.log("s = " + stored.s);
         return stored.s;
     }
 
