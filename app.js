@@ -505,12 +505,8 @@
         newsContainer = data["newsFeed"];
         newsText = "";
 
-        console.log("Loading sectors...");
         for(const s of data["sectorOverrides"]){
-            console.log(s.name);
             var sector = {...sectors.get(s.name)};
-            console.log(s);
-            console.log(sector);
 
             sector.name = s.properName ? (s.properName === "" ? null : s.properName) : sector.name;
             sector.src = s.src ? (s.src === "" ? null : s.src) : sector.src;
@@ -526,8 +522,6 @@
                     }
                 }
             }
-
-            console.log(sector);
             
             sectorOverrides.set(s.name, sector);
         }
@@ -737,14 +731,9 @@
             overlayCtx.textBaseline = "middle";
 
             sectors.forEach( (s, key) => {
-                var sector = s;
-                
-                if(sectorOverrides.has(sector.name)){
-                    const n = sectorOverrides.get(sector.name);
-                    sector.name = n.properName ? (n.properName === "" ? null : n.properName) : sector.name;
-                    sector.img = n.img ?? sector.img;
-                    sector.faction = n.faction ? (n.faction === "" ? null : n.faction) : sector.faction;
-                }
+                var sector = sectorOverrides.has(s.name) ? sectorOverrides.get(s.name) : s;
+
+                console.log("draw call ", sectorOverrides.has(s.name), sector)
 
                 if (!sector.img) return;
 
@@ -1158,23 +1147,9 @@
         if(isForInfoPanel){
             isActiveObjectStar = true;
 
-            const foundSector = {
-                ...stored.s
-            };
+            const foundSector = sectorOverrides.has(stored.s.name) ? sectorOverrides.get(stored.s.name) : stored.s;
 
-            if(sectorOverrides.has(foundSector.name)){
-                const n = sectorOverrides.get(foundSector.name);
-                console.log("textbox! ");
-                console.log(n);
-                foundSector.name = n.properName ? (n.properName === "" ? null : n.properName) : foundSector.name;
-                foundSector.img = n.img ?? foundSector.img;
-                foundSector.faction = n.faction ? (n.faction === "" ? null : n.faction) : foundSector.faction;
-
-                if(n.notes){
-                    foundSector.notes = s.notes;
-                }
-            }
-
+            console.log("info panel ", sectorOverrides.has(stored.s.name), foundSector)
             return foundSector;
         }
 
