@@ -472,7 +472,7 @@
 
                     if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                    sectors.set(fedName, { x, y, name, fedName, faction, nearbyToken: null, img: await getImageCached(src), });
+                    sectors.set(fedName, { x, y, name, fedName, faction, notes: s.notes ?? null, nearbyToken: null, img: await getImageCached(src), });
                 });
             }
 
@@ -1168,9 +1168,12 @@
                 }
             }
 
+            console.log("textbox! ");
+            console.log(foundSector);
             return foundSector;
         }
 
+        console.log("s = " + stored.s);
         return stored.s;
     }
 
