@@ -731,9 +731,7 @@
             overlayCtx.textBaseline = "middle";
 
             sectors.forEach( (s, key) => {
-                var sector = sectorOverrides.has(s.name) ? sectorOverrides.get(s.name) : s;
-
-                console.log("draw call ", sectorOverrides.has(s.name), sector)
+                var sector = sectorOverrides.has(s.fedName) ? sectorOverrides.get(s.fedName) : s;
 
                 if (!sector.img) return;
 
@@ -1147,9 +1145,9 @@
         if(isForInfoPanel){
             isActiveObjectStar = true;
 
-            const foundSector = sectorOverrides.has(stored.s.name) ? sectorOverrides.get(stored.s.name) : stored.s;
+            const foundSector = sectorOverrides.has(stored.s.fedName) ? sectorOverrides.get(stored.s.fedName) : stored.s;
 
-            console.log("info panel ", sectorOverrides.has(stored.s.name), foundSector)
+            console.log("info panel ", sectorOverrides.has(stored.s.fedName), foundSector)
             return foundSector;
         }
 
