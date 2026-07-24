@@ -505,8 +505,12 @@
         newsContainer = data["newsFeed"];
         newsText = "";
 
+        console.log("Loading sectors...");
         for(const s of data["sectorOverrides"]){
+            console.log(s.name);
             var sector = {...sectors.get(s.name)};
+            console.log(s);
+            console.log(sector);
 
             sector.name = s.properName ? (s.properName === "" ? null : s.properName) : sector.name;
             sector.src = s.src ? (s.src === "" ? null : s.src) : sector.src;
@@ -523,9 +527,8 @@
                 }
             }
 
-            console.log(s.name);
-            console.log(s);
             console.log(sector);
+            
             sectorOverrides.set(s.name, sector);
         }
 
