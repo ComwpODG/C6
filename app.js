@@ -56,6 +56,7 @@
     const factionMap = new Map();
 
     factionMap.set("PC",         "#FFD800");
+    factionMap.set("WVL",        "#FFD800");
     factionMap.set("AZ",         "#636363");
     factionMap.set("VT",         "#05D7AE");
     factionMap.set("ENI",        "#8F93FF");
@@ -67,20 +68,16 @@
     factionMap.set("PTMC",       "#FFC987");
     factionMap.set("BOTS",       "#E27900");
     factionMap.set("PHM",        "#BAD300");
-    factionMap.set("SIGG",       "#9BFF70");
+    factionMap.set("SIG",        "#9BFF70");
     factionMap.set("OSM",        "#7FC9FF");
     factionMap.set("LVN",        "#FFC600");
+    factionMap.set("GCL",        "#000080");
 
     const factionFrames = new Map();
 
     // progression vars:
     let unlockedGalaxies = [];
     let unlockedFactions = [];
-
-    let hideWVP = true;
-    let hideMEWAO = true;
-    let hideVeils = true;
-    let hideWave = true;
 
     let hideENINames = true;
     let ANOMALY_RADIUS = -1; //-1 means disabled
@@ -548,14 +545,15 @@
         //hideVeils   = data["flags"].hideVeils ?? hideVeils;
         //hideWVP     = data["flags"].hideWVP ?? hideWVP;
         //hideWave = data["flags"].hideWave ?? hideWave;
-        hideENINames = data["hideENINames"] ?? hideENINames;
+
+        unlockedGalaxies = data["unlockedGalaxies"];
+        unlockedFactions = data["unlockedFactions"];
+
+        hideENINames = !unlockedFactions.includes("ENI");
 
         displayName = data["displayName"];
         //flags = data["flags"];
-
-
-        unlockedGalaxies = data["unlockedGalaxies"];
-
+        ANOMALY_RADIUS = data["waveRadius"] ?? -1;
 
         // Start the audio as soon as the user loads a player
         audio.play();
@@ -748,9 +746,8 @@
 
                 if(s.faction && factionFrames.has(s.faction))
                 {
-                    if(s.faction === "WVP" && hideWVP);
-                    else if(s.faction === "M.E.W.A.O." && hideMEWAO);
-                    else overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
+                    if(unlockedFactions.includes(s.faction))
+                        overlayCtx.drawImage(factionFrames.get(s.faction), s.x - (starScale / 2), s.y - (starScale / 2), starScale, starScale);
                 }
 
 
@@ -796,7 +793,7 @@
         }
 
 
-        if(!hideWave){
+        if(ANOMALY_RADIUS > 0){
         //else if (cam.scale <= ANOMALY_SHOW_BEFORE) {
             //if(azapallAnomaly){
                 //overlayCtx.fillStyle = "#ff000055";
@@ -877,9 +874,9 @@
                 searchedForTokens = activeObject;
 
                 var faction = "";
-                if (activeObject.faction === "WVP" && hideWVP);
-                else if (activeObject.faction === "M.E.W.A.O." && hideMEWAO);
-                else faction = activeObject.faction;
+                if(unlockedFactions.includes(activeObject.faction))
+                    faction = activeObject.faction;
+
                 var colour = factionMap.get(faction) ?? "#FFFFFF";
                 overlayCtx.fillStyle = "#000000";
                 overlayCtx.strokeStyle = colour;
@@ -1113,7 +1110,7 @@
         if (!best) return;
         if (best.id === activeGalaxyId) return; // no DOM churn
 
-        if(best.name === "Veils" && hideVeils) return;
+        if(!unlockedFactions.includes(best.name)) return;
 
         activeGalaxyId = best.id;
 

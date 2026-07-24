@@ -1,0 +1,261 @@
+{
+    "Kaelin": {
+        "displayName": "Kaelin Moya",
+        "hideWave": false,
+        "hideENINames": false,
+        "waveRadius": 4000,
+        "unlockedGalaxies": [
+            "Azapall", "Veils"
+        ],
+        "unlockedFactions": [
+            "FED", "KGC", "WVP", "BIO", "M.E.W.A.O.", "ENI", "PTMC", "AZ"
+        ],
+        "sectorOverrides": [
+            {
+                "faction": "BIO",
+                "name": "Sector 4041",
+                "properName": null,
+                "src": "assets\\stars\\frame_08_delay-0.1s.bmp"
+            },
+            {
+                "faction": null,
+                "name": "Sector 0523",
+                "properName": "Dichroma",
+                "src": "assets\\stars\\frame_19_delay-0.1s.bmp",
+                "notes": [
+                    {
+                        "title": "Derelict Enigmata Fortress",
+                        "desc": "A once-thriving homeworld of the enigmata turned to ruin by a relentless torrent of biomorph artillery. Not only a mass grave, but a danger still today.",
+                        "charNL": [
+                            52,
+                            100
+                        ],
+                        "src": ""
+                    }
+                ]
+            },
+            {
+                "faction": "M.E.W.A.O.",
+                "name": "Sector 0440",
+                "properName": "Gravitas",
+                "src": "assets\\stars\\frame_19_delay-0.1s.bmp",
+                "notes": [
+                    {
+                        "title": "Black Hole",
+                        "desc": "A supermassive black hole sits in the center of this sector, consuming all that gets too close.",
+                        "charNL": [
+                            50
+                        ],
+                        "src": ""
+                    },
+                    {
+                        "title": "Freyja Power Beam",
+                        "desc": "A massive beam of energy rips through extradimensional space originating from this sector, powering Freyja from afar.",
+                        "charNL": [
+                            50,
+                            100
+                        ],
+                        "src": ""
+                    }
+                ]
+            }
+        ],
+        "newsFeed": [
+            {
+                "text": "The Wave continues to expand outwards."
+            },
+            {
+                "text": "Koakuma Mountain Federation Charity Hiking event a huge success - Record breaking donations to Save-An-Orphan foundation bring morale up fleet-wide"
+            },
+            {
+                "text": "Federation preparing to investigate northern galactic sectors for another EX-S Gate, in hopes of intergalactic expedition to recover Osculpa and possibly another Artefact"
+            },
+            {
+                "text": "A macrophysics-based quantum communications device prototype has been created and is in testing"
+            },
+            {
+                "text": "Armada recruit-to-death ratio soars above 1 for first time since before the war at Gozna; KGC Transport Facility"
+            }
+        ],
+        "icons": [
+            {
+                "name": "Federation Forces",
+                "desc": "Miscellaneous Federation task force",
+                "nearbySector": null,
+                "x": 10,
+                "y": 0,
+                "src": "assets/icons/fed.png",
+                "color": "#00FFFF",
+                "img": {},
+                "id": null
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 510,
+                "y": 0,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": null
+            },
+            {
+                "name": "KGC Presence",
+                "desc": "Miscellaneous KGC Forces",
+                "nearbySector": null,
+                "x": 1010,
+                "y": 0,
+                "src": "assets/icons/kgc.png",
+                "color": "#FF0000",
+                "img": {},
+                "id": null
+            }
+        ],
+        "tokens": [
+            {
+                "name": "Federation Forces",
+                "desc": "Miscellaneous Federation task force",
+                "nearbySector": null,
+                "x": 3155.3001229899837,
+                "y": 2153.419943200865,
+                "src": "assets/icons/fed.png",
+                "color": "#00FFFF",
+                "img": {},
+                "id": 0
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3136.1408590055953,
+                "y": 2140.65572172215,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 1
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3085.799986918755,
+                "y": 1920.2271809284387,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 2
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3194.2110136874003,
+                "y": 1881.5148886068246,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 3
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3015.7617898082403,
+                "y": 2200.9236895381264,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 4
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 2701.1261750680533,
+                "y": 2299.976386221568,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 5
+            },
+            {
+                "name": "Federation Forces",
+                "desc": "Miscellaneous Federation task force",
+                "nearbySector": null,
+                "x": 3275.372075040802,
+                "y": 1252.1500163487672,
+                "src": "assets/icons/fed.png",
+                "color": "#00FFFF",
+                "img": {},
+                "id": 6
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3561.1761061861803,
+                "y": 1959.0932346898603,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 7
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3378.9273282101267,
+                "y": 2248.064270039278,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 8
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 3314.0730333447746,
+                "y": 2407.3267156579914,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 9
+            },
+            {
+                "name": "WVP Forces",
+                "desc": "Miscellaneous WVP task force",
+                "nearbySector": null,
+                "x": 2888.7304581472063,
+                "y": 2013.4324642457227,
+                "src": "assets/icons/wvp.png",
+                "color": "#FF00DC",
+                "img": {},
+                "id": 10
+            },
+            {
+                "name": "Federation Forces",
+                "desc": "Miscellaneous Federation task force",
+                "nearbySector": null,
+                "x": -5530.177850232323,
+                "y": -965.7975546838493,
+                "src": "assets/icons/fed.png",
+                "color": "#00FFFF",
+                "img": {},
+                "id": 11
+            },
+            {
+                "name": "Federation Forces",
+                "desc": "Miscellaneous Federation task force",
+                "nearbySector": null,
+                "x": 3133.3873996569077,
+                "y": 1478.427662530444,
+                "src": "assets/icons/fed.png",
+                "color": "#00FFFF",
+                "img": {},
+                "id": 12
+            }
+        ]
+    }
+}
