@@ -38,7 +38,7 @@
     const ZOOM_MAX = 4.0;
 
 
-    let galaxies = ["Azapall"];
+    let galaxies = [];
     const sectors = new Map();
 
     const sectorOverrides = new Map();
@@ -76,8 +76,8 @@
     const factionFrames = new Map();
 
     // progression vars:
-    let unlockedGalaxies = [];
-    let unlockedFactions = [];
+    let unlockedGalaxies = ["Azapall"];
+    let unlockedFactions = ["FED"];
 
     let hideENINames = true;
     let ANOMALY_RADIUS = -1; //-1 means disabled
@@ -102,7 +102,7 @@
 
                 offCtx.drawImage(diamondFrame, 0, 0);
                 offCtx.globalCompositeOperation = "source-atop";
-                offCtx.fillStyle = colour;
+                offCtx.fillStyle = colour.colorA;
                 offCtx.fillRect(0, 0, off.width, off.height);
                 offCtx.globalCompositeOperation = "source-over";
 
@@ -888,7 +888,7 @@
                 if(unlockedFactions.includes(activeObject.faction))
                     faction = activeObject.faction;
 
-                var colour = factionMap.get(faction) ?? "#FFFFFF";
+                var colour = factionMap.get(faction).colorA ?? "#FFFFFF";
                 overlayCtx.fillStyle = "#000000";
                 overlayCtx.strokeStyle = colour;
                 overlayCtx.lineWidth = 5 / cam.scale;
