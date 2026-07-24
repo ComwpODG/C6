@@ -38,7 +38,7 @@
     const ZOOM_MAX = 4.0;
 
 
-    let galaxies = [];
+    let galaxies = ["Azapall"];
     const sectors = new Map();
 
     const sectorOverrides = new Map();
@@ -1165,10 +1165,6 @@
 
                 if(n.notes){
                     foundSector.notes = s.notes;
-                    for(const note of foundSector.notes){
-                        if(note.src)
-                            note.img = await getImageCached(note.src);
-                    }
                 }
             }
 
