@@ -318,63 +318,50 @@
 
     async function createSaveFile(){
         console.log("saving...");
-        var rawSectors = [];
 
-        for (const g of galaxies){
-            const result = await loadSectorsJson(g);
-            rawSectors = [...rawSectors, ...result.data.map(d => ({data: d, src: g}))];
+        /*
+        Requirements:
+        name {  ✔
+        display name  ✔
+        wave radius   ✔
+        unlocked galaxies   ✔
+        unlocked factions   ✔
+        sector overrides    - dump saved sectors
+        news feed   ✔
+        icons   ✔
+        tokens  ✔
         }
+        */
 
-
-        //Do the same for sectors
-        var tempSectors = rawSectors.map((s, i) => {
-            const x = Number.isFinite(s.data.x) ? s.data.x / 2.5 + s.src.x : 0;
-            const y = Number.isFinite(s.data.y) ? s.data.y / 2.5 + s.src.y : 0;
-            const src = (typeof s.data.src === "string" && s.data.src.trim()) ? s.data.src.trim() : null;
-            const fedName = (s.data.name ?? `Sector ${i + 1}`).toString();
-
-            //prioritize properName
-            const name = (typeof s.data.properName === "string" && s.data.properName.trim()) ? s.data.properName.trim() : null;
-            const faction = (typeof s.data.faction === "string" && s.data.faction.trim()) ? s.data.faction.trim() : null;
-
-            if (!src) throw new Error(`Sector entry ${i} missing "src"`);
-
-            return { x, y, src, name, fedName, faction, nearbyToken: null, img: null};
-        });
 
         var savedSectors = [];
-        for(const s of tempSectors){
-            const inMemory = sectors.get(s.fedName);
-            if(!inMemory){
-                console.warn("Could not find ", s.fedName);
-                continue;
-            }
+        sectorOverrides.forEach((s, i) => {
+            savedSectors.push({
+                faction:s.faction,
+                name:s.fedName,
+                properName:s.name,
+                src:s.src,
+                notes:s.notes
+            });
+        });
 
-            if( s.faction !== inMemory.faction ||
-                s.name !== inMemory.name ||
-                inMemory.notes
-            ){
-                savedSectors.push({
-                    faction:inMemory.faction,
-                    name:inMemory.fedName,
-                    properName:inMemory.name,
-                    src:inMemory.src,
-                    notes:inMemory.notes
-                });
-            }
-        }
 
         var saveData = {
             [activePlayer]:{
-                displayName,
-                flags,
+                displayName,            //✔
+                waveRadius:ANOMALY_RADIUS,  //✔
+                unlockedGalaxies:unlockedGalaxies,  //✔
+                unlockedFactions:unlockedFactions,  //✔
+                
                 sectorOverrides:savedSectors,
-                newsFeed:newsContainer,
-                icons:tokenList,
-                tokens:tokens
+
+                newsFeed:newsContainer, //✔
+                icons:tokenList,        //✔
+                tokens:tokens           //✔
             }
         }
 
+        console.log(saveData);
         console.log("Save file created!");
         return saveData;
     }
@@ -1144,10 +1131,8 @@
 
         if(isForInfoPanel){
             isActiveObjectStar = true;
-
+            if(!stored.s) return stored.s;
             const foundSector = sectorOverrides.has(stored.s.fedName) ? sectorOverrides.get(stored.s.fedName) : stored.s;
-
-            console.log("info panel ", sectorOverrides.has(stored.s.fedName), foundSector)
             return foundSector;
         }
 
