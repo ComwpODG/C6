@@ -431,6 +431,7 @@
                     id, 
                     x, 
                     y,
+                    src,
                     scale, 
                     name: g.name ?? "", 
                     desc: g.desc ?? "", 
@@ -459,7 +460,7 @@
 
                     if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
-                    sectors.set(fedName, { x, y, name, fedName, faction, notes: s.notes ?? null, nearbyToken: null, img: await getImageCached(src), });
+                    sectors.set(fedName, { x, y, name, fedName, faction, src, notes: s.notes ?? null, nearbyToken: null, img: await getImageCached(src), });
                 });
             }
 
