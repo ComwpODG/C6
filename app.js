@@ -319,21 +319,6 @@
     async function createSaveFile(){
         console.log("saving...");
 
-        /*
-        Requirements:
-        name {  ✔
-        display name  ✔
-        wave radius   ✔
-        unlocked galaxies   ✔
-        unlocked factions   ✔
-        sector overrides    - dump saved sectors
-        news feed   ✔
-        icons   ✔
-        tokens  ✔
-        }
-        */
-
-
         var savedSectors = [];
         sectorOverrides.forEach((s, i) => {
             savedSectors.push({
@@ -348,16 +333,14 @@
 
         var saveData = {
             [activePlayer]:{
-                displayName,            //✔
-                waveRadius:ANOMALY_RADIUS,  //✔
-                unlockedGalaxies:unlockedGalaxies,  //✔
-                unlockedFactions:unlockedFactions,  //✔
-                
+                displayName,
+                waveRadius:ANOMALY_RADIUS,
+                unlockedGalaxies:unlockedGalaxies,
+                unlockedFactions:unlockedFactions,
                 sectorOverrides:savedSectors,
-
-                newsFeed:newsContainer, //✔
-                icons:tokenList,        //✔
-                tokens:tokens           //✔
+                newsFeed:newsContainer,
+                icons:tokenList,
+                tokens:tokens
             }
         }
 
@@ -459,6 +442,38 @@
                     const faction = (typeof s.faction === "string" && s.faction.trim()) ? s.faction.trim() : null;
 
                     if (!src) throw new Error(`Sector entry ${i} missing "src"`);
+
+                    if(s.notes){
+                        for(const n of s.notes){
+
+                            // normalize \r\n into \n
+                            n.desc = n.desc.replace(/\r\n/g, '\n');
+
+                            let pos = 0;
+                            let last = 0;
+                            let lineStart = 0;
+                            n.charNL = [];
+                            while(pos < n.desc.length)
+                            {
+                                if(n.desc[pos] === ' ')
+                                    last = pos + 1;
+                                if(n.desc[pos] === '\n'){
+                                    n.charNL.push(pos);
+                                    last = 0;
+                                    lineStart = pos + 1;
+                                }
+                                else if(pos - lineStart > 46){
+                                    if(last === 0)
+                                        n.charNL.push(pos);
+                                    else
+                                        n.charNL.push(last);
+                                    last = 0
+                                    lineStart = n.charNL.at(-1);
+                                }
+                                pos++;
+                            }
+                        }
+                    }
 
                     sectors.set(fedName, { x, y, name, fedName, faction, src, notes: s.notes ?? null, nearbyToken: null, img: await getImageCached(src), });
                 });
@@ -929,16 +944,19 @@
 
                 overlayCtx.font = `${textHeight}px C6-font`;
 
+                // draw object ID / fedName
                 overlayCtx.fillStyle = "#666666";
                 overlayCtx.fillText(activeObject.fedName, bottomLeftX, topLeft + topOffset + (7 / cam.scale), 500 / cam.scale);
                 topOffset += textHeight + (20 / cam.scale);
 
+                // divider line
                 overlayCtx.beginPath();
                 overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (50 / cam.scale), topLeft + topOffset);
                 overlayCtx.lineTo(bottomLeftX - (20 / cam.scale) + (430 / cam.scale), topLeft + topOffset);
                 overlayCtx.stroke();
                 topOffset += (20 / cam.scale) + overlayCtx.lineWidth;
 
+                // controlling faction
                 overlayCtx.fillStyle = colour;
                 overlayCtx.textAlign = "center";
                 overlayCtx.textBaseline = "middle";
@@ -946,11 +964,12 @@
                 overlayCtx.fillText(factionText, activeObject.x, topLeft + topOffset, 500 / cam.scale);
                 topOffset += 1 * textHeight;
 
-
+                // descriptions and tokens
                 var firstNote = true;
                 if (activeObject.notes) {
                     topOffset += 0.5 * textHeight;
 
+                    // lower faction divider line
                     overlayCtx.lineWidth = 5 / cam.scale;
                     overlayCtx.beginPath();
                     overlayCtx.moveTo(bottomLeftX - (20 / cam.scale) + (50 / cam.scale), topLeft + topOffset);
@@ -963,6 +982,8 @@
                     overlayCtx.textBaseline = "alphabetic";
                     overlayCtx.fillStyle = "#666666";
                     overlayCtx.lineWidth = (5 / cam.scale) / 3;
+
+
                     for (const note of activeObject.notes) {
                         if (!firstNote) {
                             overlayCtx.beginPath();
@@ -973,6 +994,10 @@
 
 
                         overlayCtx.fillStyle = colour;
+
+                        // draw title and sprite, if present
+                        overlayCtx.font = `${textHeight}px C6-font`;
+
                         if (note.src) {
                             //console.log(note.src);
                             overlayCtx.drawImage(note.img, bottomLeftX, topLeft + topOffset + (5 /cam.scale), textHeight * 2, textHeight * 2);
@@ -982,6 +1007,8 @@
 
                         topOffset += textHeight * 2;
 
+                        // draw description
+                        overlayCtx.font = `${textHeight}px Consolas`;
                         overlayCtx.fillStyle = "#666666";
                         let prev = 0;
                         for (const breakPoint of note.charNL) {
@@ -1019,7 +1046,8 @@
                         } else firstNote = false;
 
 
-
+                        // draw title and sprite, if present
+                        overlayCtx.font = `${textHeight}px C6-font`;
                         overlayCtx.fillStyle = note.color;
                         if (note.src) {
                             //console.log(note.src);
@@ -1030,6 +1058,8 @@
 
                         topOffset += textHeight * 2;
 
+                        // draw description
+                        overlayCtx.font = `${textHeight}px Consolas`;
                         overlayCtx.fillStyle = "#666666";
                         let prev = 0;
                         overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
@@ -1056,19 +1086,22 @@
                 const bottomLeftX = activeObject.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
                 var bottomLeftY = activeObject.y - starScale;
 
+                // draw border
                 overlayCtx.strokeStyle = colour;
 
                 overlayCtx.fillRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), bottomLeftY - rectHeight, 500 / cam.scale, rectHeight);
                 overlayCtx.strokeRect(bottomLeftX - (overlayCtx.lineWidth * 1.8), bottomLeftY - rectHeight, 500 / cam.scale, rectHeight);
 
-                overlayCtx.fillStyle = colour;
-
+                //draw sprite
                 overlayCtx.drawImage(activeObject.img, bottomLeftX, bottomLeftY - rectHeight + (10 / cam.scale), textHeight * 2, textHeight * 2);
 
+                // draw name
                 overlayCtx.font = `${starScale / 2}px C6-font`;
+                overlayCtx.fillStyle = colour;
                 overlayCtx.fillText(activeObject.name, bottomLeftX + (textHeight * 2) + (5 / cam.scale), bottomLeftY - rectHeight + (textHeight * 0.5) + (10 / cam.scale), 500 / cam.scale);
 
-                overlayCtx.font = `${textHeight}px C6-font`;
+                // draw description
+                overlayCtx.font = `${textHeight}px Consolas`;
                 overlayCtx.fillStyle = "#666666";
                 overlayCtx.fillText(activeObject.desc, bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale), 500 / cam.scale);
             }
@@ -1101,7 +1134,7 @@
         if (!best) return;
         if (best.id === activeGalaxyId) return; // no DOM churn
 
-        if(!unlockedFactions.includes(best.name)) return;
+        if(!unlockedGalaxies.includes(best.name)) return;
 
         activeGalaxyId = best.id;
 
