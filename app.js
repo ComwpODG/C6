@@ -1324,9 +1324,35 @@
         trinket = null;
 
 
-        if (activeObject) {
-            if (!isActiveObjectStar){
-                console.log("check for textbox");
+        if (e.ctrlKey) {
+            if (!galaxies || galaxies.length === 0 || !galaxies[0].img) return;
+
+            // pick the galaxy whose TOP-LEFT is closest to camera center (world coords)
+            let best = null;
+            let bestD2 = Infinity;
+            for (const g of galaxies) {
+                // top-left "anchor" at g.x, g.y (as requested)
+                const cx = g.x + (g.img.width * g.scale) * 0.5;
+                const cy = g.y + (g.img.height * g.scale) * 0.5;
+
+                const dx = e.clientX - cx;
+                const dy = e.clientY - cy;
+
+                const d2 = dx * dx + dy * dy;
+                if (d2 < bestD2) {
+                    bestD2 = d2;
+                    best = g;
+                }
+            }
+
+            if (best && best.id === activeGalaxyId && unlockedGalaxies.includes(best.name)){
+                const star = {
+                    name:`Sector ${best.name}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+                    src:`assets\\stars\\frame_${(Math.floor(Math.random() * 100) % 20)}_delay-0.1s.bmp`,
+                    x:e.clientX,
+                    y:e.clientY
+                }
+                console.log(star);
             }
         }
     });

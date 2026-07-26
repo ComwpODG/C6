@@ -28,13 +28,6 @@ TODO:
     - exception for the ENI faction to also enable properNames  ✔
 - add a way to edit the descriptions of tokens, even if its just a basic input  
     - also allow for swapping of src
-- make saving up to date
-- add a way to edit factions from the web page
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-notes arent loaded into textboxes
-clicking on blank sectors makes it freak out ✔
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 Note:
