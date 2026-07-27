@@ -31,7 +31,7 @@ TODO:
     - edit button is left aligned   ✔
     - upon clicking edit
         - if it is a star system
-            - needs to show a drop down for faction
+            - needs to show a drop down for faction ✔
             - a text box for description
         - if it is a token
             - needs to show a drop down for image

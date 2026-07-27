@@ -22,7 +22,14 @@
 
 
 
-    const editButton = document.getElementById("editButton")
+    const editButton = document.getElementById("editButton");
+
+    const sectorEdit = document.getElementById("sectorEdit");
+    const factionSelect = document.getElementById("factions");
+
+    const tokenEdit = document.getElementById("tokenEdit");
+    const tokenName = document.getElementById("tokenName");
+    const tokenDesc = document.getElementById("tokenDesc");
 
 
     // Camera in world pixels
@@ -81,6 +88,7 @@
     // progression vars:
     let unlockedGalaxies = ["Azapall"];
     let unlockedFactions = ["FED"];
+    //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL"
 
     let hideENINames = true;
     let ANOMALY_RADIUS = -1; //-1 means disabled
@@ -127,7 +135,24 @@
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
 
-            
+
+
+            // set up the sector/token editing
+            editButton.onclick = () => {
+                if (activeObject) {
+                    if (isActiveObjectStar){
+                        toggleSectorEditPanel();
+                    }
+                    else
+                        toggleTokenEditPanel();
+                }
+            };
+            factionSelect.onchange = () => {
+                const sector = sectors.get(activeObject.fedName);
+                sector.faction = factionSelect.value;
+                draw();
+            };
+
 
 
             document.getElementById("authButton").onclick = async () => {
@@ -556,6 +581,13 @@
         unlockedGalaxies = data["unlockedGalaxies"];
         unlockedFactions = data["unlockedFactions"];
 
+        for(const f of unlockedFactions){
+            const option = document.createElement("option");
+            option.value = f;
+            option.textContent = f;
+            factions.appendChild(option); 
+        }
+
         hideENINames = !unlockedFactions.includes("ENI");
 
         displayName = data["displayName"];
@@ -933,8 +965,17 @@
 
 
                 // start drawing
-
+                
                 const topLeft = bottomLeftY - rectHeight;
+
+                const screenPos = worldToScreen(bottomLeftX, topLeft);
+                editButton.style.left = `${screenPos.x}px`;
+                editButton.style.top = `${screenPos.y - 30}px`;
+
+                sectorEdit.style.left = `${screenPos.x + 200}px`;
+                sectorEdit.style.top = `${screenPos.y - 30}px`;
+                tokenEdit.style.left = `${screenPos.x + 200}px`;
+                tokenEdit.style.top = `${screenPos.y - 30}px`;
 
                 // draw title
                 if (activeObject.name && !hideENINames) {
@@ -1115,6 +1156,28 @@
                 overlayCtx.fillText(activeObject.desc, bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale), 500 / cam.scale);
             }
         }
+    }
+
+
+    // both are working against activeObject
+    function toggleSectorEditPanel(){
+        console.log("Editing sector");
+
+        factionSelect.selectedIndex = 0;
+        for(let i = 0; i < factionSelect.length; i++){
+            if(activeObject.faction === factionSelect.options[i].value){
+                factionSelect.selectedIndex = i;
+                i = factionSelect.length;
+            }
+        }
+
+        sectorEdit.style.display = sectorEdit.style.display == "none" ? "block" : "none";
+    }
+
+    function toggleTokenEditPanel(){
+        console.log("Editing token");
+
+        tokenEdit.style.display = tokenEdit.style.display == "none" ? "block" : "none";
     }
 
 
@@ -1300,7 +1363,16 @@
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
             activeObject = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
-            if(activeObject && isActiveObjectStar) searchedForTokens = null;
+            if(activeObject){
+                editButton.style.display = "block";
+                if (isActiveObjectStar) searchedForTokens = null;
+            }
+            else {
+                editButton.style.display = "none";
+                sectorEdit.style.display = "none";
+                tokenEdit.style.display = "none";
+            }
+
             draw();
         }
         if(newToken && e.clientX > 100)

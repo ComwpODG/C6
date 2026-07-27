@@ -127,7 +127,6 @@ html, body {
 
 #players {
     cursor: pointer;
-    padding: 0;
     position: absolute;
     padding: 2px;
     border: 2px solid #00FFFF;
@@ -135,6 +134,25 @@ html, body {
     background: #00000073;
     top: 64px;
     left: 13px;
+}
+
+#sectorEdit {
+    cursor: pointer;
+    position: absolute;
+    padding: 2px;
+    border: 2px solid #00FFFF;
+    color: #00FFFF;
+    background: #00000073;
+}
+
+
+#tokenEdit {
+    cursor: pointer;
+    position: absolute;
+    padding: 2px;
+    border: 2px solid #00FFFF;
+    color: #00FFFF;
+    background: #00000073;
 }
 
 
