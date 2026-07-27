@@ -76,7 +76,7 @@
     const factionFrames = new Map();
 
     // progression vars:
-    let unlockedGalaxies = ["Azapall"];
+    let unlockedGalaxies = ["Azapall", "Sigg", "Veils"];
     let unlockedFactions = ["FED"];
 
     let hideENINames = true;
@@ -429,7 +429,7 @@
             }
 
 
-            // goes through each galaxies and loads of galactic sectors, sectors and lanes
+            // goes through each galaxies and loads sectors
             for (const g of raw) {
                 g.sectors.forEach(async (s, i) => {
                     const x = Number.isFinite(s.x) ? s.x / 2.5 + g.x : 0;
@@ -1287,7 +1287,7 @@
 
 
     let freeList = [];
-    mapCanvas.addEventListener("pointerup", (e) => {
+    mapCanvas.addEventListener("pointerup", async (e) => {
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
             activeObject = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
@@ -1327,6 +1327,7 @@
         if (e.ctrlKey) {
             if (!galaxies || galaxies.length === 0 || !galaxies[0].img) return;
 
+            const mouse = screenToWorld(e.clientX, e.clientY);
             // pick the galaxy whose TOP-LEFT is closest to camera center (world coords)
             let best = null;
             let bestD2 = Infinity;
@@ -1335,8 +1336,8 @@
                 const cx = g.x + (g.img.width * g.scale) * 0.5;
                 const cy = g.y + (g.img.height * g.scale) * 0.5;
 
-                const dx = e.clientX - cx;
-                const dy = e.clientY - cy;
+                const dx = mouse.x - cx;
+                const dy = mouse.y - cy;
 
                 const d2 = dx * dx + dy * dy;
                 if (d2 < bestD2) {
@@ -1346,13 +1347,30 @@
             }
 
             if (best && best.id === activeGalaxyId && unlockedGalaxies.includes(best.name)){
+                const src = `assets\\stars\\frame_${(Math.floor(Math.random() * 100) % 20).toString().padStart(2, '0')}_delay-0.1s.bmp`;
                 const star = {
                     name:`Sector ${best.name}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-                    src:`assets\\stars\\frame_${(Math.floor(Math.random() * 100) % 20)}_delay-0.1s.bmp`,
-                    x:e.clientX,
-                    y:e.clientY
+                    src,
+                    x:(mouse.x - best.x) * 2.5,
+                    y:(mouse.y - best.y) * 2.5,
                 }
+    
+
+                const displayStar = { 
+                    x:mouse.x, 
+                    y:mouse.y,
+                    name:"", 
+                    fedName:star.name, 
+                    faction:"", 
+                    src,
+                    notes: null, nearbyToken: null, img: await getImageCached(src), 
+                };
+
                 console.log(star);
+
+                sectors.set(displayStar.fedName, displayStar);
+                
+                //draw();
             }
         }
     });
