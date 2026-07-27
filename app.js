@@ -22,6 +22,9 @@
 
 
 
+    const editButton = document.getElementById("editButton")
+
+
     // Camera in world pixels
     const cam = {
         x: 0,
@@ -76,7 +79,7 @@
     const factionFrames = new Map();
 
     // progression vars:
-    let unlockedGalaxies = ["Azapall", "Sigg", "Veils"];
+    let unlockedGalaxies = ["Azapall"];
     let unlockedFactions = ["FED"];
 
     let hideENINames = true;
@@ -896,6 +899,9 @@
                 var bottomLeftY = activeObject.y - starScale;
 
 
+
+                // dynamically compute the size of the info panel
+
                 var rectHeight = 2 * overlayCtx.lineWidth; // baseline
                 var topOffset = overlayCtx.lineWidth * 1.8;
 
@@ -924,6 +930,9 @@
                     }
                 }
 
+
+
+                // start drawing
 
                 const topLeft = bottomLeftY - rectHeight;
 
@@ -1349,7 +1358,7 @@
             if (best && best.id === activeGalaxyId && unlockedGalaxies.includes(best.name)){
                 const src = `assets\\stars\\frame_${(Math.floor(Math.random() * 100) % 20).toString().padStart(2, '0')}_delay-0.1s.bmp`;
                 const star = {
-                    name:`Sector ${best.name}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+                    name:`Sector ${best.name.toString().toUpperCase()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
                     src,
                     x:(mouse.x - best.x) * 2.5,
                     y:(mouse.y - best.y) * 2.5,
@@ -1366,11 +1375,11 @@
                     notes: null, nearbyToken: null, img: await getImageCached(src), 
                 };
 
-                console.log(star);
+                console.log(JSON.stringify(star));
 
                 sectors.set(displayStar.fedName, displayStar);
                 
-                //draw();
+                draw();
             }
         }
     });
@@ -1479,11 +1488,11 @@
 
     function screenToWorld(clientX, clientY) {
         const rect = mapCanvas.getBoundingClientRect();
-        const x = clientX - rect.left;
-        const y = clientY - rect.top;
-
         const vw = rect.width;
         const vh = rect.height;
+
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
 
         const wx = (x - vw * 0.5) / cam.scale + cam.x;
         const wy = (y - vh * 0.5) / cam.scale + cam.y;
@@ -1492,11 +1501,14 @@
 
 
     function worldToScreen(x, y) {
-        var xP = x;
-        var yP = y * Math.cos(28 * Math.PI / 180); // z is 0
-        var zP = y * Math.sin(28 * Math.PI / 180); // z is 0
+        const rect = mapCanvas.getBoundingClientRect();
+        const vw = rect.width;
+        const vh = rect.height;
 
-        return {x: xP / (1 - (zP/1400)), y: yP / (1 - (zP/1400))};
+        const cx = ((x - cam.x) * cam.scale) + (vw * 0.5);
+        const cy = ((y - cam.y) * cam.scale) + (vh * 0.5);
+
+        return {x: cx + rect.left, y: cy + rect.top}
     }
 
     // b is up, a is down

@@ -26,8 +26,18 @@ TODO:
     - a list of galaxy names. If the name of a galaxy is present, the galaxy is enabled ✔
     - a list of faction names. If the name of a faction is present, the faction display is enbaled  ✔
     - exception for the ENI faction to also enable properNames  ✔
-- add a way to edit the descriptions of tokens, even if its just a basic input  
-    - also allow for swapping of src
+
+- Need an edit button that floats above the current popup   ✔
+    - edit button is left aligned   ✔
+    - upon clicking edit
+        - if it is a star system
+            - needs to show a drop down for faction
+            - a text box for description
+        - if it is a token
+            - needs to show a drop down for image
+            - needs a text box for name
+            - needs a text box or selector of some kind for color as well
+            - needs a text box for description
 
 
 Note:
