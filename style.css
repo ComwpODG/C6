@@ -30,6 +30,8 @@ html, body {
 }
 
 #newsCanvas {
+    width: 100vw;
+    height: 100vh;
     pointer-events: none;
 }
 
@@ -119,6 +121,7 @@ html, body {
     top: 94px;
     left: 0px;
 
+    display: none;
     width: 100px;
     clip-path: inset(0 0% 0 0);
     overflow: hidden;

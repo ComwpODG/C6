@@ -974,8 +974,6 @@
 
                 sectorEdit.style.left = `${screenPos.x + 200}px`;
                 sectorEdit.style.top = `${screenPos.y - 30}px`;
-                tokenEdit.style.left = `${screenPos.x + 200}px`;
-                tokenEdit.style.top = `${screenPos.y - 30}px`;
 
                 // draw title
                 if (activeObject.name && !hideENINames) {
@@ -1135,6 +1133,14 @@
 
                 const bottomLeftX = activeObject.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
                 var bottomLeftY = activeObject.y - starScale;
+
+
+                const screenPos = worldToScreen(bottomLeftX, bottomLeftY - rectHeight);
+
+                editButton.style.left = `${screenPos.x}px`;
+                editButton.style.top = `${screenPos.y - 30}px`;
+                tokenEdit.style.left = `${screenPos.x + 200}px`;
+                tokenEdit.style.top = `${screenPos.y - 30}px`;
 
                 // draw border
                 overlayCtx.strokeStyle = colour;
