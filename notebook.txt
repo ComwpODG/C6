@@ -27,15 +27,15 @@ TODO:
     - a list of faction names. If the name of a faction is present, the faction display is enbaled  ✔
     - exception for the ENI faction to also enable properNames  ✔
 
-- ctrl-click two sectors to print a lane
-- tokens can't handle long descriptions
-- the "uncontrolled" faction option is broken
-    - it doesn't show up after loading
-    - the resulting text is weird
+- ctrl-click two sectors to print a lane    ✔
+- tokens can't handle long descriptions 
+- the "uncontrolled" faction option is broken   ✔
+    - it doesn't show up after loading      ✔
+    - the resulting text is weird           ✔
 - ability to swap token sprites
 - ability to swap sector sprites
 - style the edit panels
-- tokens need a way of editing their colour
+- tokens need a way of editing their colour 
 
 
 Note:
