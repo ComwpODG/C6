@@ -158,6 +158,11 @@
                     editTokenName(tokenName.value);
             });
 
+            tokenDesc.addEventListener("keydown", (event) => {
+                if (event.key === "Enter")
+                    editTokenDesc(tokenDesc.value);
+            });
+
 
 
             document.getElementById("authButton").onclick = async () => {
@@ -186,7 +191,6 @@
             document.getElementById("authButton").style.display = "block";
 
             azapallAnomaly = sectors.get("Sector 2466");
-            console.log(imageCache);
             draw();
 
             requestAnimationFrame(animationLoop);
@@ -1177,21 +1181,36 @@
     }
 
 
+
     // both are working against activeObject
     function toggleSectorEditPanel(){
-        factionSelect.selectedIndex = 0;
-        for(let i = 0; i < factionSelect.length; i++){
-            if(activeObject.faction === factionSelect.options[i].value){
-                factionSelect.selectedIndex = i;
-                i = factionSelect.length;
+        if(sectorEdit.style.display == "none"){
+            factionSelect.selectedIndex = 0;
+            for(let i = 0; i < factionSelect.length; i++){
+                if(activeObject.faction === factionSelect.options[i].value){
+                    factionSelect.selectedIndex = i;
+                    i = factionSelect.length;
+                }
             }
-        }
 
-        sectorEdit.style.display = sectorEdit.style.display == "none" ? "block" : "none";
+            sectorEdit.style.display = "block";
+        }
+        else{
+            sectorEdit.style.display = "none";
+        }
     }
 
+
+
     function toggleTokenEditPanel(){
-        tokenEdit.style.display = tokenEdit.style.display == "none" ? "block" : "none";
+        if(tokenEdit.style.display == "none"){
+            tokenName = activeObject.name;
+            tokenDesc = activeObject.desc;
+            tokenEdit.style.display = "block";
+        }
+        else {
+            tokenEdit.style.display = "none";
+        }
     }
 
     function editTokenName(name){
@@ -1221,6 +1240,8 @@
                 console.warn("Active object is not token ", activeObject);
         }
     }
+
+
 
 
 
@@ -1406,9 +1427,14 @@
             //console.log("click at:", e.clientX, " ", e.clientY);
             let temp = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
             if(temp){
-                activeObject = {... temp};
                 editButton.style.display = "block";
-                if (isActiveObjectStar) searchedForTokens = null;
+                if (isActiveObjectStar){ 
+                    searchedForTokens = null
+                    activeObject = {... temp};
+                }
+                else{
+                    activeObject = temp;    
+                }
             }
             else {
                 activeObject = null;
