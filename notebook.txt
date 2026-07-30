@@ -27,19 +27,15 @@ TODO:
     - a list of faction names. If the name of a faction is present, the faction display is enbaled  ✔
     - exception for the ENI faction to also enable properNames  ✔
 
-- Need an edit button that floats above the current popup   ✔
-    - edit button is left aligned   ✔
-    - upon clicking edit
-        - if it is a star system
-            - needs to show a drop down for faction ✔
-            - a text box for description
-        - if it is a token
-            - needs to show a drop down for image
-                - only have the images already present in the token tray, which means make the src list on load
-            - needs a text box for name
-            - needs a text box or selector of some kind for color as well
-            - needs a text box for description
-                - text applies on `enter`
+- ctrl-click two sectors to print a lane
+- tokens can't handle long descriptions
+- the "uncontrolled" faction option is broken
+    - it doesn't show up after loading
+    - the resulting text is weird
+- ability to swap token sprites
+- ability to swap sector sprites
+- style the edit panels
+- tokens need a way of editing their colour
 
 
 Note:

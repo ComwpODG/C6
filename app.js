@@ -1429,8 +1429,15 @@
             if(temp){
                 editButton.style.display = "block";
                 if (isActiveObjectStar){ 
-                    searchedForTokens = null
-                    activeObject = {... temp};
+                    if(e.ctrlKey){
+                        console.log("Craeting lane...");
+                        let newLane = {"star1":activeObject.fedName, "star2":temp.fedName};
+                        console.log(JSON.stringify(newLane));
+                    }
+                    else {
+                        searchedForTokens = null
+                        activeObject = {... temp};
+                    }
                 }
                 else{
                     activeObject = temp;    
@@ -1476,7 +1483,7 @@
         trinket = null;
 
 
-        if (e.ctrlKey) {
+        if (e.ctrlKey && !activeObject) {
             if (!galaxies || galaxies.length === 0 || !galaxies[0].img) return;
 
             const mouse = screenToWorld(e.clientX, e.clientY);
