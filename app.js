@@ -87,8 +87,8 @@
     const factionFrames = new Map();
 
     // progression vars:
-    let unlockedGalaxies = ["Azapall", "Sigg"];
-    let unlockedFactions = ["PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL"];
+    let unlockedGalaxies = ["Azapall"];
+    let unlockedFactions = ["FED"];
     //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL"
 
     let hideENINames = true;
@@ -136,26 +136,6 @@
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
 
-            tokenList = [
-                {
-                    name: "Azurealis",
-                    desc: "The Federation's flagship",
-                    nearbySector: null,
-                    x: -1954.566850091855,
-                    y: -2401.4584127153935,
-                    src: "assets/icons/fed.png",
-                    color: "#00FFFF",
-                    img: await getImageCached("assets/icons/fed.png"),
-                    id: 0,
-                },
-            ];
-
-            for(const f of unlockedFactions){
-                const option = document.createElement("option");
-                option.value = f;
-                option.textContent = f;
-                factions.appendChild(option); 
-            }
 
             // set up the sector/token editing
             editButton.onclick = () => {
