@@ -102,7 +102,7 @@
             cam.x = g1.img.width * 0.5 * g1.scale + g1.x;
             cam.y = g1.img.height * 0.5 * g1.scale + g1.y;
 
-            diamondFrame = await getImageCached("assets/stars/star frame.bmp");
+            diamondFrame = await getImageCached("assets/stars/empty.png");
 
             // pre-render coloured diamonds for performance reasons
             for (const [faction, colour] of factionMap) {
@@ -186,6 +186,7 @@
             document.getElementById("authButton").style.display = "block";
 
             azapallAnomaly = sectors.get("Sector 2466");
+            console.log(imageCache);
             draw();
 
             requestAnimationFrame(animationLoop);
@@ -1413,7 +1414,7 @@
                 activeObject = null;
                 editButton.style.display = "none";
             }
-            
+
             sectorEdit.style.display = "none";
             tokenEdit.style.display = "none";
 

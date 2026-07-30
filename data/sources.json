@@ -1,3 +1,22 @@
 {
-    "stars":[]
+    "stars":[
+        "assets\\stars\\orange yellow binary.png", 
+        "assets\\stars\\white.png", 
+        "assets\\stars\\red giant.png", 
+        "assets\\stars\\red orange binary.png", 
+        "assets\\stars\\blue giant.png", 
+        "assets\\stars\\orange.png", 
+        "assets\\stars\\yellow yellow binary.png", 
+        "assets\\stars\\star trinary.png", 
+        "assets\\stars\\yellow.png", 
+        "assets\\stars\\orange orange binary.png", 
+        "assets\\stars\\derelict.png", 
+        "assets\\stars\\pulsar.png", 
+        "assets\\stars\\red giant yellow binary.png", 
+        "assets\\stars\\asteroids.png", 
+        "assets\\stars\\blue.png", 
+        "assets\\stars\\wvp base.png", 
+        "assets\\stars\\rainbow ocean.png", 
+        "assets\\stars\\black hole.png"
+    ]
 }
