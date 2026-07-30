@@ -148,10 +148,15 @@
                 }
             };
             factionSelect.onchange = () => {
-                const sector = sectors.get(activeObject.fedName);
-                sector.faction = factionSelect.value;
+                activeObject.faction = factionSelect.value;
+                sectorOverrides.set(activeObject.fedName, activeObject);
                 draw();
             };
+
+            tokenName.addEventListener("keydown", (event) => {
+                if (event.key === "Enter")
+                    editTokenName(tokenName.value);
+            });
 
 
 
@@ -580,6 +585,12 @@
 
         unlockedGalaxies = data["unlockedGalaxies"];
         unlockedFactions = data["unlockedFactions"];
+
+
+
+        for(let i = factionSelect.length; i > 0; i--){
+            factionSelect.remove(i - 1);
+        }
 
         for(const f of unlockedFactions){
             const option = document.createElement("option");
@@ -1167,8 +1178,6 @@
 
     // both are working against activeObject
     function toggleSectorEditPanel(){
-        console.log("Editing sector");
-
         factionSelect.selectedIndex = 0;
         for(let i = 0; i < factionSelect.length; i++){
             if(activeObject.faction === factionSelect.options[i].value){
@@ -1181,9 +1190,35 @@
     }
 
     function toggleTokenEditPanel(){
-        console.log("Editing token");
-
         tokenEdit.style.display = tokenEdit.style.display == "none" ? "block" : "none";
+    }
+
+    function editTokenName(name){
+        if(name === "") return;
+
+        console.log(name);
+
+        if (activeObject) {
+            if (!isActiveObjectStar){
+                activeObject.name = name;
+            }
+            else
+                console.warn("Active object is not token ", activeObject);
+        }
+    }
+
+    function editTokenDesc(desc){
+        if(desc === "") return;
+        
+        console.log(desc);
+
+        if (activeObject) {
+            if (!isActiveObjectStar){
+                activeObject.desc = desc;
+            }
+            else
+                console.warn("Active object is not token ", activeObject);
+        }
     }
 
 
@@ -1368,16 +1403,19 @@
     mapCanvas.addEventListener("pointerup", async (e) => {
         if(Date.now() - LClickTime < 200 && cam.dragging === false){ //200ms threshold for click
             //console.log("click at:", e.clientX, " ", e.clientY);
-            activeObject = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
-            if(activeObject){
+            let temp = checkClickedStar(screenToWorld(e.clientX, e.clientY), starScale, true) ?? checkClickedToken(screenToWorld(e.clientX, e.clientY));
+            if(temp){
+                activeObject = {... temp};
                 editButton.style.display = "block";
                 if (isActiveObjectStar) searchedForTokens = null;
             }
             else {
+                activeObject = null;
                 editButton.style.display = "none";
-                sectorEdit.style.display = "none";
-                tokenEdit.style.display = "none";
             }
+            
+            sectorEdit.style.display = "none";
+            tokenEdit.style.display = "none";
 
             draw();
         }

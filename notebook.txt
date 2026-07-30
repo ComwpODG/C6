@@ -35,9 +35,11 @@ TODO:
             - a text box for description
         - if it is a token
             - needs to show a drop down for image
+                - only have the images already present in the token tray, which means make the src list on load
             - needs a text box for name
             - needs a text box or selector of some kind for color as well
             - needs a text box for description
+                - text applies on `enter`
 
 
 Note:
