@@ -1204,8 +1204,8 @@
 
     function toggleTokenEditPanel(){
         if(tokenEdit.style.display == "none"){
-            tokenName = activeObject.name;
-            tokenDesc = activeObject.desc;
+            tokenName.value = activeObject.name;
+            tokenDesc.value = activeObject.desc;
             tokenEdit.style.display = "block";
         }
         else {
