@@ -9584,7 +9584,15 @@
             {"name": "Sector SIGG-9490", "src": "assets\\stars\\orange.png", "x": 7871.678408369934, "y": 792.7863420528797},
             {"name": "Sector SIGG-2721", "src": "assets\\stars\\orange yellow binary.png", "x": 7322.766582045411, "y": 2660.5122965596966}
         ],
-        "lanes": [],
+        "lanes": [
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-9849"},
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-1330"},
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-4050"},
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-1312"},
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-4827"},
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-6884"},
+            {"star1":"Sector SIGG-4829","star2":"Sector SIGG-6695"}
+        ],
         "src": "assets/galaxy4.png",
         "x": -5200,
         "y": -4800
