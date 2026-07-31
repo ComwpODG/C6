@@ -91,6 +91,8 @@
     let unlockedFactions = ["FED"];
     //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL"
 
+    let srcData;
+
     let hideENINames = true;
     let ANOMALY_RADIUS = -1; //-1 means disabled
 
@@ -139,11 +141,11 @@
             // set up the sector/token editing
             const res = await fetch(`data/sources.json`);
             if (!res.ok) throw new Error(`Failed to fetch data/galaxies.json: HTTP ${res.status}`);
-            const rawSrcData = await res.json();
+            srcData = await res.json();
 
-            for(const s of rawSrcData.tokens.sprites){
+            for(const s of srcData.tokens.sprites){
                 const option = document.createElement("option");
-                option.value = rawSrcData.tokens.root + s;
+                option.value = srcData.tokens.root + s;
                 option.textContent = s;
                 tokenSprites.appendChild(option); 
             }
@@ -1538,7 +1540,7 @@
             }
 
             if (best && best.id === activeGalaxyId && unlockedGalaxies.includes(best.name)){
-                const src = `assets\\stars\\frame_${(Math.floor(Math.random() * 100) % 20).toString().padStart(2, '0')}_delay-0.1s.bmp`;
+                const src = `assets\\stars\\${srcData.stars.sprites[Math.floor(Math.random() * 100) % srcData.stars.sprites.length]}`;
                 const star = {
                     name:`Sector ${best.name.toString().toUpperCase()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
                     src,
