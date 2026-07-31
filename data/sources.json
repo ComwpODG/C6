@@ -1,22 +1,39 @@
 {
-    "stars":[
-        "assets\\stars\\orange yellow binary.png", 
-        "assets\\stars\\white.png", 
-        "assets\\stars\\red giant.png", 
-        "assets\\stars\\red orange binary.png", 
-        "assets\\stars\\blue giant.png", 
-        "assets\\stars\\orange.png", 
-        "assets\\stars\\yellow yellow binary.png", 
-        "assets\\stars\\star trinary.png", 
-        "assets\\stars\\yellow.png", 
-        "assets\\stars\\orange orange binary.png", 
-        "assets\\stars\\derelict.png", 
-        "assets\\stars\\pulsar.png", 
-        "assets\\stars\\red giant yellow binary.png", 
-        "assets\\stars\\asteroids.png", 
-        "assets\\stars\\blue.png", 
-        "assets\\stars\\wvp base.png", 
-        "assets\\stars\\rainbow ocean.png", 
-        "assets\\stars\\black hole.png"
-    ]
+    "stars": {
+        "root":"assets\\stars\\",
+        "sprites": [
+            "orange yellow binary.png",
+            "white.png",
+            "red giant.png",
+            "red orange binary.png",
+            "blue giant.png",
+            "orange.png",
+            "yellow yellow binary.png",
+            "star trinary.png",
+            "yellow.png",
+            "orange orange binary.png",
+            "derelict.png",
+            "pulsar.png",
+            "red giant yellow binary.png",
+            "asteroids.png",
+            "blue.png",
+            "wvp base.png",
+            "rainbow ocean.png",
+            "black hole.png"
+        ]
+    },
+
+    "tokens": {
+        "root":"assets\\icons\\",
+        "sprites":[
+            "fed.png",
+            "kgc.png",
+            "wvp.png",
+            "eni.png",
+            
+            "rain.png",
+            "blue lightning.png",
+            "yellow lightning.png"
+        ]
+    }
 }

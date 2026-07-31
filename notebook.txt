@@ -21,7 +21,7 @@ My plans for after the end
 TODO:
 - clean the files   ✔
 - music loop with volume slider   ✔
-- from Com: I also consider the repository clean when token images don't need their dimensions listed unless that is absolutely unavoidable   ✔
+- from Com: I also consider the repository clean when token images don't need their coordinates listed unless that is absolutely unavoidable   ✔
 - swap the hide bools with a list of names in the player save file  ✔
     - a list of galaxy names. If the name of a galaxy is present, the galaxy is enabled ✔
     - a list of faction names. If the name of a faction is present, the faction display is enbaled  ✔
@@ -31,11 +31,10 @@ TODO:
 - tokens can't handle long descriptions 
 - the "uncontrolled" faction option is broken   ✔
     - it doesn't show up after loading      ✔
-    - the resulting text is weird           ✔
-- ability to swap token sprites
-- ability to swap sector sprites
+    - the resulting text is wrong           ✔
+- ability to swap token sprites             ✔
 - style the edit panels
-- tokens need a way of editing their colour 
+- tokens need a way of editing their colour ✔
 
 
 Note:

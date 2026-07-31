@@ -136,8 +136,18 @@
             mouseRaw = {x: rect.width / 3, y: rect.height / 3};
 
 
-
             // set up the sector/token editing
+            const res = await fetch(`data/sources.json`);
+            if (!res.ok) throw new Error(`Failed to fetch data/galaxies.json: HTTP ${res.status}`);
+            const rawSrcData = await res.json();
+
+            for(const s of rawSrcData.tokens.sprites){
+                const option = document.createElement("option");
+                option.value = rawSrcData.tokens.root + s;
+                option.textContent = s;
+                tokenSprites.appendChild(option); 
+            }
+
             editButton.onclick = () => {
                 if (activeObject) {
                     if (isActiveObjectStar){
@@ -154,6 +164,14 @@
             };
 
             
+
+            tokenSprites.onchange = async () => {
+                console.log(activeObject);
+                activeObject.src = tokenSprites.value;
+                activeObject.img = await getImageCached(tokenSprites.value);
+                sectorOverrides.set(activeObject.fedName, activeObject);
+                draw();
+            };
 
             tokenColor.onchange = () => {
                 console.log(tokenColor.value);
