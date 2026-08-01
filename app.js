@@ -13,6 +13,7 @@
     let activeGalaxyId = null;
 
 
+
     const audio = new Audio('assets/BGM.mp3');
     const volumeSlider = document.getElementById("volumeSlider");
     audio.volume = volumeSlider.value;
@@ -87,7 +88,7 @@
     const factionFrames = new Map();
 
     // progression vars:
-    let unlockedGalaxies = ["Azapall"];
+    let unlockedGalaxies = ["Azapall", "Sigg"];
     let unlockedFactions = ["FED"];
     //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL"
 
@@ -482,6 +483,10 @@
                     y,
                     src,
                     scale, 
+                    STAR_SHOW_ZOOM: g.STAR_SHOW_ZOOM ?? STAR_SHOW_ZOOM,
+                    STAR_MAX_AT_ZOOM: g.STAR_MAX_AT_ZOOM ?? STAR_MAX_AT_ZOOM,
+                    TEXT_SHOW_ZOOM: g.TEXT_SHOW_ZOOM ?? TEXT_SHOW_ZOOM,
+                    TEXT_MAX_AT_ZOOM: g.TEXT_MAX_AT_ZOOM ?? TEXT_MAX_AT_ZOOM,
                     name: g.name ?? "", 
                     desc: g.desc ?? "", 
                     galacticSectors: g.galacticSectors, 
@@ -627,7 +632,7 @@
 
         const firstOption = document.createElement("option");
         firstOption.value = "";
-        firstOption.textContent = "Uncontroller";
+        firstOption.textContent = "Uncontrolled";
         factions.appendChild(firstOption); 
 
         for(const f of unlockedFactions){
@@ -690,11 +695,11 @@
 
 
     // Star visibility + sizing rules
-    const STAR_SHOW_ZOOM = 0.22;   // below this, stars don't render at all
-    const STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
+    let STAR_SHOW_ZOOM = 0.22;   // below this, stars don't render at all
+    let STAR_MAX_AT_ZOOM = 0.4; // reaches max opacity at 2x zoom
 
-    const TEXT_SHOW_ZOOM = 0.5;   // below this, stars don't render at all
-    const TEXT_MAX_AT_ZOOM = 0.8; // reaches max opacity at 2x zoom
+    let TEXT_SHOW_ZOOM = 0.5;   // below this, text doesn't render at all
+    let TEXT_MAX_AT_ZOOM = 0.8;
 
     // Culling padding (in screen px -> converted to world units)
     const STAR_CULL_PAD_PX = 120;
@@ -1307,6 +1312,12 @@
 
         activeGalaxyId = best.id;
 
+        STAR_SHOW_ZOOM = best.STAR_SHOW_ZOOM;
+        STAR_MAX_AT_ZOOM = best.STAR_MAX_AT_ZOOM;
+
+        TEXT_SHOW_ZOOM = best.TEXT_SHOW_ZOOM;
+        TEXT_MAX_AT_ZOOM = best.TEXT_MAX_AT_ZOOM;
+
         const nm = (best.name ?? best.id ?? "").toString();
         const ds = (best.desc ?? "").toString();
 
@@ -1464,7 +1475,7 @@
                 editButton.style.display = "block";
                 if (isActiveObjectStar){ 
                     if(e.ctrlKey && activeObject){
-                        console.log("Craeting lane...");
+                        console.log("Creating lane...");
                         let newLane = {"star1":activeObject.fedName, "star2":temp.fedName};
                         console.log(JSON.stringify(newLane));
                     }
