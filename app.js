@@ -60,7 +60,19 @@
     let tokenList = [];
 
     // tokens actively on the map
-    let tokens = [];
+    let tokens = [
+        {
+            "name": "Azurealis + Trailmixer + Fractal",
+            "desc": "Hurricane Squad's Flagship, Tracy's Vortesian Dreadnought, and Fractal the Oversized Space Dog",
+            "nearbySector": null,
+            "x": -1973.6164493196827,
+            "y": -2392.9329760480596,
+            "src": "assets/icons/fed.png",
+            "color": "#00FFFF",
+            "img": {},
+            "id": 1
+        }
+    ];
 
     let trayImage;
 
@@ -151,6 +163,21 @@
                 option.textContent = s;
                 tokenSprites.appendChild(option); 
             }
+
+            tokens = [
+                {
+                    name: "Azurealis + Trailmixer + Fractal",
+                    desc: "Hurricane Squad's Flagship, Tracy's Vortesian Dreadnought, and Fractal the Oversized Space Dog",
+                    charNL: [46, 91],
+                    nearbySector: null,
+                    x: -1973.6164493196827,
+                    y: -2392.9329760480596,
+                    src: "assets/icons/fed.png",
+                    color: "#00FFFF",
+                    img: await getImageCached("assets/icons/fed.png"),
+                    id: 0,
+                }
+            ];
 
             editButton.onclick = () => {
                 if (activeObject) {
@@ -515,6 +542,8 @@
 
                     if (!src) throw new Error(`Sector entry ${i} missing "src"`);
 
+
+                    // if notes, create the points at which the text wraps
                     if(s.notes){
                         for(const n of s.notes){
 
@@ -589,11 +618,35 @@
 
             sector.img = await getImageCached(sector.src);
             
+            // if notes, create the points at which the text wraps
             if(s.notes){
-                sector.notes = s.notes;
-                for(const note of sector.notes){
-                    if(note.src){
-                        note.img = await getImageCached(note.src);
+                for(const n of s.notes){
+
+                    // normalize \r\n into \n
+                    n.desc = n.desc.replace(/\r\n/g, '\n');
+
+                    let pos = 0;
+                    let last = 0;
+                    let lineStart = 0;
+                    n.charNL = [];
+                    while(pos < n.desc.length)
+                    {
+                        if(n.desc[pos] === ' ')
+                            last = pos + 1;
+                        if(n.desc[pos] === '\n'){
+                            n.charNL.push(pos);
+                            last = 0;
+                            lineStart = pos + 1;
+                        }
+                        else if(pos - lineStart > 46){
+                            if(last === 0)
+                                n.charNL.push(pos);
+                            else
+                                n.charNL.push(last);
+                            last = 0
+                            lineStart = n.charNL.at(-1);
+                        }
+                        pos++;
                     }
                 }
             }
@@ -603,14 +656,42 @@
 
 
         tokenList = data.icons.map((t, i) => {
-            return{name: t["name"], desc: t["desc"], nearbySector: null, src: t["src"], color: t["color"], img: null, id:null};
+            return{name: t["name"], desc: t["desc"], charNL: [0], nearbySector: null, src: t["src"], color: t["color"], img: null, id:null};
         });
         for(const t of tokenList){
             t.img = await getImageCached(t.src);
         }
 
         tokens = data.tokens.map((t, i) => {
-            return{name: t["name"], desc: t["desc"], nearbySector: null, x: t.x, y: t.y, src: t["src"], color: t["color"], img: null, id:null};
+            let charNL = [];
+
+            // normalize \r\n into \n
+            n.desc = n.desc.replace(/\r\n/g, '\n');
+
+            let pos = 0;
+            let last = 0;
+            let lineStart = 0;
+            while(pos < t.desc.length)
+            {
+                if(desc[pos] === ' ')
+                    last = pos + 1;
+                if(desc[pos] === '\n'){
+                    charNL.push(pos);
+                    last = 0;
+                    lineStart = pos + 1;
+                }
+                else if(pos - lineStart > 46){
+                    if(last === 0)
+                        charNL.push(pos);
+                    else
+                        charNL.push(last);
+                    last = 0
+                    lineStart = charNL.at(-1);
+                }
+                pos++;
+            }
+
+            return{name: t["name"], desc: t["desc"], charNL, nearbySector: null, x: t.x, y: t.y, src: t["src"], color: t["color"], img: null, id:null};
         });
         for(const [i, t] of tokens.entries()){
             t.img = await getImageCached(t.src);
@@ -1013,7 +1094,7 @@
                     for (const note of tokenCache) {
                         rectHeight += (20 / cam.scale);
                         rectHeight += 2 * textHeight; //title section
-                        rectHeight += textHeight; // description
+                        rectHeight += textHeight * (note.charNL.length + 1); // description
                     }
                 }
 
@@ -1161,10 +1242,17 @@
 
                         topOffset += textHeight * 2;
 
+
                         // draw description
                         overlayCtx.font = `${textHeight}px Consolas`;
                         overlayCtx.fillStyle = "#666666";
                         let prev = 0;
+                        for (const breakPoint of note.charNL) {
+                            var temp = note.desc.slice(prev, breakPoint);
+                            prev = breakPoint;
+                            overlayCtx.fillText(temp, bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
+                            topOffset += textHeight;
+                        }
                         overlayCtx.fillText(note.desc.slice(prev), bottomLeftX, topLeft + topOffset + textHeight, 500 / cam.scale);
                         topOffset += textHeight + (20 / cam.scale);
                     }
@@ -1184,7 +1272,9 @@
                 overlayCtx.textBaseline = "top";
 
                 var rectHeight = 2 * overlayCtx.lineWidth;
-                rectHeight += 4 * textHeight;
+                rectHeight += 3 * textHeight; // title and spacings
+                rectHeight += textHeight * (activeObject.charNL.length + 1) // desription
+
 
                 const bottomLeftX = activeObject.x - (250 / cam.scale) + (overlayCtx.lineWidth * 1.8);
                 var bottomLeftY = activeObject.y - starScale;
@@ -1212,9 +1302,23 @@
                 overlayCtx.fillText(activeObject.name, bottomLeftX + (textHeight * 2) + (5 / cam.scale), bottomLeftY - rectHeight + (textHeight * 0.5) + (10 / cam.scale), 500 / cam.scale);
 
                 // draw description
+                //overlayCtx.font = `${textHeight}px Consolas`;
+                //overlayCtx.fillStyle = "#666666";
+                //overlayCtx.fillText(activeObject.desc, bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale), 500 / cam.scale);
+//
+                // draw description
                 overlayCtx.font = `${textHeight}px Consolas`;
                 overlayCtx.fillStyle = "#666666";
-                overlayCtx.fillText(activeObject.desc, bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale), 500 / cam.scale);
+                let prev = 0;
+                let topOffset = 0;
+                for (const breakPoint of activeObject.charNL) {
+                    var temp = activeObject.desc.slice(prev, breakPoint);
+                    prev = breakPoint;
+                    overlayCtx.fillText(temp, bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale) + topOffset, 500 / cam.scale);
+                    topOffset += textHeight;
+                }
+                overlayCtx.fillText(activeObject.desc.slice(prev), bottomLeftX, bottomLeftY - rectHeight + (2*textHeight) + (20 / cam.scale) + topOffset, 500 / cam.scale);
+                topOffset += textHeight + (20 / cam.scale);
             }
         }
     }
@@ -1275,6 +1379,34 @@
         if (activeObject) {
             if (!isActiveObjectStar){
                 activeObject.desc = desc;
+
+                // normalize \r\n into \n
+                activeObject.desc = activeObject.desc.replace(/\r\n/g, '\n');
+
+                let pos = 0;
+                let last = 0;
+                let lineStart = 0;
+                activeObject.charNL = [];
+
+                while(pos < activeObject.desc.length)
+                {
+                    if(activeObject.desc[pos] === ' ')
+                        last = pos + 1;
+                    if(activeObject.desc[pos] === '\n'){
+                        activeObject.charNL.push(pos);
+                        last = 0;
+                        lineStart = pos + 1;
+                    }
+                    else if(pos - lineStart > 46){
+                        if(last === 0)
+                            activeObjectv.charNL.push(pos);
+                        else
+                            activeObject.charNL.push(last);
+                        last = 0
+                        lineStart = activeObject.charNL.at(-1);
+                    }
+                    pos++;
+                }
             }
             else
                 console.warn("Active object is not token ", activeObject);
