@@ -83,14 +83,15 @@
     factionMap.set("SIG",        {colorA:"#9BFF70",colorB:"#E27900"});//Sigg
     factionMap.set("LVN",        {colorA:"#FFC600",colorB:"#44DD44"});//Laven (Deprecated)
     factionMap.set("KBL",        {colorA:"#00BBFF",colorB:"#0077AA"});//Kybeline
-    factionMap.set("GCL",        {colorA:"#000080",colorB:"#A0A000"});//spoilers
+    factionMap.set("GCL",        {colorA:"#000080",colorB:"#A0A000"});//Great Conglomerate
+    factionMap.set("OSM",        {colorA:"#0000CC",colorB:"#00CC00"});//Osmoid
 
     const factionFrames = new Map();
 
     // progression vars:
     let unlockedGalaxies = ["Azapall", "Sigg"];
     let unlockedFactions = ["FED"];
-    //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL"
+    //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL","OSM"
 
     let srcData;
 
