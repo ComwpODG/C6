@@ -60,19 +60,7 @@
     let tokenList = [];
 
     // tokens actively on the map
-    let tokens = [
-        {
-            "name": "Azurealis + Trailmixer + Fractal",
-            "desc": "Hurricane Squad's Flagship, Tracy's Vortesian Dreadnought, and Fractal the Oversized Space Dog",
-            "nearbySector": null,
-            "x": -1973.6164493196827,
-            "y": -2392.9329760480596,
-            "src": "assets/icons/fed.png",
-            "color": "#00FFFF",
-            "img": {},
-            "id": 1
-        }
-    ];
+    let tokens = [];
 
     let trayImage;
 
@@ -101,7 +89,7 @@
     const factionFrames = new Map();
 
     // progression vars:
-    let unlockedGalaxies = ["Azapall", "Sigg"];
+    let unlockedGalaxies = ["Azapall"];
     let unlockedFactions = ["FED"];
     //"PC", "WVL","AZ", "VT", "ENI","BIO","FED","KGC","WVP","M.E.W.A.O","PTMC","BOTS","PHM","SIG","LVN","KBL","GCL","OSM"
 
@@ -164,20 +152,9 @@
                 tokenSprites.appendChild(option); 
             }
 
-            tokens = [
-                {
-                    name: "Azurealis + Trailmixer + Fractal",
-                    desc: "Hurricane Squad's Flagship, Tracy's Vortesian Dreadnought, and Fractal the Oversized Space Dog",
-                    charNL: [46, 91],
-                    nearbySector: null,
-                    x: -1973.6164493196827,
-                    y: -2392.9329760480596,
-                    src: "assets/icons/fed.png",
-                    color: "#00FFFF",
-                    img: await getImageCached("assets/icons/fed.png"),
-                    id: 0,
-                }
-            ];
+            
+
+
 
             editButton.onclick = () => {
                 if (activeObject) {
@@ -666,12 +643,12 @@
             let charNL = [];
 
             // normalize \r\n into \n
-            n.desc = n.desc.replace(/\r\n/g, '\n');
+            var desc = t["desc"].replace(/\r\n/g, '\n');
 
             let pos = 0;
             let last = 0;
             let lineStart = 0;
-            while(pos < t.desc.length)
+            while(pos < desc.length)
             {
                 if(desc[pos] === ' ')
                     last = pos + 1;
@@ -691,7 +668,7 @@
                 pos++;
             }
 
-            return{name: t["name"], desc: t["desc"], charNL, nearbySector: null, x: t.x, y: t.y, src: t["src"], color: t["color"], img: null, id:null};
+            return{name: t["name"], desc, charNL, nearbySector: null, x: t.x, y: t.y, src: t["src"], color: t["color"], img: null, id:null};
         });
         for(const [i, t] of tokens.entries()){
             t.img = await getImageCached(t.src);
