@@ -153,7 +153,20 @@
             }
 
             
-
+            tokens = [
+                {
+                name: "Federation Forces",
+                desc: "Miscellaneous Federation task force",
+                charNL: [],
+                nearbySector: null,
+                x: 3155.3001229899837,
+                y: 2153.419943200865,
+                src: "assets/icons/fed.png",
+                color: "#00FFFF",
+                img: await getImageCached("assets/icons/fed.png"),
+                id: 0,
+            }
+            ];
 
 
             editButton.onclick = () => {
@@ -1551,7 +1564,7 @@
         {
             if(e.clientX >= 25 && e.clientY >= 70 * i + 120 && e.clientX <= 25 + 50 && e.clientY <= 70 * i + 170){
                 newToken = true;
-                trinket = t;
+                trinket = {... t};
                 break;
             }
             i++;
@@ -1628,6 +1641,8 @@
                 //console.log("deletion", trinket.id, tokens.length);
                 tokens = tokens.filter(obj => obj.id !== trinket.id);
                 trinket = null;
+                tokenEdit.style.display = "none";
+                activeObject = isActiveObjectStar ? activeObject : null;
                 draw();
             }
         }
