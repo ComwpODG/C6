@@ -153,20 +153,6 @@
             }
 
             
-            tokens = [
-                {
-                name: "Federation Forces",
-                desc: "Miscellaneous Federation task force",
-                charNL: [],
-                nearbySector: null,
-                x: 3155.3001229899837,
-                y: 2153.419943200865,
-                src: "assets/icons/fed.png",
-                color: "#00FFFF",
-                img: await getImageCached("assets/icons/fed.png"),
-                id: 0,
-            }
-            ];
 
 
             editButton.onclick = () => {
